@@ -1,0 +1,78 @@
+import fabric
+import subprocess
+
+from .rsync import Rsync
+from .receipe import Receipe
+
+
+class Cook:
+    def __init__(self, base_path, project, build_server):
+        self.base_path = base_path
+        self.project = project
+        self.build_server = build_server
+
+    def cook(self):
+        self._prepare()
+
+        if self.receipe.is_build_local():
+            self._local_build()
+        else:
+            self._remote_build()
+
+    def _prepare(self):
+        self.receipe = Receipe(self.base_path)
+        self.receipe.load()
+
+        if self.project is not None:
+            self.receipe.set_project(self.project)
+
+        if self.build_server is not None:
+            self.receipe.set_build_server(self.build_server)
+
+    def _local_build(self):
+        # TODO
+        ...
+
+    def _remote_build(self):
+        ssh_name = self.receipe.get_server_ssh_name()
+        project_build_path = self.receipe.get_project_remote_build_path()
+        rsync = Rsync(self.base_path, ssh_name, project_build_path)
+
+        files_to_send = self.receipe.get_files_to_send()
+        files_to_exclude = self.receipe.get_files_to_exclude()
+        if files_to_send:
+            self._create_remote_workspace(ssh_name, project_build_path)
+            self._send_files(rsync, files_to_send, files_to_exclude)
+
+        build_steps = self.receipe.get_build_steps()
+        if build_steps:
+            self._run_build_steps(ssh_name, build_steps)
+
+        files_to_receive = self.receipe.get_files_to_receive()
+        if files_to_receive:
+            self._receive_files(rsync, files_to_receive)
+
+        # TODO: post actions
+
+    def _create_remote_workspace(self, ssh_name, remote_build_path):
+        print('=== Creating remote project directory ===')
+        mkdir_cmd = ['mkdir', '-p', remote_build_path]
+        with fabric.Connection(ssh_name) as c:
+            c.run(' '.join(mkdir_cmd))
+
+    def _send_files(self, rsync, files_to_send, files_to_exclude):
+        print('=== Sending files ===')
+        rsync.send(files_to_send, files_to_exclude)
+
+    def _receive_files(self, rsync, files_to_receive):
+        print('=== Receiving files ===')
+        rsync.receive(files_to_receive)
+
+    def _run_build_steps(self, ssh_name, build_steps):
+        with fabric.Connection(ssh_name) as c:
+            for workdir, command in build_steps:
+                print(f'=== Workdir: {workdir} ===')
+                print(f'=== Command: {command} ===')
+                with c.cd(workdir):
+                    res = c.run(command)
+                print('Return code:', res)
