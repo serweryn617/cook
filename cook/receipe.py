@@ -70,6 +70,10 @@ class Receipe:
         if self.build_server == 'local':
             return None
 
+        # TODO: better handle this
+        if self.project not in self.build_servers[self.build_server]['project_remote_build_paths']:
+            return None
+
         return self.build_servers[self.build_server]['project_remote_build_paths'][self.project]
 
     def get_project_path(self):

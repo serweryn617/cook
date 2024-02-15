@@ -58,7 +58,7 @@ projects = {
                 '.',
                 'cp build/output ../output_latest'
             ),
-        ]
+        ],
     },
 
     'clean': {
@@ -72,9 +72,13 @@ projects = {
                 'rm output_latest'
             )
         ]
+
+        # TODO
+        # 'default_build_server': 'local'
     },
 
     # TODO: Composite targets
+    # clean -> build -> post actions
 }
 
 
