@@ -19,6 +19,8 @@ class Cook:
         else:
             self._remote_build()
 
+        self._post_actions()
+
     def _prepare(self):
         self.receipe = Receipe(self.base_path)
         self.receipe.load()
@@ -30,18 +32,32 @@ class Cook:
             self.receipe.set_build_server(self.build_server)
 
     def _local_build(self):
-        # TODO
-        ...
+        build_steps = self.receipe.get_build_steps()
+        if build_steps:
+            print('=== Running local build ===')
+            self._execute_steps_local(build_steps)
+
+    def _post_actions(self):
+        steps = self.receipe.get_post_actions()
+        if steps:
+            print('=== Running post actions ===')
+            self._execute_steps_local(steps)
+
+    def _execute_steps_local(self, steps):
+        for workdir, command in steps:
+            print(f'=== Workdir: {workdir} === Command: {command} ===')
+            subprocess.run(command, cwd=workdir, shell=True)
 
     def _remote_build(self):
         ssh_name = self.receipe.get_server_ssh_name()
-        project_build_path = self.receipe.get_project_remote_build_path()
-        rsync = Rsync(self.base_path, ssh_name, project_build_path)
+        project_remote_build_path = self.receipe.get_project_remote_build_path()
+        project_path = self.receipe.get_project_path()
+        rsync = Rsync(project_path, ssh_name, project_remote_build_path)
 
         files_to_send = self.receipe.get_files_to_send()
         files_to_exclude = self.receipe.get_files_to_exclude()
         if files_to_send:
-            self._create_remote_workspace(ssh_name, project_build_path)
+            self._create_remote_workspace(ssh_name, project_remote_build_path)
             self._send_files(rsync, files_to_send, files_to_exclude)
 
         build_steps = self.receipe.get_build_steps()
@@ -51,8 +67,6 @@ class Cook:
         files_to_receive = self.receipe.get_files_to_receive()
         if files_to_receive:
             self._receive_files(rsync, files_to_receive)
-
-        # TODO: post actions
 
     def _create_remote_workspace(self, ssh_name, remote_build_path):
         print('=== Creating remote project directory ===')
@@ -71,8 +85,7 @@ class Cook:
     def _run_build_steps(self, ssh_name, build_steps):
         with fabric.Connection(ssh_name) as c:
             for workdir, command in build_steps:
-                print(f'=== Workdir: {workdir} ===')
-                print(f'=== Command: {command} ===')
+                print(f'=== Workdir: {workdir} === Command: {command} ===')
                 with c.cd(workdir):
                     res = c.run(command)
                 print('Return code:', res)

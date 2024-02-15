@@ -54,14 +54,23 @@ projects = {
 
         # Commands to run after the build. These are run on the local machine.
         'post_actions': [
-            'cp build/artifact ../artifact_latest',
+            (
+                '.',
+                'cp build/output ../output_latest'
+            ),
         ]
     },
 
     'clean': {
         'post_actions': [
-            'rm -r my_project/build',
-            'rm artifact_latest'
+            (
+                '.',
+                'rm -r my_project/build'
+            ),
+            (
+                '.',
+                'rm output_latest'
+            )
         ]
     },
 

@@ -72,6 +72,9 @@ class Receipe:
 
         return self.build_servers[self.build_server]['project_remote_build_paths'][self.project]
 
+    def get_project_path(self):
+        return self.base_path / self.location
+
     def get_files_to_send(self):
         if 'send' not in self.projects[self.project] or self.build_server == 'local':
             return None
@@ -118,7 +121,7 @@ class Receipe:
         base_dir = self.base_path / self.location
 
         post_actions = []
-        for command in self.projects[self.project]['post_actions']:
-            post_actions.append((base_dir, command))
+        for workdir, command in self.projects[self.project]['post_actions']:
+            post_actions.append((base_dir / workdir, command))
 
         return post_actions
