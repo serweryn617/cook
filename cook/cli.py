@@ -1,9 +1,9 @@
 import argparse
-import os
 import pathlib
-import sys
 
 from .cook import Cook
+from .receipe import Receipe
+from .configuration import Configuration
 
 
 def main():
@@ -16,7 +16,13 @@ def main():
 
     base_path = pathlib.Path.cwd()
 
-    cook = Cook(base_path, args.project, args.build_server)
+    receipe = Receipe(base_path)
+    receipe.load()
+
+    configuration = Configuration(receipe)
+    configuration.setup(args.project, args.build_server)
+
+    cook = Cook(receipe, configuration)
     cook.cook()
 
 

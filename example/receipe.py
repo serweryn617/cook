@@ -7,9 +7,10 @@ build_servers = {
         # Hostname as defined in SSH config.
         'ssh_name': 'argon',
 
-        #
+        # Paths where to build each project
         'project_remote_build_paths': {
-            'my_project': '~/cook_example',
+            'create_project_dir': '~',
+            'build_my_project': '~/cook_example',
         }
     },
 }
@@ -22,6 +23,23 @@ projects = {
     # All paths used locally are relative to 'location' project parameter or to this receipe location if 'location' was not specified.
     # Paths used remotely are relative to 'project_remote_build_paths' for a given project.
     'my_project': {
+        'components': [
+            'create_project_dir',
+            'build_my_project',
+            'my_project_post_actions',
+        ],
+    },
+
+    'create_project_dir': {
+        'build_steps': [
+            (
+                '.',
+                'mkdir -p ~/cook_example'
+            ),
+        ],
+    },
+
+    'build_my_project': {
         # Local project location.
         'location': 'my_project',
 
@@ -52,17 +70,23 @@ projects = {
             ),
         ],
 
-        # Commands to run after the build. These are run on the local machine.
-        'post_actions': [
+    },
+
+    'my_project_post_actions': {
+        'location': 'my_project',
+
+        'build_steps': [
             (
                 '.',
                 'cp build/output ../output_latest'
             ),
         ],
+
+        'build_server': 'local',
     },
 
     'clean': {
-        'post_actions': [
+        'build_steps': [
             (
                 '.',
                 'rm -r my_project/build'
@@ -71,23 +95,17 @@ projects = {
                 '.',
                 'rm output_latest'
             )
-        ]
+        ],
 
-        # TODO
-        # 'default_build_server': 'local'
+        'build_server': 'local',
     },
-
-    # TODO: Composite targets
-    # clean -> build -> post actions
 }
 
 
 # Build server used when none were explicitly selected.
 # Can be on of 'build_servers' or 'local' to build locally.
-# Defaults to 'local' when left unspecified.
 default_build_server = 'argon'
 
 
 # Project to build when none were explicitly selected.
-# Defaults to the first project from 'projects' when left unspecified.
 default_project = 'my_project'

@@ -3,45 +3,31 @@ import subprocess
 
 from .rsync import Rsync
 from .receipe import Receipe
+from .configuration import Configuration, BuildType
 
 
 class Cook:
-    def __init__(self, base_path, project, build_server):
-        self.base_path = base_path
-        self.project = project
-        self.build_server = build_server
+    def __init__(self, receipe, configuration):
+        self.receipe = receipe
+        self.configuration = configuration
 
     def cook(self):
-        self._prepare()
+        build_type = self.configuration.get_build_type()
 
-        if self.receipe.is_build_local():
+        if build_type == BuildType.LOCAL:
             self._local_build()
-        else:
+        elif build_type == BuildType.COMPOSITE:
+            self._composite_build()
+        elif build_type == BuildType.REMOTE:
             self._remote_build()
-
-        self._post_actions()
-
-    def _prepare(self):
-        self.receipe = Receipe(self.base_path)
-        self.receipe.load()
-
-        if self.project is not None:
-            self.receipe.set_project(self.project)
-
-        if self.build_server is not None:
-            self.receipe.set_build_server(self.build_server)
+        else:
+            raise RuntimeError(f"Unknown build type: {build_type}")
 
     def _local_build(self):
-        build_steps = self.receipe.get_build_steps()
+        build_steps = self.configuration.get_build_steps()
         if build_steps:
             print('=== Running local build ===')
             self._execute_steps_local(build_steps)
-
-    def _post_actions(self):
-        steps = self.receipe.get_post_actions()
-        if steps:
-            print('=== Running post actions ===')
-            self._execute_steps_local(steps)
 
     def _execute_steps_local(self, steps):
         for workdir, command in steps:
@@ -49,30 +35,25 @@ class Cook:
             subprocess.run(command, cwd=workdir, shell=True)
 
     def _remote_build(self):
-        ssh_name = self.receipe.get_server_ssh_name()
-        project_remote_build_path = self.receipe.get_project_remote_build_path()
-        project_path = self.receipe.get_project_path()
+        print('=== Running Remote Build ===')
+
+        ssh_name = self.configuration.get_server_ssh_name()
+        project_remote_build_path = self.configuration.get_project_remote_build_path()
+        project_path = self.configuration.get_project_path()
         rsync = Rsync(project_path, ssh_name, project_remote_build_path)
 
-        files_to_send = self.receipe.get_files_to_send()
-        files_to_exclude = self.receipe.get_files_to_exclude()
+        files_to_send = self.configuration.get_files_to_send()
+        files_to_exclude = self.configuration.get_files_to_exclude()
         if files_to_send:
-            self._create_remote_workspace(ssh_name, project_remote_build_path)
             self._send_files(rsync, files_to_send, files_to_exclude)
 
-        build_steps = self.receipe.get_build_steps()
+        build_steps = self.configuration.get_build_steps()
         if build_steps:
             self._run_build_steps(ssh_name, build_steps)
 
-        files_to_receive = self.receipe.get_files_to_receive()
+        files_to_receive = self.configuration.get_files_to_receive()
         if files_to_receive:
             self._receive_files(rsync, files_to_receive)
-
-    def _create_remote_workspace(self, ssh_name, remote_build_path):
-        print('=== Creating remote project directory ===')
-        mkdir_cmd = ['mkdir', '-p', remote_build_path]
-        with fabric.Connection(ssh_name) as c:
-            c.run(' '.join(mkdir_cmd))
 
     def _send_files(self, rsync, files_to_send, files_to_exclude):
         print('=== Sending files ===')
@@ -89,3 +70,20 @@ class Cook:
                 with c.cd(workdir):
                     res = c.run(command)
                 print('Return code:', res)
+
+    def _composite_build(self):
+        components = self.configuration.get_components()
+        if not components:
+            return
+        
+        print('=== Executing Components ===')
+        for component in components:
+            print(f'=== Running Component: {component} ===')
+            
+            sub_configuration = Configuration(self.receipe)
+            
+            build_server = self.configuration.get_build_server()
+            sub_configuration.setup(component, build_server)
+
+            sub_cook = Cook(self.receipe, sub_configuration)
+            sub_cook.cook()
