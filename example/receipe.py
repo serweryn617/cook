@@ -1,13 +1,10 @@
 # Cooking receipe, checkout Cook at https://github.com/serweryn617/cook
 
 
-# List of remote build servers with directory paths in which to build each project.
 build_servers = {
     'argon': {
-        # Hostname as defined in SSH config.
-        'ssh_name': 'argon',
+        'ssh_name': 'argon',  # Hostname from SSH config
 
-        # Paths where to build each project
         'project_remote_build_paths': {
             'my_project_create_workdir': '~',
             'my_project_build': '~/cook_example',
@@ -16,12 +13,7 @@ build_servers = {
 }
 
 
-# List of projects with instructions on how to build them.
 projects = {
-    # Instructions for 'my_project'.
-    # Each part is optional, when it is missing the respective step will be omitted.
-    # All paths used locally are relative to 'location' project parameter or to this receipe location if 'location' was not specified.
-    # Paths used remotely are relative to 'project_remote_build_paths' for a given project.
     'my_project': {
         'components': [
             'my_project_create_workdir',
@@ -37,26 +29,21 @@ projects = {
     },
 
     'my_project_build': {
-        # Local project location.
         'location': 'my_project_source',
 
-        # Files from 'location' to send to remote build server.
         'send': [
             '*',
         ],
 
-        # Files to exclude from previous list.
         'exclude': [
             'build',
         ],
 
-        # Steps to build the project. A list of two element tuples consisting of working directory and a command to run.
         'build_steps': [
             'mkdir -p build',
             ('build', 'python3 ../my_script.py'),
         ],
 
-        # Files to get back from remote server after the build.
         'receive': [
             'build',
         ],
@@ -64,32 +51,25 @@ projects = {
 
     'my_project_post_actions': {
         'location': 'my_project_source',
+        'build_server': 'local',  # Always run locally
 
         'build_steps': [
             'cp build/output ../output_latest',
             'cat ../output_latest',
         ],
-
-        'build_server': 'local',
     },
 
     'clean': {
         'location': 'my_project_source',
+        'build_server': 'local',  # Always run locally
 
         'build_steps': [
             'rm -rf build',
             'rm -f ../output_latest',
         ],
-
-        'build_server': 'local',
     },
 }
 
 
-# Build server used when none were explicitly selected.
-# Can be on of 'build_servers' or 'local' to build locally.
-default_build_server = 'argon'
-
-
-# Project to build when none were explicitly selected.
-default_project = 'my_project'
+default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
+default_project = 'my_project'  # Project to build when none were explicitly selected.
