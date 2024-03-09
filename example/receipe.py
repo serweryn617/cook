@@ -80,6 +80,10 @@ projects = {
                 '.',
                 'cp build/output ../output_latest'
             ),
+            (
+                '.',
+                'cat ../output_latest'
+            ),
         ],
 
         'build_server': 'local',
@@ -89,11 +93,11 @@ projects = {
         'build_steps': [
             (
                 '.',
-                'rm -r my_project/build'
+                'rm -rf my_project/build'
             ),
             (
                 '.',
-                'rm output_latest'
+                'rm -f output_latest'
             )
         ],
 

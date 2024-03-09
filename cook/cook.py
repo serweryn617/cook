@@ -5,6 +5,12 @@ from .rsync import Rsync
 from .receipe import Receipe
 from .configuration import Configuration, BuildType
 
+from rich import print as rprint
+
+
+GREEN = '[#00cc52]'
+PURPLE = '[#d849ff]'
+
 
 class Cook:
     def __init__(self, receipe, configuration):
@@ -26,17 +32,15 @@ class Cook:
     def _local_build(self):
         build_steps = self.configuration.get_build_steps()
         if build_steps:
-            print('=== Running local build ===')
+            rprint(GREEN + '=== Running local build ===')
             self._execute_steps_local(build_steps)
 
     def _execute_steps_local(self, steps):
         for workdir, command in steps:
-            print(f'=== Workdir: {workdir} === Command: {command} ===')
+            rprint(GREEN + f'=== Workdir: {workdir} === Command: {command} ===')
             subprocess.run(command, cwd=workdir, shell=True)
 
     def _remote_build(self):
-        print('=== Running Remote Build ===')
-
         ssh_name = self.configuration.get_server_ssh_name()
         project_remote_build_path = self.configuration.get_project_remote_build_path()
         project_path = self.configuration.get_project_path()
@@ -49,6 +53,7 @@ class Cook:
 
         build_steps = self.configuration.get_build_steps()
         if build_steps:
+            rprint(PURPLE + '=== Running Remote Build ===')
             self._run_build_steps(ssh_name, build_steps)
 
         files_to_receive = self.configuration.get_files_to_receive()
@@ -56,29 +61,29 @@ class Cook:
             self._receive_files(rsync, files_to_receive)
 
     def _send_files(self, rsync, files_to_send, files_to_exclude):
-        print('=== Sending files ===')
+        rprint(GREEN + '=== Sending files ===')
         rsync.send(files_to_send, files_to_exclude)
 
     def _receive_files(self, rsync, files_to_receive):
-        print('=== Receiving files ===')
+        rprint(GREEN + '=== Receiving files ===')
         rsync.receive(files_to_receive)
 
     def _run_build_steps(self, ssh_name, build_steps):
         with fabric.Connection(ssh_name) as c:
             for workdir, command in build_steps:
-                print(f'=== Workdir: {workdir} === Command: {command} ===')
+                rprint(PURPLE + f'=== Workdir: {workdir} === Command: {command} ===')
                 with c.cd(workdir):
                     res = c.run(command)
-                print('Return code:', res)
+                rprint(PURPLE + f'Return code: {res}')
 
     def _composite_build(self):
         components = self.configuration.get_components()
         if not components:
             return
         
-        print('=== Executing Components ===')
+        rprint(GREEN + '=== Executing Components ===')
         for component in components:
-            print(f'=== Running Component: {component} ===')
+            rprint(GREEN + f'=== Running Component: {component} ===')
             
             sub_configuration = Configuration(self.receipe)
             
