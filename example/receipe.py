@@ -9,8 +9,8 @@ build_servers = {
 
         # Paths where to build each project
         'project_remote_build_paths': {
-            'create_project_dir': '~',
-            'build_my_project': '~/cook_example',
+            'my_project_create_workdir': '~',
+            'my_project_build': '~/cook_example',
         }
     },
 }
@@ -24,28 +24,25 @@ projects = {
     # Paths used remotely are relative to 'project_remote_build_paths' for a given project.
     'my_project': {
         'components': [
-            'create_project_dir',
-            'build_my_project',
+            'my_project_create_workdir',
+            'my_project_build',
             'my_project_post_actions',
         ],
     },
 
-    'create_project_dir': {
+    'my_project_create_workdir': {
         'build_steps': [
-            (
-                '.',
-                'mkdir -p ~/cook_example'
-            ),
+            'mkdir -p ~/cook_example',
         ],
     },
 
-    'build_my_project': {
+    'my_project_build': {
         # Local project location.
-        'location': 'my_project',
+        'location': 'my_project_source',
 
         # Files from 'location' to send to remote build server.
         'send': [
-            'my_script.py',
+            '*',
         ],
 
         # Files to exclude from previous list.
@@ -53,52 +50,35 @@ projects = {
             'build',
         ],
 
+        # Steps to build the project. A list of two element tuples consisting of working directory and a command to run.
+        'build_steps': [
+            'mkdir -p build',
+            ('build', 'python3 ../my_script.py'),
+        ],
+
         # Files to get back from remote server after the build.
         'receive': [
             'build',
         ],
-
-        # Steps to build the project. A list of two element tuples consisting of working directory and a command to run.
-        'build_steps': [
-            (
-                '.',
-                'mkdir -p build'
-            ),
-            (
-                'build',
-                'python3 ../my_script.py'
-            ),
-        ],
-
     },
 
     'my_project_post_actions': {
-        'location': 'my_project',
+        'location': 'my_project_source',
 
         'build_steps': [
-            (
-                '.',
-                'cp build/output ../output_latest'
-            ),
-            (
-                '.',
-                'cat ../output_latest'
-            ),
+            'cp build/output ../output_latest',
+            'cat ../output_latest',
         ],
 
         'build_server': 'local',
     },
 
     'clean': {
+        'location': 'my_project_source',
+
         'build_steps': [
-            (
-                '.',
-                'rm -rf my_project/build'
-            ),
-            (
-                '.',
-                'rm -f output_latest'
-            )
+            'rm -rf build',
+            'rm -f ../output_latest',
         ],
 
         'build_server': 'local',

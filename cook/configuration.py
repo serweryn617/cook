@@ -98,9 +98,7 @@ class Configuration:
         if 'exclude' not in self.projects[self.project] or self.build_server == 'local':
             return None
 
-        base_dir = self.base_path / self.location
-        files_to_exclude = [base_dir / file_dir for file_dir in self.projects[self.project]['exclude']]
-        return [str(file) for file in files_to_exclude]
+        return self.projects[self.project]['exclude']
 
     def get_files_to_receive(self):
         if 'receive' not in self.projects[self.project] or self.build_server == 'local':
@@ -120,7 +118,13 @@ class Configuration:
             base_dir = Path(self.remote_build_path)
 
         build_steps = []
-        for workdir, command in self.projects[self.project]['build_steps']:
+        for step in self.projects[self.project]['build_steps']:
+            if isinstance(step, tuple):
+                workdir, command = step
+            else:
+                workdir = '.'
+                command = step
+
             build_steps.append((base_dir / workdir, command))
 
         return build_steps
