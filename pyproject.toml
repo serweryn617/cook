@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cook_builder"
-version = "0.0.1"
+version = "0.0.3"
 dependencies = [
   "fabric==3.2.2",
   "rich==13.7.1",
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 authors = [
   { name="Seweryn Rusecki" },
 ]
@@ -22,6 +22,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Build Tools",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
