@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cook_builder"
-version = "0.0.3"
+version = "0.0.5"
 dependencies = [
   "fabric==3.2.2",
   "rich==13.7.1",
@@ -26,7 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+    "Operating System :: POSIX :: Linux",
 ]
 
 [project.urls]
