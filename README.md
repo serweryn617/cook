@@ -4,6 +4,12 @@ Build script aggregator and remote executor.
 
 # Getting started
 
+### Install cook with pip
+
+```sh
+pip install cook-builder
+```
+
 ### Install cook from source
 
 ```sh
