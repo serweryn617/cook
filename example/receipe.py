@@ -8,6 +8,7 @@ build_servers = {
         'project_remote_build_paths': {
             'my_project_create_workdir': '~',
             'my_project_build': '~/cook_example',
+            'my_project_clean_remote': '~/cook_example',
         }
     },
 }
@@ -66,6 +67,12 @@ projects = {
         'build_steps': [
             'rm -rf build',
             'rm -f ../output_latest',
+        ],
+    },
+
+    'my_project_clean_remote': {
+        'build_steps': [
+            'rm -rf build',
         ],
     },
 }
