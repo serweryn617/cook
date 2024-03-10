@@ -10,6 +10,7 @@ from rich import print as rprint
 
 GREEN = '[#00cc52]'
 PURPLE = '[#d849ff]'
+RED = '[#ff0000]'
 
 
 class Cook:
@@ -37,8 +38,14 @@ class Cook:
 
     def _execute_steps_local(self, steps):
         for workdir, command in steps:
-            rprint(GREEN + f'=== Workdir: {workdir} === Command: {command} ===')
-            subprocess.run(command, cwd=workdir, shell=True)
+            rprint(GREEN + f'=== Workdir/Command: {workdir}: {command} ===')
+
+            try:
+                subprocess.run(command, cwd=workdir, shell=True, check=True)
+            except subprocess.CalledProcessError as e:
+                return_code = e.returncode
+                rprint(RED + f'Encountered non-zero exit code: {return_code}')
+                exit(return_code)
 
     def _remote_build(self):
         ssh_name = self.configuration.get_server_ssh_name()
@@ -61,20 +68,25 @@ class Cook:
             self._receive_files(rsync, files_to_receive)
 
     def _send_files(self, rsync, files_to_send, files_to_exclude):
-        rprint(GREEN + '=== Sending files ===')
+        rprint(GREEN + '=== Sending Files ===')
         rsync.send(files_to_send, files_to_exclude)
 
     def _receive_files(self, rsync, files_to_receive):
-        rprint(GREEN + '=== Receiving files ===')
+        rprint(GREEN + '=== Receiving Files ===')
         rsync.receive(files_to_receive)
 
     def _run_build_steps(self, ssh_name, build_steps):
         with fabric.Connection(ssh_name) as c:
             for workdir, command in build_steps:
-                rprint(PURPLE + f'=== Workdir: {workdir} === Command: {command} ===')
+                rprint(PURPLE + f'=== Workdir/Command: {workdir}: {command} ===')
+
                 with c.cd(workdir):
-                    res = c.run(command)
-                rprint(PURPLE + f'Return code: {res}')
+                    result = c.run(command, warn=True)
+
+                return_code = result.return_code
+                if return_code != 0:
+                    rprint(RED + f'Encountered non-zero exit code: {return_code}')
+                    exit(return_code)
 
     def _composite_build(self):
         components = self.configuration.get_components()
