@@ -70,7 +70,7 @@ projects = {
         ],
     },
 
-    'my_project_clean_remote': {
+    'clean_remote': {
         'build_steps': [
             'rm -rf build',
         ],
