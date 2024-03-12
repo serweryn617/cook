@@ -32,6 +32,7 @@ class Cook:
 
     def _local_build(self):
         build_steps = self.configuration.get_build_steps()
+
         if build_steps:
             rprint(GREEN + '=== Running local build ===')
             self._execute_steps_local(build_steps)
@@ -48,32 +49,31 @@ class Cook:
                 exit(return_code)
 
     def _remote_build(self):
-        ssh_name = self.configuration.get_server_ssh_name()
-        project_remote_build_path = self.configuration.get_project_remote_build_path()
-        source_files_path = self.configuration.get_source_files_path()
-        rsync = Rsync(source_files_path, ssh_name, project_remote_build_path)
-
         files_to_send = self.configuration.get_files_to_send()
         files_to_exclude = self.configuration.get_files_to_exclude()
-        if files_to_send:
-            self._send_files(rsync, files_to_send, files_to_exclude)
-
         build_steps = self.configuration.get_build_steps()
+        files_to_receive = self.configuration.get_files_to_receive()
+
+        ssh_name = self.configuration.get_build_server()
+
+        setup_rsync = files_to_send or files_to_receive
+
+        if setup_rsync:
+            source_files_path = self.configuration.get_source_files_path()
+            project_remote_path = self.configuration.get_project_remote_path()
+            rsync = Rsync(source_files_path, ssh_name, project_remote_path)
+
+        if files_to_send:
+            rprint(PURPLE + '=== Sending Files ===')
+            rsync.send(files_to_send, files_to_exclude)
+
         if build_steps:
             rprint(PURPLE + '=== Running Remote Build ===')
             self._run_build_steps(ssh_name, build_steps)
 
-        files_to_receive = self.configuration.get_files_to_receive()
         if files_to_receive:
-            self._receive_files(rsync, files_to_receive)
-
-    def _send_files(self, rsync, files_to_send, files_to_exclude):
-        rprint(PURPLE + '=== Sending Files ===')
-        rsync.send(files_to_send, files_to_exclude)
-
-    def _receive_files(self, rsync, files_to_receive):
-        rprint(PURPLE + '=== Receiving Files ===')
-        rsync.receive(files_to_receive)
+            rprint(PURPLE + '=== Receiving Files ===')
+            rsync.receive(files_to_receive)
 
     def _run_build_steps(self, ssh_name, build_steps):
         with fabric.Connection(ssh_name) as c:
@@ -90,15 +90,17 @@ class Cook:
 
     def _composite_build(self):
         components = self.configuration.get_components()
+
         if not components:
             return
-        
+
         rprint(GREEN + '=== Executing Components ===')
+
         for component in components:
             rprint(GREEN + f'=== Running Component: {component} ===')
-            
+
             sub_configuration = Configuration(self.receipe)
-            
+
             build_server = self.configuration.get_build_server()
             sub_configuration.setup(component, build_server)
 

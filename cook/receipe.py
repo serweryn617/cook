@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 class Receipe:
-    def __init__(self, base_path):
+    def __init__(self, base_path: Path):
         self.base_path = base_path
 
         self.projects = None

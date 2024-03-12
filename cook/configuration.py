@@ -31,18 +31,19 @@ class Configuration:
             server = self.default_build_server
         self._set_build_server(server)
 
+    def _get_nested_item(self, source_dict, *keys):
+        nested_item = source_dict
+        for key in keys:
+            if key not in nested_item:
+                return None
+            nested_item = nested_item[key]
+        return nested_item
+
     def _set_project(self, project):
-        assert project in self.projects, f'No such project {project}'
+        project_defined = project in self.projects
+        assert project_defined, f'No such project {project}'
 
         self.project = project
-
-        self.source_files_location = '.'
-        if (
-            'build_servers' in self.projects[self.project] and
-            'local' in self.projects[self.project]['build_servers'] and
-            'base_path' in self.projects[self.project]['build_servers']['local']
-        ):
-            self.source_files_location = self.projects[self.project]['build_servers']['local']['base_path']
 
     def _set_build_server(self, build_server):
         self.build_server = build_server
@@ -50,6 +51,7 @@ class Configuration:
         if self._is_composite():
             return
 
+        assert 'build_servers' in self.projects[self.project], f'Build servers not defined for {self.project}'
         build_servers = self.projects[self.project]['build_servers']
         assert build_server in build_servers, f'Build server {build_server} not defined for {self.project}'
 
@@ -57,8 +59,12 @@ class Configuration:
             self.skip = True
             return
 
-        assert 'base_path' in build_servers[build_server], f"No base_path defined for {self.project} on build server {build_server}"
-        self.remote_build_path = build_servers[build_server]['base_path']
+        assert 'build_path' in build_servers[build_server], f"No base_path defined for {self.project} on build server {build_server}"
+        self.remote_path = Path(build_servers[build_server]['build_path'])
+
+        local_path = self._get_nested_item(build_servers, 'local', 'build_path')
+        if local_path is not None:
+            self.local_path = Path(local_path)
 
     def _get_build_server_override(self):
         if 'build_servers' not in self.projects[self.project]:
@@ -70,29 +76,27 @@ class Configuration:
                 return server_name
 
     def _is_composite(self):
-        return 'components' in self.projects[self.project]
+        is_composite = 'components' in self.projects[self.project]
+        return is_composite
+
+    def _is_local(self):
+        is_local = self.build_server == 'local'
+        return is_local
 
     def get_build_type(self):
-        build_type = BuildType.REMOTE
-
         if self._is_composite():
             build_type = BuildType.COMPOSITE
-        elif self.build_server == 'local':
+        elif self._is_local():
             build_type = BuildType.LOCAL
+        else:
+            build_type = BuildType.REMOTE
 
         return build_type
 
     def get_build_server(self):
         return self.build_server
 
-    def get_server_ssh_name(self):
-        # TODO: Used?
-        if self.build_server == 'local':
-            return None
-
-        return self.build_server
-
-    def get_project_remote_build_path(self):
+    def get_project_remote_path(self):
         if self.build_server == 'local':
             return None
 
@@ -100,47 +104,61 @@ class Configuration:
         if (
             'build_servers' in self.projects[self.project] and
             self.build_server in self.projects[self.project]['build_servers'] and
-            'base_path' in self.projects[self.project]['build_servers'][self.build_server]
+            'build_path' in self.projects[self.project]['build_servers'][self.build_server]
         ):
-            return self.projects[self.project]['build_servers'][self.build_server]['base_path']
+            return self.projects[self.project]['build_servers'][self.build_server]['build_path']
 
     def get_source_files_path(self):
-        return self.base_path / self.source_files_location
+        return self.base_path / self.local_path
 
     def get_files_to_send(self):
-        send_step = 'send' in self.projects[self.project]
+        files_to_send = 'send' in self.projects[self.project]
 
-        if not send_step or self.build_server == 'local':
+        if not files_to_send:
             return None
 
-        base_dir = self.base_path / self.source_files_location
+        base_dir = self.base_path / self.local_path
         files_to_send = [base_dir / file_dir for file_dir in self.projects[self.project]['send']]
         return [str(file) for file in files_to_send]
 
     def get_files_to_exclude(self):
-        if 'exclude' not in self.projects[self.project] or self.build_server == 'local':
+        files_to_exclude = 'exclude' in self.projects[self.project]
+
+        if not files_to_exclude:
             return None
 
         return self.projects[self.project]['exclude']
 
     def get_files_to_receive(self):
-        if 'receive' not in self.projects[self.project] or self.build_server == 'local':
+        files_to_receive = 'receive' in self.projects[self.project]
+
+        if not files_to_receive:
             return None
 
-        base_dir = Path(self.remote_build_path)
+        base_dir = self.remote_path
         files_to_receive = [base_dir / file_dir for file_dir in self.projects[self.project]['receive']]
+
         return [str(file) for file in files_to_receive]
 
+    def _get_build_steps_base_dir(self):
+        if self._is_local():
+            if self.local_path.is_absolute():
+                base_dir = self.local_path
+            else:
+                base_dir = self.base_path / self.local_path
+        else:
+            base_dir = self.remote_path
+        return base_dir
+
     def get_build_steps(self):
-        if 'build_steps' not in self.projects[self.project]:
+        build_steps_defined = 'build_steps' in self.projects[self.project]
+
+        if not build_steps_defined:
             return None
 
-        if self.build_server == 'local':
-            base_dir = self.base_path / self.source_files_location
-        else:
-            base_dir = Path(self.remote_build_path)
-
         build_steps = []
+        base_dir = self._get_build_steps_base_dir()
+
         for step in self.projects[self.project]['build_steps']:
             if isinstance(step, tuple):
                 workdir, command = step
@@ -153,7 +171,9 @@ class Configuration:
         return build_steps
 
     def get_components(self):
-        if 'components' not in self.projects[self.project]:
+        components_defined = 'components' in self.projects[self.project]
+
+        if not components_defined:
             return None
 
         return self.projects[self.project]['components']

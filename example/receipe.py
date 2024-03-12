@@ -20,7 +20,7 @@ projects = {
                 'skip': True,
             },
             'argon': {  # Hostname from SSH config
-                'base_path': '~',
+                'build_path': '~',
             },
         },
 
@@ -32,10 +32,10 @@ projects = {
     'my_project_build': {
         'build_servers': {
             'local': {
-                'base_path': 'my_project_source',
+                'build_path': 'my_project_source',
             },
             'argon': {
-                'base_path': '~/cook_example',
+                'build_path': '~/cook_example',
             },
         },
 
@@ -61,7 +61,7 @@ projects = {
         'build_servers': {
             'local': {
                 'override': True,  # Always run locally
-                'base_path': 'my_project_source',
+                'build_path': 'my_project_source',
             },
         },
 
@@ -75,7 +75,7 @@ projects = {
         'build_servers': {
             'local': {
                 'override': True,  # Always run locally
-                'base_path': 'my_project_source',
+                'build_path': 'my_project_source',
             },
         },
 
@@ -88,7 +88,7 @@ projects = {
     'clean_remote': {
         'build_servers': {
             'argon': {
-                'base_path': '~/cook_example',
+                'build_path': '~/cook_example',
             },
         },
 
