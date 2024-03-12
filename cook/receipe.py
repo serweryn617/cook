@@ -7,7 +7,6 @@ class Receipe:
     def __init__(self, base_path):
         self.base_path = base_path
 
-        self.build_servers = None
         self.projects = None
 
         self.default_project = None
@@ -23,9 +22,6 @@ class Receipe:
         receipe = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = receipe
         spec.loader.exec_module(receipe)
-
-        if hasattr(receipe, 'build_servers'):
-            self.build_servers = receipe.build_servers
 
         if hasattr(receipe, 'projects'):
             self.projects = receipe.projects

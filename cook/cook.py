@@ -50,8 +50,8 @@ class Cook:
     def _remote_build(self):
         ssh_name = self.configuration.get_server_ssh_name()
         project_remote_build_path = self.configuration.get_project_remote_build_path()
-        project_path = self.configuration.get_project_path()
-        rsync = Rsync(project_path, ssh_name, project_remote_build_path)
+        source_files_path = self.configuration.get_source_files_path()
+        rsync = Rsync(source_files_path, ssh_name, project_remote_build_path)
 
         files_to_send = self.configuration.get_files_to_send()
         files_to_exclude = self.configuration.get_files_to_exclude()
@@ -68,11 +68,11 @@ class Cook:
             self._receive_files(rsync, files_to_receive)
 
     def _send_files(self, rsync, files_to_send, files_to_exclude):
-        rprint(GREEN + '=== Sending Files ===')
+        rprint(PURPLE + '=== Sending Files ===')
         rsync.send(files_to_send, files_to_exclude)
 
     def _receive_files(self, rsync, files_to_receive):
-        rprint(GREEN + '=== Receiving Files ===')
+        rprint(PURPLE + '=== Receiving Files ===')
         rsync.receive(files_to_receive)
 
     def _run_build_steps(self, ssh_name, build_steps):
