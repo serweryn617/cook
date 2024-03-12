@@ -22,6 +22,7 @@ class Configuration:
         if project is None:
             project = self.default_project
         self._set_project(project)
+        self._update_local_path()
 
         server_override = self._get_build_server_override()
         if server_override is not None:
@@ -46,31 +47,32 @@ class Configuration:
         self.project = project
 
     def _set_build_server(self, build_server):
-        # TODO: Refactor
         self.build_server = build_server
 
         if self._is_composite():
             return
 
-        assert 'build_servers' in self.projects[self.project], f'Build servers not defined for {self.project}'
-        build_servers = self.projects[self.project]['build_servers']
-        assert build_server in build_servers, f'Build server {build_server} not defined for {self.project}'
+        build_server_config = self._get_nested_item(self.projects, self.project, 'build_servers', build_server)
+        assert build_server_config is not None, f'Build server {build_server} not defined for {self.project}'
 
-        if 'skip' in build_servers[build_server] and build_servers[build_server]['skip'] == True:
+        skip = self._get_nested_item(build_server_config, 'skip')
+        if skip == True:
             self.skip = True
             return
 
-        assert 'build_path' in build_servers[build_server], f"No base_path defined for {self.project} on build server {build_server}"
-        self.remote_path = Path(build_servers[build_server]['build_path'])
+        if not self._is_local():
+            remote_path = self._get_nested_item(build_server_config, 'build_path')
+            assert remote_path is not None, f"No build path defined for {self.project} on build server {build_server}"
+            self.remote_path = Path(remote_path)
 
-        local_path = self._get_nested_item(build_servers, 'local', 'build_path')
+    def _update_local_path(self):
+        local_path = self._get_nested_item(self.projects, self.project, 'build_servers', 'local', 'build_path')
         if local_path is not None:
             local_path = Path(local_path)
             if local_path.is_absolute():
                 self.local_path = local_path
             else:
                 self.local_path = self.base_path / local_path
-
 
     def _get_build_server_override(self):
         build_servers = self._get_nested_item(self.projects, self.project, 'build_servers')
@@ -117,8 +119,8 @@ class Configuration:
         if files_to_send is None:
             return None
 
-        files_to_send = [self.local_path / file_dir for file_dir in files_to_send]
-        return [str(file) for file in files_to_send]
+        files_to_send = [str(self.local_path / file) for file in files_to_send]
+        return files_to_send
 
     def get_files_to_exclude(self):
         files_to_exclude = self._get_nested_item(self.projects, self.project, 'exclude')
@@ -130,10 +132,8 @@ class Configuration:
         if files_to_receive is None:
             return None
 
-        base_dir = self.remote_path
-        files_to_receive = [base_dir / file_dir for file_dir in files_to_receive]
-
-        return [str(file) for file in files_to_receive]
+        files_to_receive = [str(self.remote_path / file) for file in files_to_receive]
+        return files_to_receive
 
     def _get_build_steps_base_dir(self):
         if self._is_local():
