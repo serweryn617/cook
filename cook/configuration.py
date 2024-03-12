@@ -46,6 +46,7 @@ class Configuration:
         self.project = project
 
     def _set_build_server(self, build_server):
+        # TODO: Refactor
         self.build_server = build_server
 
         if self._is_composite():
@@ -67,12 +68,14 @@ class Configuration:
             self.local_path = Path(local_path)
 
     def _get_build_server_override(self):
-        if 'build_servers' not in self.projects[self.project]:
+        build_servers = self._get_nested_item(self.projects, self.project, 'build_servers')
+        if build_servers is None:
             return None
 
-        server_configs = self.projects[self.project]['build_servers']
-        for server_name, config in server_configs.items():
-            if 'override' in config and config['override'] == True:
+        for server_name, config in build_servers.items():
+            override = self._get_nested_item(config, 'override')
+            if override == True:
+                # TODO: Detect multiple overrides
                 return server_name
 
     def _is_composite(self):
@@ -96,47 +99,35 @@ class Configuration:
     def get_build_server(self):
         return self.build_server
 
-    def get_project_remote_path(self):
-        if self.build_server == 'local':
-            return None
-
-        # TODO: better handle this
-        if (
-            'build_servers' in self.projects[self.project] and
-            self.build_server in self.projects[self.project]['build_servers'] and
-            'build_path' in self.projects[self.project]['build_servers'][self.build_server]
-        ):
-            return self.projects[self.project]['build_servers'][self.build_server]['build_path']
+    def get_project_remote_path(self):  # TODO: Name change
+        build_path = self._get_nested_item(self.projects, self.project, 'build_servers', self.build_server, 'build_path')
+        return build_path
 
     def get_source_files_path(self):
         return self.base_path / self.local_path
 
     def get_files_to_send(self):
-        files_to_send = 'send' in self.projects[self.project]
+        files_to_send = self._get_nested_item(self.projects, self.project, 'send')
 
-        if not files_to_send:
+        if files_to_send is None:
             return None
 
         base_dir = self.base_path / self.local_path
-        files_to_send = [base_dir / file_dir for file_dir in self.projects[self.project]['send']]
+        files_to_send = [base_dir / file_dir for file_dir in files_to_send]
         return [str(file) for file in files_to_send]
 
     def get_files_to_exclude(self):
-        files_to_exclude = 'exclude' in self.projects[self.project]
-
-        if not files_to_exclude:
-            return None
-
-        return self.projects[self.project]['exclude']
+        files_to_exclude = self._get_nested_item(self.projects, self.project, 'exclude')
+        return files_to_exclude
 
     def get_files_to_receive(self):
-        files_to_receive = 'receive' in self.projects[self.project]
+        files_to_receive = self._get_nested_item(self.projects, self.project, 'receive')
 
-        if not files_to_receive:
+        if files_to_receive is None:
             return None
 
         base_dir = self.remote_path
-        files_to_receive = [base_dir / file_dir for file_dir in self.projects[self.project]['receive']]
+        files_to_receive = [base_dir / file_dir for file_dir in files_to_receive]
 
         return [str(file) for file in files_to_receive]
 
@@ -151,29 +142,25 @@ class Configuration:
         return base_dir
 
     def get_build_steps(self):
-        build_steps_defined = 'build_steps' in self.projects[self.project]
+        build_steps = self._get_nested_item(self.projects, self.project, 'build_steps')
 
-        if not build_steps_defined:
+        if build_steps is None:
             return None
 
-        build_steps = []
+        parsed_build_steps = []
         base_dir = self._get_build_steps_base_dir()
 
-        for step in self.projects[self.project]['build_steps']:
+        for step in build_steps:
             if isinstance(step, tuple):
                 workdir, command = step
             else:
                 workdir = '.'
                 command = step
 
-            build_steps.append((base_dir / workdir, command))
+            parsed_build_steps.append((base_dir / workdir, command))
 
-        return build_steps
+        return parsed_build_steps
 
     def get_components(self):
-        components_defined = 'components' in self.projects[self.project]
-
-        if not components_defined:
-            return None
-
-        return self.projects[self.project]['components']
+        components = self._get_nested_item(self.projects, self.project, 'components')
+        return components
