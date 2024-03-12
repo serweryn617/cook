@@ -1,5 +1,6 @@
 from enum import Enum, auto
 from pathlib import Path
+from cook import logger
 
 
 class BuildType(Enum):
@@ -42,7 +43,10 @@ class Configuration:
 
     def _set_project(self, project):
         project_defined = project in self.projects
-        assert project_defined, f'No such project {project}'
+        
+        if not project_defined:
+            logger.error(f'No such project {project}')
+            exit(1)
 
         self.project = project
 
@@ -53,7 +57,9 @@ class Configuration:
             return
 
         build_server_config = self._get_nested_item(self.projects, self.project, 'build_servers', build_server)
-        assert build_server_config is not None, f'Build server {build_server} not defined for {self.project}'
+        if build_server_config is None:
+            logger.error(f'Build server {build_server} not defined for {self.project}')
+            exit(1)
 
         skip = self._get_nested_item(build_server_config, 'skip')
         if skip == True:
@@ -62,7 +68,9 @@ class Configuration:
 
         if not self._is_local():
             remote_path = self._get_nested_item(build_server_config, 'build_path')
-            assert remote_path is not None, f"No build path defined for {self.project} on build server {build_server}"
+            if remote_path is None:
+                logger.error(f"No build path defined for {self.project} on build server {build_server}")
+                exit(1)
             self.remote_path = Path(remote_path)
 
     def _update_local_path(self):

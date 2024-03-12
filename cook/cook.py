@@ -4,13 +4,7 @@ import subprocess
 from .rsync import Rsync
 from .receipe import Receipe
 from .configuration import Configuration, BuildType
-
-from rich import print as rprint
-
-
-GREEN = '[#00cc52]'
-PURPLE = '[#d849ff]'
-RED = '[#ff0000]'
+from cook import logger
 
 
 class Cook:
@@ -34,18 +28,18 @@ class Cook:
         build_steps = self.configuration.get_build_steps()
 
         if build_steps:
-            rprint(GREEN + '=== Running local build ===')
+            logger.local('=== Running local build ===')
             self._execute_steps_local(build_steps)
 
     def _execute_steps_local(self, steps):
         for workdir, command in steps:
-            rprint(GREEN + f'=== Workdir/Command: {workdir}: {command} ===')
+            logger.local(f'=== Workdir/Command: {workdir}: {command} ===')
 
             try:
                 subprocess.run(command, cwd=workdir, shell=True, check=True)
             except subprocess.CalledProcessError as e:
                 return_code = e.returncode
-                rprint(RED + f'Encountered non-zero exit code: {return_code}')
+                logger.error(f'Encountered non-zero exit code: {return_code}')
                 exit(return_code)
 
     def _remote_build(self):
@@ -64,28 +58,28 @@ class Cook:
             rsync = Rsync(source_files_path, ssh_name, project_remote_path)
 
         if files_to_send:
-            rprint(PURPLE + '=== Sending Files ===')
+            logger.remote('=== Sending Files ===')
             rsync.send(files_to_send, files_to_exclude)
 
         if build_steps:
-            rprint(PURPLE + '=== Running Remote Build ===')
+            logger.remote('=== Running Remote Build ===')
             self._run_build_steps(ssh_name, build_steps)
 
         if files_to_receive:
-            rprint(PURPLE + '=== Receiving Files ===')
+            logger.remote('=== Receiving Files ===')
             rsync.receive(files_to_receive)
 
     def _run_build_steps(self, ssh_name, build_steps):
         with fabric.Connection(ssh_name) as c:
             for workdir, command in build_steps:
-                rprint(PURPLE + f'=== Workdir/Command: {workdir}: {command} ===')
+                logger.remote(f'=== Workdir/Command: {workdir}: {command} ===')
 
                 with c.cd(workdir):
                     result = c.run(command, warn=True)
 
                 return_code = result.return_code
                 if return_code != 0:
-                    rprint(RED + f'Encountered non-zero exit code: {return_code}')
+                    logger.error(f'Encountered non-zero exit code: {return_code}')
                     exit(return_code)
 
     def _composite_build(self):
@@ -94,10 +88,10 @@ class Cook:
         if not components:
             return
 
-        rprint(GREEN + '=== Executing Components ===')
+        logger.local('=== Executing Components ===')
 
         for component in components:
-            rprint(GREEN + f'=== Running Component: {component} ===')
+            logger.local(f'=== Running Component: {component} ===')
 
             sub_configuration = Configuration(self.receipe)
 
