@@ -142,6 +142,9 @@ class Configuration:
         return base_dir
 
     def get_build_steps(self):
+        if self.skip == True:
+            return None
+
         build_steps = self._get_nested_item(self.projects, self.project, 'build_steps')
 
         if build_steps is None:

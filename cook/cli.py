@@ -9,9 +9,8 @@ from .configuration import Configuration
 def main():
     parser = argparse.ArgumentParser()
 
-    # TODO: Change to optional flags
-    parser.add_argument('project', nargs='?')
-    parser.add_argument('build_server', nargs='?')
+    parser.add_argument('-p', '--project')
+    parser.add_argument('-s', '--build_server')
 
     args = parser.parse_args()
 
