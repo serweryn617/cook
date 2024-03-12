@@ -65,7 +65,12 @@ class Configuration:
 
         local_path = self._get_nested_item(build_servers, 'local', 'build_path')
         if local_path is not None:
-            self.local_path = Path(local_path)
+            local_path = Path(local_path)
+            if local_path.is_absolute():
+                self.local_path = local_path
+            else:
+                self.local_path = self.base_path / local_path
+
 
     def _get_build_server_override(self):
         build_servers = self._get_nested_item(self.projects, self.project, 'build_servers')
@@ -99,12 +104,12 @@ class Configuration:
     def get_build_server(self):
         return self.build_server
 
-    def get_project_remote_path(self):  # TODO: Name change
+    def get_project_build_path(self):
         build_path = self._get_nested_item(self.projects, self.project, 'build_servers', self.build_server, 'build_path')
         return build_path
 
     def get_source_files_path(self):
-        return self.base_path / self.local_path
+        return self.local_path
 
     def get_files_to_send(self):
         files_to_send = self._get_nested_item(self.projects, self.project, 'send')
@@ -112,8 +117,7 @@ class Configuration:
         if files_to_send is None:
             return None
 
-        base_dir = self.base_path / self.local_path
-        files_to_send = [base_dir / file_dir for file_dir in files_to_send]
+        files_to_send = [self.local_path / file_dir for file_dir in files_to_send]
         return [str(file) for file in files_to_send]
 
     def get_files_to_exclude(self):
@@ -133,10 +137,7 @@ class Configuration:
 
     def _get_build_steps_base_dir(self):
         if self._is_local():
-            if self.local_path.is_absolute():
-                base_dir = self.local_path
-            else:
-                base_dir = self.base_path / self.local_path
+            base_dir = self.local_path
         else:
             base_dir = self.remote_path
         return base_dir

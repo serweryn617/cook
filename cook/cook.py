@@ -60,7 +60,7 @@ class Cook:
 
         if setup_rsync:
             source_files_path = self.configuration.get_source_files_path()
-            project_remote_path = self.configuration.get_project_remote_path()
+            project_remote_path = self.configuration.get_project_build_path()
             rsync = Rsync(source_files_path, ssh_name, project_remote_path)
 
         if files_to_send:
