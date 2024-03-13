@@ -38,7 +38,3 @@ class Receipe:
 
         if hasattr(receipe, 'default_build_server'):
             self.default_build_server = receipe.default_build_server
-
-    def validate():
-        # TODO
-        ...
