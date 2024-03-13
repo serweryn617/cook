@@ -9,12 +9,13 @@ from .configuration import Configuration
 def main():
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('receipe_path', nargs='?', default='.')
     parser.add_argument('-p', '--project')
     parser.add_argument('-s', '--build_server')
 
     args = parser.parse_args()
 
-    base_path = pathlib.Path.cwd()
+    base_path = pathlib.Path.cwd() / args.receipe_path
 
     receipe = Receipe(base_path)
     receipe.load()

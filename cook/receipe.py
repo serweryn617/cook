@@ -1,6 +1,7 @@
 import importlib.util
 import sys
 from pathlib import Path
+from cook import logger
 
 
 class Receipe:
@@ -13,12 +14,16 @@ class Receipe:
         self.default_build_server = 'local'
 
     def load(self):
-        p = self.base_path.glob('**/receipe.py')
-        p = str(list(p)[0])
+        receipes = list(self.base_path.glob('receipe.py'))
 
-        module_name, file_path = 'receipe', p
+        if len(receipes) == 0:
+            logger.error(f'Receipe file not found in {self.base_path}')
+            exit(1)
 
-        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        receipe_file_path = str(receipes[0])
+        module_name = 'receipe'
+
+        spec = importlib.util.spec_from_file_location(module_name, receipe_file_path)
         receipe = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = receipe
         spec.loader.exec_module(receipe)
