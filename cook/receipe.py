@@ -31,7 +31,8 @@ class Receipe:
         if hasattr(receipe, 'projects'):
             self.projects = receipe.projects
         else:
-            assert False, 'No projects found in receipe.'
+            logger.error('No projects found in receipe.')
+            exit(1)
 
         if hasattr(receipe, 'default_project'):
             self.default_project = receipe.default_project
