@@ -28,12 +28,12 @@ class Cook:
         build_steps = self.configuration.get_build_steps()
 
         if build_steps:
-            logger.local('=== Running local build ===')
+            logger.local('Running local build')
             self._execute_steps_local(build_steps)
 
     def _execute_steps_local(self, steps):
         for workdir, command in steps:
-            logger.local(f'=== Workdir/Command: {workdir}: {command} ===')
+            logger.local(f'Local Workdir/Command: {workdir}: {command}')
 
             try:
                 subprocess.run(command, cwd=workdir, shell=True, check=True)
@@ -58,21 +58,21 @@ class Cook:
             rsync = Rsync(source_files_path, ssh_name, project_remote_path)
 
         if files_to_send:
-            logger.remote('=== Sending Files ===')
+            logger.remote('Sending Files')
             rsync.send(files_to_send, files_to_exclude)
 
         if build_steps:
-            logger.remote('=== Running Remote Build ===')
+            logger.remote('Running Remote Build')
             self._run_build_steps(ssh_name, build_steps)
 
         if files_to_receive:
-            logger.remote('=== Receiving Files ===')
+            logger.remote('Receiving Files')
             rsync.receive(files_to_receive)
 
     def _run_build_steps(self, ssh_name, build_steps):
         with fabric.Connection(ssh_name) as c:
             for workdir, command in build_steps:
-                logger.remote(f'=== Workdir/Command: {workdir}: {command} ===')
+                logger.remote(f'Remote Workdir/Command: {ssh_name}:{workdir}: {command}')
 
                 with c.cd(workdir):
                     result = c.run(command, warn=True)
@@ -88,10 +88,10 @@ class Cook:
         if not components:
             return
 
-        logger.local('=== Executing Components ===')
+        logger.local('Executing Components')
 
         for component in components:
-            logger.local(f'=== Running Component: {component} ===')
+            logger.local(f'Component: {component}')
 
             sub_configuration = Configuration(self.receipe)
 
