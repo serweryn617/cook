@@ -87,11 +87,18 @@ class Configuration:
         if build_servers is None:
             return None
 
+        overrides = []
         for server_name, config in build_servers.items():
             override = self._get_nested_item(config, 'override')
             if override == True:
-                # TODO: Detect multiple overrides
-                return server_name
+                overrides.append(server_name)
+
+        if len(overrides) > 1:
+            logger.error(f"Multiple server overrides defined for {self.project}")
+            exit(1)
+
+        if overrides:
+            return overrides[0]
 
     def _is_composite(self):
         is_composite = 'components' in self.projects[self.project]
