@@ -5,6 +5,12 @@ default_build_server = 'argon'  # Build server used when none were explicitly se
 default_project = 'my_project'  # Project to build when none were explicitly selected.
 
 
+if 'name' in user_args:
+    out_file_name = f'output_{user_args["name"]}'
+else:
+    out_file_name = 'output_latest'
+
+
 projects = {
     'my_project': {
         'components': [
@@ -66,8 +72,8 @@ projects = {
         },
 
         'build_steps': [
-            'cp build/output ../output_latest',
-            'cat ../output_latest',
+            f'cp build/output ../{out_file_name}',
+            f'cat ../{out_file_name}',
         ],
     },
 
@@ -81,7 +87,7 @@ projects = {
 
         'build_steps': [
             'rm -rf build',
-            'rm -f ../output_latest',
+            f'rm -f ../{out_file_name}',
         ],
     },
 
