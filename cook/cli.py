@@ -2,28 +2,28 @@ import argparse
 import pathlib
 
 from .cook import Cook
-from .receipe import Receipe
+from .recipe import Recipe
 from .configuration import Configuration
 
 
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('receipe_path', nargs='?', default='.')
-    parser.add_argument('-p', '--project')
-    parser.add_argument('-s', '--build_server')
+    parser.add_argument('recipe_path', nargs='?', default='.', help='Recipe file directory path.')
+    parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
+    parser.add_argument('-s', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
 
     args = parser.parse_args()
 
-    base_path = pathlib.Path.cwd() / args.receipe_path
+    base_path = pathlib.Path.cwd() / args.recipe_path
 
-    receipe = Receipe(base_path)
-    receipe.load()
+    recipe = Recipe(base_path)
+    recipe.load()
 
-    configuration = Configuration(receipe)
+    configuration = Configuration(recipe)
     configuration.setup(args.project, args.build_server)
 
-    cook = Cook(receipe, configuration)
+    cook = Cook(recipe, configuration)
     cook.cook()
 
 

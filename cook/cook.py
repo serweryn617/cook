@@ -2,14 +2,14 @@ import fabric
 import subprocess
 
 from .rsync import Rsync
-from .receipe import Receipe
+from .recipe import Recipe
 from .configuration import Configuration, BuildType
 from cook import logger
 
 
 class Cook:
-    def __init__(self, receipe, configuration):
-        self.receipe = receipe
+    def __init__(self, recipe, configuration):
+        self.recipe = recipe
         self.configuration = configuration
 
     def cook(self):
@@ -93,10 +93,10 @@ class Cook:
         for component in components:
             logger.local(f'Component: {component}')
 
-            sub_configuration = Configuration(self.receipe)
+            sub_configuration = Configuration(self.recipe)
 
             build_server = self.configuration.get_build_server()
             sub_configuration.setup(component, build_server)
 
-            sub_cook = Cook(self.receipe, sub_configuration)
+            sub_cook = Cook(self.recipe, sub_configuration)
             sub_cook.cook()

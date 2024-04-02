@@ -1,4 +1,4 @@
-# Cooking receipe, checkout Cook at https://github.com/serweryn617/cook
+# Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
 
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.

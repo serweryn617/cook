@@ -20,10 +20,10 @@ pip install .
 
 ### Setup
 
-Create `receipe.py` file which describes how to build Your project and lists the available remote build servers.
+Create `recipe.py` file which describes how to build Your project and lists the available remote build servers.
 
 See the [example project](example).
 
 ### Run
 
-Run `cook` command in the directory where the `receipe.py` file is located and see how the project is being built!
+Run `cook` command in the directory where the `recipe.py` file is located and see how the project is being built!

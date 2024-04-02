@@ -10,13 +10,13 @@ class BuildType(Enum):
 
 
 class Configuration:
-    def __init__(self, receipe):
-        self.projects = receipe.projects
+    def __init__(self, recipe):
+        self.projects = recipe.projects
 
-        self.default_project = receipe.default_project
-        self.default_build_server = receipe.default_build_server
+        self.default_project = recipe.default_project
+        self.default_build_server = recipe.default_build_server
 
-        self.base_path = receipe.base_path
+        self.base_path = recipe.base_path
         self.skip = False
 
     def setup(self, project, server):
