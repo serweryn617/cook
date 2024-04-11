@@ -16,22 +16,24 @@ def parse_user_args(user_args):
 
 def main():
     parser = argparse.ArgumentParser()
-
-    parser.add_argument('recipe_path', nargs='?', default='.', help='Recipe file directory path.')
-    parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
-    parser.add_argument('-s', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
-    parser.add_argument('-u', '--user_args', nargs='*', default={}, help='User arguments. Can be used in recipe file. Format: key=value')
+    parser.add_argument('-p', '--recipe_path', default='.', help='Recipe file directory path.')
+    parser.add_argument('options', nargs='*', default={}, help='Project to build followed by user arguments.') #  Uses value of `default_project` if left unspecified, Can be used in recipe file. Format: key=value
+    parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
 
     args = parser.parse_args()
+    recipe_base_path = pathlib.Path.cwd() / args.recipe_path
+    build_server = args.build_server
+    if args.options and '=' in args.options[0]:
+        project = None
+    else:
+        project = args.options.pop(0)
+    user_args = parse_user_args(args.options)
 
-    base_path = pathlib.Path.cwd() / args.recipe_path
-    user_args = parse_user_args(args.user_args)
-
-    recipe = Recipe(base_path, user_args)
+    recipe = Recipe(recipe_base_path, user_args)
     recipe.load()
 
     configuration = Configuration(recipe)
-    configuration.setup(args.project, args.build_server)
+    configuration.setup(project, build_server)
 
     cook = Cook(recipe, configuration)
     cook.cook()
