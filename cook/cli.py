@@ -3,7 +3,7 @@ import pathlib
 
 from .configuration import Configuration, ConfigurationError
 from .cook import Cook
-from .executors import ProcessError
+from .executors import ExecutorProcessError
 from .logger import Logger
 from .recipe import NoProjectsDefined, Recipe, RecipeNotFound
 
@@ -43,27 +43,21 @@ def main():
         project = args.project
     user_args = parse_user_args(args.user_args)
 
-    # Recipe
-    recipe = Recipe(recipe_base_path, user_args)
     try:
+        recipe = Recipe(recipe_base_path, user_args)
         recipe.load()
-    except (RecipeNotFound, NoProjectsDefined) as e:
-        Logger().error(e)
-        exit(1)
 
-    # Project configuration
-    configuration = Configuration(recipe)
-    try:
+        configuration = Configuration(recipe)
         configuration.setup(project, build_server)
-    except ConfigurationError as e:
+
+        cook = Cook(recipe, configuration)
+        cook.cook()
+
+    except (RecipeNotFound, NoProjectsDefined, ConfigurationError) as e:
         Logger().error(e)
         exit(1)
 
-    # Cook!
-    cook = Cook(recipe, configuration)
-    try:
-        cook.cook()
-    except ProcessError as e:
+    except ExecutorProcessError as e:
         Logger().error(e)
         exit(e.return_code)
 
