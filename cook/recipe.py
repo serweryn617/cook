@@ -1,7 +1,7 @@
 import importlib.util
 import sys
 from pathlib import Path
-from cook import logger
+from .logger import Logger
 
 
 class Recipe:
@@ -18,7 +18,7 @@ class Recipe:
         recipes = list(self.base_path.glob('recipe.py'))
 
         if len(recipes) == 0:
-            logger.error(f'Recipe file not found in {self.base_path}')
+            Logger().error(f'Recipe file not found in {self.base_path}')
             exit(1)
 
         recipe_file_path = str(recipes[0])
@@ -33,7 +33,7 @@ class Recipe:
         if hasattr(recipe, 'projects'):
             self.projects = recipe.projects
         else:
-            logger.error('No projects found in recipe.')
+            Logger().error('No projects found in recipe.')
             exit(1)
 
         if hasattr(recipe, 'default_project'):
