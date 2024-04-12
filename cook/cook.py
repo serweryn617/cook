@@ -35,19 +35,12 @@ class Cook:
         for workdir, command in steps:
             Logger().local(f'Local Workdir/Command: {workdir}: {command}')
 
-            process = subprocess.Popen(command, cwd=workdir, shell=True, stdout=subprocess.PIPE)
-            while process.poll() is None:
-                line = process.stdout.readline()
-                Logger().raw(line.decode())
-
-                    # for line in process.stdout:
-                    #     print(line.decode('utf8'))
-                    # for c in iter(lambda: process.stdout.read(1), b""):
-                    #     print(c)
-            # except subprocess.CalledProcessError as e:
-            #     return_code = e.returncode
-            #     Logger().error(f'Encountered non-zero exit code: {return_code}')
-            #     exit(return_code)
+            try:
+                subprocess.run(command, cwd=workdir, shell=True, check=True)
+            except subprocess.CalledProcessError as e:
+                return_code = e.returncode
+                Logger().error(f'Encountered non-zero exit code: {return_code}')
+                exit(return_code)
 
     def _remote_build(self):
         files_to_send = self.configuration.get_files_to_send()
@@ -83,8 +76,6 @@ class Cook:
 
                 with c.cd(workdir):
                     result = c.run(command, warn=True)
-
-                # breakpoint()
 
                 return_code = result.return_code
                 if return_code != 0:
