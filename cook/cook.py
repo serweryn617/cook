@@ -4,7 +4,7 @@ import subprocess
 from .rsync import Rsync
 from .recipe import Recipe
 from .configuration import Configuration, BuildType
-from cook import logger
+from .logger import Logger
 
 
 class Cook:
@@ -28,17 +28,17 @@ class Cook:
         build_steps = self.configuration.get_build_steps()
 
         if build_steps:
-            logger.local('Running local build')
+            Logger().local('Running local build')
             self._execute_steps_local(build_steps)
 
     def _execute_steps_local(self, steps):
         for workdir, command in steps:
-            logger.local(f'Local Workdir/Command: {workdir}: {command}')
+            Logger().local(f'Local Workdir/Command: {workdir}: {command}')
 
             process = subprocess.Popen(command, cwd=workdir, shell=True, stdout=subprocess.PIPE)
             while process.poll() is None:
                 line = process.stdout.readline()
-                logger.auto(line.decode())
+                Logger().raw(line.decode())
 
                     # for line in process.stdout:
                     #     print(line.decode('utf8'))
@@ -46,7 +46,7 @@ class Cook:
                     #     print(c)
             # except subprocess.CalledProcessError as e:
             #     return_code = e.returncode
-            #     logger.error(f'Encountered non-zero exit code: {return_code}')
+            #     Logger().error(f'Encountered non-zero exit code: {return_code}')
             #     exit(return_code)
 
     def _remote_build(self):
@@ -65,21 +65,21 @@ class Cook:
             rsync = Rsync(source_files_path, ssh_name, project_remote_path)
 
         if files_to_send:
-            logger.remote('Sending Files')
+            Logger().remote('Sending Files')
             rsync.send(files_to_send, files_to_exclude)
 
         if build_steps:
-            logger.remote('Running Remote Build')
+            Logger().remote('Running Remote Build')
             self._run_build_steps(ssh_name, build_steps)
 
         if files_to_receive:
-            logger.remote('Receiving Files')
+            Logger().remote('Receiving Files')
             rsync.receive(files_to_receive)
 
     def _run_build_steps(self, ssh_name, build_steps):
         with fabric.Connection(ssh_name) as c:
             for workdir, command in build_steps:
-                logger.remote(f'Remote Workdir/Command: {ssh_name}:{workdir}: {command}')
+                Logger().remote(f'Remote Workdir/Command: {ssh_name}:{workdir}: {command}')
 
                 with c.cd(workdir):
                     result = c.run(command, warn=True)
@@ -88,7 +88,7 @@ class Cook:
 
                 return_code = result.return_code
                 if return_code != 0:
-                    logger.error(f'Encountered non-zero exit code: {return_code}')
+                    Logger().error(f'Encountered non-zero exit code: {return_code}')
                     exit(return_code)
 
     def _composite_build(self):
@@ -97,10 +97,10 @@ class Cook:
         if not components:
             return
 
-        logger.local('Executing Components')
+        Logger().local('Executing Components')
 
         for component in components:
-            logger.local(f'Component: {component}')
+            Logger().local(f'Component: {component}')
 
             sub_configuration = Configuration(self.recipe)
 

@@ -1,6 +1,6 @@
 from enum import Enum, auto
 from pathlib import Path
-from cook import logger
+from .logger import Logger
 
 
 class BuildType(Enum):
@@ -45,7 +45,7 @@ class Configuration:
         project_defined = project in self.projects
         
         if not project_defined:
-            logger.error(f'No such project {project}')
+            Logger().error(f'No such project {project}')
             exit(1)
 
         self.project = project
@@ -58,7 +58,7 @@ class Configuration:
 
         build_server_config = self._get_nested_item(self.projects, self.project, 'build_servers', build_server)
         if build_server_config is None:
-            logger.error(f'Build server {build_server} not defined for {self.project}')
+            Logger().error(f'Build server {build_server} not defined for {self.project}')
             exit(1)
 
         skip = self._get_nested_item(build_server_config, 'skip')
@@ -69,7 +69,7 @@ class Configuration:
         if not self._is_local():
             remote_path = self._get_nested_item(build_server_config, 'build_path')
             if remote_path is None:
-                logger.error(f"No build path defined for {self.project} on build server {build_server}")
+                Logger().error(f"No build path defined for {self.project} on build server {build_server}")
                 exit(1)
             self.remote_path = Path(remote_path)
 
@@ -94,7 +94,7 @@ class Configuration:
                 overrides.append(server_name)
 
         if len(overrides) > 1:
-            logger.error(f"Multiple server overrides defined for {self.project}")
+            Logger().error(f"Multiple server overrides defined for {self.project}")
             exit(1)
 
         if overrides:

@@ -1,25 +1,38 @@
 from rich import print as rprint
 from rich.console import Console
+from rich.theme import Theme
 
-GREEN = '[#00cc52]'
-PURPLE = '[#d849ff]'
-RED = '[#ff0000]'
 
-console = Console()
+GREEN = '#00cc52'
+PURPLE = '#d849ff'
+RED = '#ff0000'
 
-def process(message):
-    message = message.replace('[', '\[')
-    return '=== ' + message + ' ==='
 
-def local(message):
-    console.print(GREEN + process(message))
+class Logger:
+    def __init__(self):
+        cook_console_theme = Theme({
+            "local": GREEN,
+            "remote": PURPLE,
+            "error": RED,
+        })
+        self.console = Console(theme=cook_console_theme)
 
-def remote(message):
-    console.print(PURPLE + process(message))
+    def _internal_message(self, message, style):
+        message = '=== ' + message + ' ==='
+        self.console.print(message, style=style, highlight=False)
 
-def error(message):
-    console.print(RED + process(message))
+    def local(self, message):
+        self._internal_message(message, 'local')
 
-def auto(message):
-    console.print(message, end='')
+    def remote(self, message):
+        self._internal_message(message, 'remote')
+
+    def error(self, message):
+        self._internal_message(message, 'error')
+
+    def rich(self, message):
+        self.console.print(message, end='')
+
+    def raw(self, message):
+        print(message, end='')
 
