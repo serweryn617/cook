@@ -1,4 +1,3 @@
-from rich import print as rprint
 from rich.console import Console
 from rich.theme import Theme
 
