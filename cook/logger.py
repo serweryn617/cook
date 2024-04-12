@@ -8,11 +8,13 @@ RED = '#ff0000'
 
 class Logger:
     def __init__(self):
-        cook_console_theme = Theme({
-            "local": GREEN,
-            "remote": PURPLE,
-            "error": RED,
-        })
+        cook_console_theme = Theme(
+            {
+                "local": GREEN,
+                "remote": PURPLE,
+                "error": RED,
+            }
+        )
         self.console = Console(theme=cook_console_theme)
 
     def _internal_message(self, message, style):
@@ -33,4 +35,3 @@ class Logger:
 
     def raw(self, message):
         print(message, end='')
-

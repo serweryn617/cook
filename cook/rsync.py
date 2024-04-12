@@ -20,7 +20,7 @@ class Rsync:
 
     def send(self, files, exclude=None):
         cmd = list(Rsync.command)
-        
+
         if exclude:
             cmd += [Rsync.exclude + pattern for pattern in exclude]
 

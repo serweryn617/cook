@@ -11,7 +11,6 @@ class NoProjectsDefined(Exception):
     pass
 
 
-
 class Recipe:
     def __init__(self, base_path: Path, user_args: dict):
         self.base_path = base_path

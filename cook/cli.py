@@ -17,15 +17,15 @@ def parse_user_args(user_args):
 
 
 def main():
-    epilog_text = '\n'.join((
-        'example usage:',
-        '  %(prog)s my_project name=latest -p ./example/ -b local',
-    ))
+    epilog_text = '\n'.join(
+        (
+            'example usage:',
+            '  %(prog)s my_project name=latest -p ./example/ -b local',
+        )
+    )
 
     parser = argparse.ArgumentParser(
-        description='Build script aggregator and remote executor',
-        epilog=epilog_text,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description='Build script aggregator and remote executor', epilog=epilog_text, formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     parser.add_argument('-p', '--recipe_path', default='.', help='Path to directory containing `recipe.py` file.')

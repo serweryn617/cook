@@ -46,7 +46,7 @@ class Configuration:
 
     def _set_project(self, project):
         project_defined = project in self.projects
-        
+
         if not project_defined:
             raise ConfigurationError(f'No such project {project}')
 

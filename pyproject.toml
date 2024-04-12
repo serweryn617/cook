@@ -35,3 +35,9 @@ Issues = "https://github.com/serweryn617/cook/issues"
 
 [project.scripts]
 cook = "cook.cli:main"
+
+[tool.black]
+line-length = 140
+target-version = ['py310']
+skip-string-normalization = true
+extend-exclude = 'example/recipe.py'
