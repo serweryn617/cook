@@ -17,7 +17,7 @@ class Logger:
         self.console = Console(theme=cook_console_theme)
 
     def _internal_message(self, message, style):
-        message = '=== ' + message + ' ==='
+        message = '=== ' + str(message) + ' ==='
         self.console.print(message, style=style, highlight=False)
 
     def local(self, message):

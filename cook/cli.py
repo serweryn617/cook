@@ -2,8 +2,9 @@ import argparse
 import pathlib
 
 from .cook import Cook
-from .recipe import Recipe
-from .configuration import Configuration
+from .recipe import Recipe, RecipeNotFound, NoProjectsDefined
+from .configuration import Configuration, ConfigurationError
+from .logger import Logger
 
 
 def parse_user_args(user_args):
@@ -42,10 +43,18 @@ def main():
     user_args = parse_user_args(args.user_args)
 
     recipe = Recipe(recipe_base_path, user_args)
-    recipe.load()
+    try:
+        recipe.load()
+    except (RecipeNotFound, NoProjectsDefined) as e:
+        Logger().error(e)
+        exit(1)
 
     configuration = Configuration(recipe)
-    configuration.setup(project, build_server)
+    try:
+        configuration.setup(project, build_server)
+    except ConfigurationError as e:
+        Logger().error(e)
+        exit(1)
 
     cook = Cook(recipe, configuration)
     cook.cook()

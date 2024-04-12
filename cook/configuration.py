@@ -1,6 +1,9 @@
 from enum import Enum, auto
 from pathlib import Path
-from .logger import Logger
+
+
+class ConfigurationError(Exception):
+    pass
 
 
 class BuildType(Enum):
@@ -45,8 +48,7 @@ class Configuration:
         project_defined = project in self.projects
         
         if not project_defined:
-            Logger().error(f'No such project {project}')
-            exit(1)
+            raise ConfigurationError(f'No such project {project}')
 
         self.project = project
 
@@ -58,8 +60,7 @@ class Configuration:
 
         build_server_config = self._get_nested_item(self.projects, self.project, 'build_servers', build_server)
         if build_server_config is None:
-            Logger().error(f'Build server {build_server} not defined for {self.project}')
-            exit(1)
+            raise ConfigurationError(f'Build server {build_server} not defined for {self.project}')
 
         skip = self._get_nested_item(build_server_config, 'skip')
         if skip == True:
@@ -69,8 +70,7 @@ class Configuration:
         if not self._is_local():
             remote_path = self._get_nested_item(build_server_config, 'build_path')
             if remote_path is None:
-                Logger().error(f"No build path defined for {self.project} on build server {build_server}")
-                exit(1)
+                raise ConfigurationError(f"No build path defined for {self.project} on build server {build_server}")
             self.remote_path = Path(remote_path)
 
     def _update_local_path(self):
@@ -94,8 +94,7 @@ class Configuration:
                 overrides.append(server_name)
 
         if len(overrides) > 1:
-            Logger().error(f"Multiple server overrides defined for {self.project}")
-            exit(1)
+            raise ConfigurationError(f"Multiple server overrides defined for {self.project}")
 
         if overrides:
             return overrides[0]

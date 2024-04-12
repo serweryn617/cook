@@ -1,7 +1,15 @@
 import importlib.util
 import sys
 from pathlib import Path
-from .logger import Logger
+
+
+class RecipeNotFound(Exception):
+    pass
+
+
+class NoProjectsDefined(Exception):
+    pass
+
 
 
 class Recipe:
@@ -18,8 +26,7 @@ class Recipe:
         recipes = list(self.base_path.glob('recipe.py'))
 
         if len(recipes) == 0:
-            Logger().error(f'Recipe file not found in {self.base_path}')
-            exit(1)
+            raise RecipeNotFound(f'Recipe file not found in {self.base_path}')
 
         recipe_file_path = str(recipes[0])
         module_name = 'recipe'
@@ -33,8 +40,7 @@ class Recipe:
         if hasattr(recipe, 'projects'):
             self.projects = recipe.projects
         else:
-            Logger().error('No projects found in recipe.')
-            exit(1)
+            raise NoProjectsDefined('No projects found in recipe.')
 
         if hasattr(recipe, 'default_project'):
             self.default_project = recipe.default_project
