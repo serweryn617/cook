@@ -5,6 +5,7 @@ from .rsync import Rsync
 from .recipe import Recipe
 from .configuration import Configuration, BuildType
 from .logger import Logger
+from .executors import LocalExecutor, RemoteExecutor
 
 
 class Cook:
@@ -29,18 +30,8 @@ class Cook:
 
         if build_steps:
             Logger().local('Running local build')
-            self._execute_steps_local(build_steps)
-
-    def _execute_steps_local(self, steps):
-        for workdir, command in steps:
-            Logger().local(f'Local Workdir/Command: {workdir}: {command}')
-
-            try:
-                subprocess.run(command, cwd=workdir, shell=True, check=True)
-            except subprocess.CalledProcessError as e:
-                return_code = e.returncode
-                Logger().error(f'Encountered non-zero exit code: {return_code}')
-                exit(return_code)
+            executor = LocalExecutor(Logger())
+            executor.run_multiple(build_steps)
 
     def _remote_build(self):
         files_to_send = self.configuration.get_files_to_send()
@@ -63,24 +54,12 @@ class Cook:
 
         if build_steps:
             Logger().remote('Running Remote Build')
-            self._run_build_steps(ssh_name, build_steps)
+            executor = RemoteExecutor(ssh_name, Logger())
+            executor.run_multiple(build_steps)
 
         if files_to_receive:
             Logger().remote('Receiving Files')
             rsync.receive(files_to_receive)
-
-    def _run_build_steps(self, ssh_name, build_steps):
-        with fabric.Connection(ssh_name) as c:
-            for workdir, command in build_steps:
-                Logger().remote(f'Remote Workdir/Command: {ssh_name}:{workdir}: {command}')
-
-                with c.cd(workdir):
-                    result = c.run(command, warn=True)
-
-                return_code = result.return_code
-                if return_code != 0:
-                    Logger().error(f'Encountered non-zero exit code: {return_code}')
-                    exit(return_code)
 
     def _composite_build(self):
         components = self.configuration.get_components()

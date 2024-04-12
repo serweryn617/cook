@@ -5,6 +5,7 @@ from .cook import Cook
 from .recipe import Recipe, RecipeNotFound, NoProjectsDefined
 from .configuration import Configuration, ConfigurationError
 from .logger import Logger
+from .executors import ProcessError
 
 
 def parse_user_args(user_args):
@@ -42,6 +43,7 @@ def main():
         project = args.project
     user_args = parse_user_args(args.user_args)
 
+    # Recipe
     recipe = Recipe(recipe_base_path, user_args)
     try:
         recipe.load()
@@ -49,6 +51,7 @@ def main():
         Logger().error(e)
         exit(1)
 
+    # Project configuration
     configuration = Configuration(recipe)
     try:
         configuration.setup(project, build_server)
@@ -56,8 +59,13 @@ def main():
         Logger().error(e)
         exit(1)
 
+    # Cook!
     cook = Cook(recipe, configuration)
-    cook.cook()
+    try:
+        cook.cook()
+    except ProcessError as e:
+        Logger().error(e)
+        exit(e.return_code)
 
 
 if __name__ == '__main__':
