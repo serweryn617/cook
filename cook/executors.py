@@ -1,5 +1,6 @@
-import fabric
 import subprocess
+
+import fabric
 
 
 class ProcessError(Exception):

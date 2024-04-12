@@ -1,7 +1,6 @@
 from rich.console import Console
 from rich.theme import Theme
 
-
 GREEN = '#00cc52'
 PURPLE = '#d849ff'
 RED = '#ff0000'

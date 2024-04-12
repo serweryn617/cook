@@ -1,11 +1,12 @@
-import fabric
 import subprocess
 
-from .rsync import Rsync
-from .recipe import Recipe
-from .configuration import Configuration, BuildType
-from .logger import Logger
+import fabric
+
+from .configuration import BuildType, Configuration
 from .executors import LocalExecutor, RemoteExecutor
+from .logger import Logger
+from .recipe import Recipe
+from .rsync import Rsync
 
 
 class Cook:
