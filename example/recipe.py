@@ -1,6 +1,6 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
-from cook import BuildStep, Responder, user_args
+from cook import Responder, user_args
 
 
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
@@ -57,7 +57,7 @@ projects = {
 
         'build_steps': [
             'mkdir -p build',
-            ('build', 'python3 ../my_script.py', [(r'Execute example script\? \[y/n\]: ', 'y\n')]),
+            ('build', 'python3 ../my_script.py', [Responder(pattern=r'Execute example script\? \[y/n\]: ', response='y\n')]),
         ],
 
         'receive': [

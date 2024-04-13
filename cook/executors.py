@@ -25,8 +25,7 @@ class Executor:
             run_args['watchers'].append(rich_printer)
 
         if responders:
-            invoke_responders = [invoke.watchers.Responder(pattern=r[0], response=r[1]) for r in responders]
-            run_args['watchers'].extend(invoke_responders)
+            run_args['watchers'].extend(responders)
 
         with context.cd(workdir):
             result = context.run(command, warn=True, pty=True, **run_args)
