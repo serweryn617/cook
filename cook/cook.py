@@ -10,9 +10,10 @@ from .rsync import Rsync
 
 
 class Cook:
-    def __init__(self, recipe, configuration):
+    def __init__(self, recipe, configuration, rich_output=False):
         self.recipe = recipe
         self.configuration = configuration
+        self.rich_output = rich_output
 
     def cook(self):
         build_type = self.configuration.get_build_type()
@@ -31,7 +32,7 @@ class Cook:
 
         if build_steps:
             Logger().local('Running local build')
-            executor = LocalExecutor(Logger())
+            executor = LocalExecutor(Logger(), self.rich_output)
             executor.run_multiple(build_steps)
 
     def _remote_build(self):
@@ -55,7 +56,7 @@ class Cook:
 
         if build_steps:
             Logger().remote('Running Remote Build')
-            executor = RemoteExecutor(ssh_name, Logger())
+            executor = RemoteExecutor(ssh_name, Logger(), self.rich_output)
             executor.run_multiple(build_steps)
 
         if files_to_receive:
@@ -78,5 +79,5 @@ class Cook:
             build_server = self.configuration.get_build_server()
             sub_configuration.setup(component, build_server)
 
-            sub_cook = Cook(self.recipe, sub_configuration)
+            sub_cook = Cook(self.recipe, sub_configuration, self.rich_output)
             sub_cook.cook()
