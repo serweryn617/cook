@@ -5,7 +5,21 @@ from .logger import Logger
 from .recipe import Recipe, RecipeError, RecipeNotFound
 
 
-def main(settings):
+class Settings:
+    def __init__(self):
+        self.recipe_base_path = None
+        self.build_server = None
+        self.rich_output = None
+        self.project = None
+        self.user_args = {}
+
+
+settings = Settings()
+
+
+def main():
+    global settings
+
     try:
         recipe = Recipe(settings.recipe_base_path)
         recipe.load()

@@ -1,19 +1,7 @@
 import argparse
 import pathlib
 
-from .main import main
-
-
-class Settings:
-    def __init__(self):
-        self.recipe_base_path = None
-        self.build_server = None
-        self.rich_output = None
-        self.project = None
-        self.user_args = {}
-
-
-settings = Settings()
+from .main import main, settings
 
 
 def parse_user_args(user_args):
@@ -55,4 +43,4 @@ def cli():
     settings.user_args.update(parse_user_args(args.user_args))
     settings.rich_output = args.rich_output
 
-    main(settings)
+    main()
