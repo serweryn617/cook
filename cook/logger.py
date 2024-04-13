@@ -10,9 +10,9 @@ class Logger:
     def __init__(self):
         cook_console_theme = Theme(
             {
-                "local": GREEN,
-                "remote": PURPLE,
-                "error": RED,
+                'local': GREEN,
+                'remote': PURPLE,
+                'error': RED,
             }
         )
         self.console = Console(theme=cook_console_theme)

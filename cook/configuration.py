@@ -70,7 +70,7 @@ class Configuration:
         if not self._is_local():
             remote_path = self._get_nested_item(build_server_config, 'build_path')
             if remote_path is None:
-                raise ConfigurationError(f"No build path defined for {self.project} on build server {build_server}")
+                raise ConfigurationError(f'No build path defined for {self.project} on build server {build_server}')
             self.remote_path = Path(remote_path)
 
     def _update_local_path(self):
@@ -94,7 +94,7 @@ class Configuration:
                 overrides.append(server_name)
 
         if len(overrides) > 1:
-            raise ConfigurationError(f"Multiple server overrides defined for {self.project}")
+            raise ConfigurationError(f'Multiple server overrides defined for {self.project}')
 
         if overrides:
             return overrides[0]

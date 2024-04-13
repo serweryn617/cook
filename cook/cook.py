@@ -24,7 +24,7 @@ class Cook:
         elif build_type == BuildType.REMOTE:
             self._remote_build()
         else:
-            raise RuntimeError(f"Unknown build type: {build_type}")
+            raise RuntimeError(f'Unknown build type: {build_type}')
 
     def _local_build(self):
         build_steps = self.configuration.get_build_steps()
