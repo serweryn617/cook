@@ -17,15 +17,10 @@ class LocalExecutor:
         self.logger = logger
         self.rich_output = rich_output
 
-    def _run_process(self, workdir, command):
-        try:
-            subprocess.run(command, cwd=workdir, shell=True, check=True)
-        except subprocess.CalledProcessError as e:
-            return_code = e.returncode
-            raise ExecutorProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
+    def run(self, workdir, command):
+        if self.logger:
+            self.logger.local(f'Local Workdir/Command: {workdir}: {command}')
 
-    def _run_process_rich(self, workdir, command):
-        context = invoke.context.Context()
         run_args = {'watchers': []}
 
         if self.rich_output:
@@ -33,21 +28,13 @@ class LocalExecutor:
             run_args['hide'] = 'both'
             run_args['watchers'].append(rich_printer)
 
+        context = invoke.context.Context()
         with context.cd(workdir):
-            result = context.run(command, warn=True, **run_args)
+            result = context.run(command, warn=True, pty=True, **run_args)
 
         return_code = result.return_code
         if return_code != 0:
             raise ExecutorProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
-
-    def run(self, workdir, command):
-        if self.logger:
-            self.logger.local(f'Local Workdir/Command: {workdir}: {command}')
-
-        if self.rich_output:
-            self._run_process_rich(workdir, command)
-        else:
-            self._run_process(workdir, command)
 
     def run_multiple(self, steps):
         for step in steps:
@@ -72,7 +59,7 @@ class RemoteExecutor:
             run_args['watchers'].append(rich_printer)
 
         with context.cd(workdir):
-            result = context.run(command, warn=True, **run_args)
+            result = context.run(command, warn=True, pty=True, **run_args)
 
         return_code = result.return_code
         if return_code != 0:
