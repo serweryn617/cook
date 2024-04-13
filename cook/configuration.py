@@ -13,7 +13,7 @@ class BuildType(Enum):
 
 
 class BuildStep:
-    def __init__(self, command, workdir, responders=None):
+    def __init__(self, workdir, command, responders=None):
         self.command = command
         self.workdir = workdir
 
@@ -184,15 +184,13 @@ class Configuration:
                 workdir = '.'
                 command = step
                 responders = None
-            elif isinstance(step, tuple):
-                if len(step) == 2:
-                    workdir, command = step
-                    responders = None
-                elif len(step) == 3:
-                    workdir, command, responders = step
+            elif isinstance(step, BuildStep):
+                workdir = step.workdir
+                command = step.command
+                responders = step.responders
 
             workdir = base_dir / workdir
-            parsed_step = BuildStep(command, workdir, responders)
+            parsed_step = BuildStep(workdir, command, responders)
             parsed_build_steps.append(parsed_step)
 
         return parsed_build_steps
