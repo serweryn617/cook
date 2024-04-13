@@ -8,6 +8,9 @@ from .logger import Logger
 from .recipe import NoProjectsDefined, Recipe, RecipeNotFound
 
 
+user_args = {}
+
+
 def parse_user_args(user_args):
     res = {}
     for arg in user_args:
@@ -17,6 +20,8 @@ def parse_user_args(user_args):
 
 
 def main():
+    global user_args
+
     epilog_text = '\n'.join(
         (
             'example usage:',
@@ -42,7 +47,7 @@ def main():
         args.user_args.insert(0, args.project)
     else:
         project = args.project
-    user_args = parse_user_args(args.user_args)
+    user_args.update(parse_user_args(args.user_args))
     rich_output = args.rich_output
 
     try:

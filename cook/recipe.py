@@ -33,7 +33,6 @@ class Recipe:
         spec = importlib.util.spec_from_file_location(module_name, recipe_file_path)
         recipe = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = recipe
-        recipe.user_args = self.user_args  # Inject user_args to receipe.py before executing the module
         spec.loader.exec_module(recipe)
 
         if hasattr(recipe, 'projects'):
