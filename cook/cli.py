@@ -7,7 +7,6 @@ from .executors import ExecutorProcessError
 from .logger import Logger
 from .recipe import NoProjectsDefined, Recipe, RecipeNotFound
 
-
 user_args = {}
 
 

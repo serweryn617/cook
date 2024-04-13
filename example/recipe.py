@@ -2,7 +2,6 @@
 
 from cook import Responder, user_args
 
-
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
 default_project = 'my_project'  # Project to build when none were explicitly selected.
 
