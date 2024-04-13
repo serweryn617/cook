@@ -38,7 +38,7 @@ def main():
     build_server = args.build_server
     if args.project and '=' in args.project:
         project = None
-        args.user_args.append(args.project)
+        args.user_args.insert(0, args.project)
     else:
         project = args.project
     user_args = parse_user_args(args.user_args)
