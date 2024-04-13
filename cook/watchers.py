@@ -9,7 +9,7 @@ class RichPrinter(invoke.watchers.StreamWatcher):
 
     def submit(self, stream):
         last_line = stream.rfind('\n')
-        new = stream[self.index:last_line + 1]
+        new = stream[self.index : last_line + 1]
         self.index += len(new)
 
         self.logger.rich(new)
