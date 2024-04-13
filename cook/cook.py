@@ -5,7 +5,6 @@ import fabric
 from .configuration import BuildType, Configuration
 from .executors import LocalExecutor, RemoteExecutor
 from .logger import Logger
-from .recipe import Recipe
 from .rsync import Rsync
 
 
