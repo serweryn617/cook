@@ -55,7 +55,7 @@ projects = {
 
         'build_steps': [
             'mkdir -p build',
-            ('build', 'python3 ../my_script.py'),
+            ('build', 'python3 ../my_script.py', [(r'Execute example script\? \[y/n\]: ', 'y\n')]),
         ],
 
         'receive': [

@@ -2,6 +2,10 @@ import socket
 import sys
 import time
 
+user_input = input('Execute example script? [y/n]: ')
+if user_input != 'y':
+    exit(1)
+
 HOSTNAME = socket.gethostname()
 
 print(f'[1/2] {__file__}: Executing on {HOSTNAME}...', flush=True)

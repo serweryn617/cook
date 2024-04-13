@@ -12,6 +12,17 @@ class BuildType(Enum):
     COMPOSITE = auto()
 
 
+class BuildStep:
+    def __init__(self, command, workdir, responders=None):
+        self.command = command
+        self.workdir = workdir
+
+        if responders:
+            self.responders = responders
+        else:
+            self.responders = tuple()
+
+
 class Configuration:
     def __init__(self, recipe):
         self.projects = recipe.projects
@@ -169,13 +180,20 @@ class Configuration:
         base_dir = self._get_build_steps_base_dir()
 
         for step in build_steps:
-            if isinstance(step, tuple):
-                workdir, command = step
-            else:
+            if isinstance(step, str):
                 workdir = '.'
                 command = step
+                responders = None
+            elif isinstance(step, tuple):
+                if len(step) == 2:
+                    workdir, command = step
+                    responders = None
+                elif len(step) == 3:
+                    workdir, command, responders = step
 
-            parsed_build_steps.append((base_dir / workdir, command))
+            workdir = base_dir / workdir
+            parsed_step = BuildStep(command, workdir, responders)
+            parsed_build_steps.append(parsed_step)
 
         return parsed_build_steps
 

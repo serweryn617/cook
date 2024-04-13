@@ -16,13 +16,17 @@ class Executor:
     def __init__(self, rich_output=False):
         self.rich_output = rich_output
 
-    def run(self, context, workdir, command):
+    def run(self, context, workdir, command, responders):
         run_args = {'watchers': []}
 
         if self.rich_output:
             rich_printer = RichPrinter(self.logger)
             run_args['hide'] = 'both'
             run_args['watchers'].append(rich_printer)
+
+        if responders:
+            invoke_responders = [invoke.watchers.Responder(pattern=r[0], response=r[1]) for r in responders]
+            run_args['watchers'].extend(invoke_responders)
 
         with context.cd(workdir):
             result = context.run(command, warn=True, pty=True, **run_args)
@@ -39,11 +43,11 @@ class LocalExecutor(Executor):
 
     def run_multiple(self, steps):
         context = invoke.context.Context()
-        for workdir, command in steps:
+        for step in steps:
             if self.logger:
-                self.logger.local(f'Local Workdir/Command: {workdir}: {command}')
+                self.logger.local(f'Local Workdir/Command: {step.workdir}: {step.command}')
 
-            self.run(context, workdir, command)
+            self.run(context, step.workdir, step.command, step.responders)
 
 
 class RemoteExecutor(Executor):
@@ -54,8 +58,8 @@ class RemoteExecutor(Executor):
 
     def run_multiple(self, steps):
         with fabric.Connection(self.ssh_name) as context:
-            for workdir, command in steps:
+            for step in steps:
                 if self.logger:
-                    self.logger.remote(f'Remote Workdir/Command: {self.ssh_name}:{workdir}: {command}')
+                    self.logger.remote(f'Remote Workdir/Command: {self.ssh_name}:{step.workdir}: {step.command}')
 
-                self.run(context, workdir, command)
+                self.run(context, step.workdir, step.command, step.responders)
