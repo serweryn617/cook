@@ -34,7 +34,7 @@ Homepage = "https://github.com/serweryn617/cook"
 Issues = "https://github.com/serweryn617/cook/issues"
 
 [project.scripts]
-cook = "cook.cli:main"
+cook = "cook.cli:cli"
 
 [tool.black]
 line-length = 140

@@ -1,13 +1,13 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
-from cook import Responder, user_args
+from cook import Responder, settings
 
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
 default_project = 'my_project'  # Project to build when none were explicitly selected.
 
 
-if 'name' in user_args:
-    out_file_name = f'output_{user_args["name"]}'
+if 'name' in settings.user_args:
+    out_file_name = f'output_{settings.user_args["name"]}'
 else:
     out_file_name = 'output_latest'
 
@@ -55,6 +55,7 @@ projects = {
         ],
 
         'build_steps': [
+            # TODO: use either string or BuildStep object
             'mkdir -p build',
             ('build', 'python3 ../my_script.py', [Responder(pattern=r'Execute example script\? \[y/n\]: ', response='y\n')]),
         ],
