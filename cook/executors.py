@@ -22,7 +22,7 @@ class LocalExecutor:
             subprocess.run(command, cwd=workdir, shell=True, check=True)
         except subprocess.CalledProcessError as e:
             return_code = e.returncode
-            raise ProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
+            raise ExecutorProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
 
     def _run_process_rich(self, workdir, command):
         context = invoke.context.Context()
@@ -38,7 +38,7 @@ class LocalExecutor:
 
         return_code = result.return_code
         if return_code != 0:
-            raise ProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
+            raise ExecutorProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
 
     def run(self, workdir, command):
         if self.logger:
@@ -76,7 +76,7 @@ class RemoteExecutor:
 
         return_code = result.return_code
         if return_code != 0:
-            raise ProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
+            raise ExecutorProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
 
     def run_multiple(self, steps):
         with fabric.Connection(self.ssh_name) as context:
