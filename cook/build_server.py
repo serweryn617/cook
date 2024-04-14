@@ -9,8 +9,8 @@ class BuildServer:
 
 
 class LocalBuildServer(BuildServer):
-    def __init__(self, name, build_path='.', sync_files=False, skip=False, override=False):
-        super().__init__(name=name, build_path=build_path, sync_files=sync_files, skip=skip, override=override, is_local=True)
+    def __init__(self, skip=False, override=False):
+        super().__init__(name='local', build_path='.', sync_files=False, skip=skip, override=override, is_local=True)
 
 
 class RemoteBuildServer(BuildServer):

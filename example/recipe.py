@@ -24,7 +24,7 @@ projects = {
 
     'my_project_create_workdir': {
         'build_servers': [
-            LocalBuildServer(name='local', skip=True),
+            LocalBuildServer(skip=True),
             RemoteBuildServer(name='argon', build_path='~'),
         ],
 
@@ -35,7 +35,7 @@ projects = {
 
     'my_project_build': {
         'build_servers': [
-            LocalBuildServer(name='local'),
+            LocalBuildServer(),
             RemoteBuildServer(name='argon', build_path='~/cook_example'),
         ],
 
@@ -66,7 +66,7 @@ projects = {
 
     'my_project_post_actions': {
         'build_servers': [
-            LocalBuildServer(name='local', override=True),
+            LocalBuildServer(override=True),
         ],
 
         'build_steps': [
@@ -77,7 +77,7 @@ projects = {
 
     'clean': {
         'build_servers': [
-            LocalBuildServer(name='local', override=True),
+            LocalBuildServer(override=True),
         ],
 
         'build_steps': [
