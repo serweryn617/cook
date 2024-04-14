@@ -19,7 +19,10 @@ class Rsync:
 
     def send(self, files, exclude=None):
         for src, dst in files:
-            print('Sending', src, 'to', self.hostname + ':' + dst)
+            src = src.rstrip('/') + '/'
+            dst = self.hostname + ':' + dst.rstrip('/')
+
+            print('Sending', src, 'to', dst)
 
             cmd = list(Rsync.command)
 
@@ -27,16 +30,19 @@ class Rsync:
             #     cmd += [Rsync.exclude + pattern for pattern in exclude]
 
             cmd.append(src)
-            cmd.append(self.hostname + ':' + dst)
+            cmd.append(dst)
 
             subprocess.check_output(' '.join(cmd), shell=True)
 
     def receive(self, files):
         for src, dst in files:
-            print('Receiving', self.hostname + ':' + src, 'to', dst)
+            src = self.hostname + ':' + src.rstrip('/') + '/'
+            dst = dst.rstrip('/')
+
+            print('Receiving', src, 'to', dst)
 
             cmd = list(Rsync.command)
-            cmd.append(self.hostname + ':' + src)
+            cmd.append(src)
             cmd.append(dst)
 
             subprocess.check_output(' '.join(cmd), shell=True)

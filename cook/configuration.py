@@ -84,10 +84,6 @@ class Configuration:
             self.skip = True
             return
 
-        build_path = self.build_server.build_path
-        if build_path is None:
-            raise ConfigurationError(f'No build path defined for {self.project} on build server {build_server.name}')
-
     def _get_build_server_override(self):
         build_servers = self._get_nested_item(self.projects, self.project, 'build_servers')
         if build_servers is None:
@@ -105,6 +101,9 @@ class Configuration:
             return overrides[0]
 
     def _update_paths(self):
+        if self.build_server.build_path is None:
+            raise ConfigurationError(f'No build path defined for {self.project} on build server {build_server.name}')
+
         build_path = Path(self.build_server.build_path)
         if self._is_local() and not build_path.is_absolute():
             self.build_path = (self.base_path / build_path).resolve()
@@ -137,8 +136,8 @@ class Configuration:
         if files_to_send is None:
             return None
 
-        src = [(self.base_path).as_posix() + '/' + file for file in files_to_send]
-        dst = [(self.build_path).as_posix() + '/' + file for file in files_to_send]
+        src = [(self.base_path / file).as_posix() for file in files_to_send]
+        dst = [(self.build_path / file).as_posix() for file in files_to_send]
         return zip(src, dst)
 
     def get_files_to_exclude(self):
@@ -151,8 +150,8 @@ class Configuration:
         if files_to_receive is None:
             return None
 
-        src = [(self.build_path).as_posix() + '/' + file for file in files_to_receive]
-        dst = [(self.base_path).as_posix() + '/' + file for file in files_to_receive]
+        src = [(self.build_path / file).as_posix() for file in files_to_receive]
+        dst = [(self.base_path / file).as_posix() for file in files_to_receive]
         return zip(src, dst)
 
     def get_build_steps(self):

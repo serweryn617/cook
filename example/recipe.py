@@ -45,7 +45,6 @@ projects = {
 
         'exclude': [
             'build',
-            'recipe.py',
         ],
 
         'build_steps': [
@@ -61,7 +60,7 @@ projects = {
         ],
 
         'receive': [
-            'my_project_source/build/',
+            'my_project_source/build',
         ],
     },
 
