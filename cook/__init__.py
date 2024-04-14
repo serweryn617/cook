@@ -1,4 +1,5 @@
 from invoke.watchers import Responder
 
-from cook.configuration import BuildServer, BuildStep
+from cook.build_server import LocalBuildServer, RemoteBuildServer
+from cook.configuration import BuildStep
 from cook.main import settings

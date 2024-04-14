@@ -1,6 +1,8 @@
 from enum import Enum, auto
 from pathlib import Path
 
+from .build_server import BuildServer
+
 
 class ConfigurationError(Exception):
     pass
@@ -23,20 +25,6 @@ class BuildStep:
             self.responders = tuple()
 
 
-class BuildServer:
-    def __init__(self, name, build_path=None, skip=False, override=False, is_local=None):
-        self.name = name
-        self.build_path = build_path
-        self.skip = skip
-        self.override = override
-        self.is_local = is_local
-
-        if self.is_local is None and name == 'local':
-            self.is_local = True
-        if self.build_path is None and self.is_local == True:
-            self.build_path = '.'
-
-
 class Configuration:
     def __init__(self, recipe):
         self.projects = recipe.projects
@@ -44,13 +32,13 @@ class Configuration:
         self.default_project = recipe.default_project
         self.default_build_server = recipe.default_build_server
 
-        self.local_path = recipe.base_path
+        self.base_path = recipe.base_path
         self.skip = False
 
     def setup(self, project=None, server=None):
         if project is None:
             project = self.default_project
-        
+
         if server is None:
             server = self.default_build_server
 
@@ -80,7 +68,7 @@ class Configuration:
         server_override = self._get_build_server_override()
         if server_override is not None:
             build_server_name = server_override
-        
+
         if self._is_composite():
             self.build_server = BuildServer(name=build_server_name)
             return
@@ -96,8 +84,8 @@ class Configuration:
             self.skip = True
             return
 
-        remote_path = self.build_server.build_path
-        if remote_path is None:
+        build_path = self.build_server.build_path
+        if build_path is None:
             raise ConfigurationError(f'No build path defined for {self.project} on build server {build_server.name}')
 
     def _get_build_server_override(self):
@@ -117,11 +105,11 @@ class Configuration:
             return overrides[0]
 
     def _update_paths(self):
-        remote_path = Path(self.build_server.build_path)
-        if self._is_local() and not remote_path.is_absolute():
-            self.remote_path = self.local_path / remote_path
+        build_path = Path(self.build_server.build_path)
+        if self._is_local() and not build_path.is_absolute():
+            self.build_path = (self.base_path / build_path).resolve()
         else:
-            self.remote_path = remote_path
+            self.build_path = build_path
 
     def _is_composite(self):
         is_composite = 'components' in self.projects[self.project]
@@ -143,21 +131,15 @@ class Configuration:
     def get_build_server(self):
         return self.build_server.name
 
-    def get_project_build_path(self):
-        build_path = self.build_server.build_path
-        return build_path
-
-    def get_source_files_path(self):
-        return self.local_path
-
     def get_files_to_send(self):
         files_to_send = self._get_nested_item(self.projects, self.project, 'send')
 
         if files_to_send is None:
             return None
 
-        files_to_send = [str(self.local_path / file) for file in files_to_send]
-        return files_to_send
+        src = [(self.base_path).as_posix() + '/' + file for file in files_to_send]
+        dst = [(self.build_path).as_posix() + '/' + file for file in files_to_send]
+        return zip(src, dst)
 
     def get_files_to_exclude(self):
         files_to_exclude = self._get_nested_item(self.projects, self.project, 'exclude')
@@ -169,12 +151,9 @@ class Configuration:
         if files_to_receive is None:
             return None
 
-        files_to_receive = [str(self.remote_path / file) for file in files_to_receive]
-        return files_to_receive
-
-    def _get_build_steps_base_dir(self):
-        # breakpoint()
-        return self.remote_path
+        src = [(self.build_path).as_posix() + '/' + file for file in files_to_receive]
+        dst = [(self.base_path).as_posix() + '/' + file for file in files_to_receive]
+        return zip(src, dst)
 
     def get_build_steps(self):
         if self.skip == True:
@@ -186,7 +165,6 @@ class Configuration:
             return None
 
         parsed_build_steps = []
-        base_dir = self._get_build_steps_base_dir()
 
         for step in build_steps:
             if isinstance(step, str):
@@ -200,7 +178,7 @@ class Configuration:
             else:
                 raise ConfigurationError(f'Expected build step to be of type str of BuildStep, was {type(step)}')
 
-            workdir = base_dir / workdir
+            workdir = self.build_path / workdir
             parsed_step = BuildStep(workdir=workdir, command=command, responders=responders)
             parsed_build_steps.append(parsed_step)
 

@@ -42,12 +42,10 @@ class Cook:
 
         ssh_name = self.configuration.get_build_server()
 
-        setup_rsync = files_to_send or files_to_receive
+        setup_rsync = bool(files_to_send or files_to_receive)
 
         if setup_rsync:
-            source_files_path = self.configuration.get_source_files_path()
-            project_remote_path = self.configuration.get_project_build_path()
-            rsync = Rsync(source_files_path, ssh_name, project_remote_path)
+            rsync = Rsync(ssh_name)
 
         if files_to_send:
             Logger().remote('Sending Files')

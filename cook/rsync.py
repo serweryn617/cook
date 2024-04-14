@@ -1,4 +1,5 @@
 import subprocess
+from pathlib import Path
 
 
 class Rsync:
@@ -13,26 +14,29 @@ class Rsync:
     )
     exclude = '--exclude='
 
-    def __init__(self, local_path, hostname, remote_path):
+    def __init__(self, hostname):  # TODO: add rsync for local
         self.hostname = hostname
-        self.local_path = local_path
-        self.remote_path = remote_path
 
     def send(self, files, exclude=None):
-        cmd = list(Rsync.command)
+        for src, dst in files:
+            print('Sending', src, 'to', self.hostname + ':' + dst)
 
-        if exclude:
-            cmd += [Rsync.exclude + pattern for pattern in exclude]
+            cmd = list(Rsync.command)
 
-        cmd += files
-        cmd.append(self.hostname + ':' + self.remote_path)
+            # if exclude:
+            #     cmd += [Rsync.exclude + pattern for pattern in exclude]
 
-        subprocess.check_output(' '.join(cmd), shell=True)
+            cmd.append(src)
+            cmd.append(self.hostname + ':' + dst)
+
+            subprocess.check_output(' '.join(cmd), shell=True)
 
     def receive(self, files):
-        files = [self.hostname + ':' + file for file in files]
-        location = [self.local_path]
+        for src, dst in files:
+            print('Receiving', self.hostname + ':' + src, 'to', dst)
 
-        cmd = list(Rsync.command) + files + location
+            cmd = list(Rsync.command)
+            cmd.append(self.hostname + ':' + src)
+            cmd.append(dst)
 
-        subprocess.check_output(cmd)
+            subprocess.check_output(' '.join(cmd), shell=True)
