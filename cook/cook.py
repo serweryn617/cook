@@ -45,7 +45,7 @@ class Cook:
         setup_rsync = bool(files_to_send or files_to_receive)
 
         if setup_rsync:
-            rsync = Rsync(ssh_name)
+            rsync = Rsync(ssh_name, Logger())
 
         if files_to_send:
             Logger().remote('Sending Files')

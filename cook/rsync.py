@@ -14,15 +14,17 @@ class Rsync:
     )
     exclude = '--exclude='
 
-    def __init__(self, hostname):  # TODO: add rsync for local
+    def __init__(self, hostname, logger=None):  # TODO: add rsync for local
         self.hostname = hostname
+        self.logger = logger
 
     def send(self, files, exclude=None):
         for src, dst in files:
             src = src.rstrip('/') + '/'
             dst = self.hostname + ':' + dst.rstrip('/')
 
-            print('Sending', src, 'to', dst)
+            if self.logger is not None:
+                self.logger.remote(f'Transfering {src} to {dst}')
 
             cmd = list(Rsync.command)
 
@@ -39,7 +41,8 @@ class Rsync:
             src = self.hostname + ':' + src.rstrip('/') + '/'
             dst = dst.rstrip('/')
 
-            print('Receiving', src, 'to', dst)
+            if self.logger is not None:
+                self.logger.remote(f'Transfering {src} to {dst}')
 
             cmd = list(Rsync.command)
             cmd.append(src)
