@@ -1,6 +1,6 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
-from cook import BuildStep, Responder, settings
+from cook import BuildServer, BuildStep, Responder, settings
 
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
 default_project = 'my_project'  # Project to build when none were explicitly selected.
@@ -22,15 +22,10 @@ projects = {
     },
 
     'my_project_create_workdir': {
-        'build_servers': {
-            # TODO: add build server builder
-            'local': {  # Local build
-                'skip': True,
-            },
-            'argon': {  # Hostname from SSH config
-                'build_path': '~',
-            },
-        },
+        'build_servers': [
+            BuildServer(name='local', skip=True),
+            BuildServer(name='argon', build_path='~'),
+        ],
 
         'build_steps': [
             'mkdir -p ~/cook_example',
@@ -38,14 +33,10 @@ projects = {
     },
 
     'my_project_build': {
-        'build_servers': {
-            'local': {
-                'build_path': 'my_project_source',
-            },
-            'argon': {
-                'build_path': '~/cook_example',
-            },
-        },
+        'build_servers': [
+            BuildServer(name='local', build_path='my_project_source'),
+            BuildServer(name='argon', build_path='~/cook_example'),
+        ],
 
         'send': [
             '*',
@@ -70,12 +61,9 @@ projects = {
     },
 
     'my_project_post_actions': {
-        'build_servers': {
-            'local': {
-                'override': True,  # Always run locally
-                'build_path': 'my_project_source',
-            },
-        },
+        'build_servers': [
+            BuildServer(name='local', build_path='my_project_source', override=True),
+        ],
 
         'build_steps': [
             f'cp build/output ../{out_file_name}',
@@ -84,12 +72,9 @@ projects = {
     },
 
     'clean': {
-        'build_servers': {
-            'local': {
-                'override': True,  # Always run locally
-                'build_path': 'my_project_source',
-            },
-        },
+        'build_servers': [
+            BuildServer(name='local', build_path='my_project_source', override=True),
+        ],
 
         'build_steps': [
             'rm -rf build',
@@ -98,11 +83,9 @@ projects = {
     },
 
     'clean_remote': {
-        'build_servers': {
-            'argon': {
-                'build_path': '~/cook_example',
-            },
-        },
+        'build_servers': [
+            BuildServer(name='argon', build_path='~/cook_example'),
+        ],
 
         'build_steps': [
             'rm -rf build',
