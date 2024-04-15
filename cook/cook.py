@@ -38,7 +38,6 @@ class Cook:
         build_steps = self.configuration.get_build_steps()
         local_base, remote_base = self.configuration.get_base_paths()
         files_to_send = self.configuration.get_files_to_send()
-        files_to_exclude = self.configuration.get_files_to_exclude()
         files_to_receive = self.configuration.get_files_to_receive()
 
         ssh_name = self.configuration.get_build_server()
@@ -50,7 +49,7 @@ class Cook:
 
         if files_to_send:
             Logger().remote('Sending Files')
-            rsync.send(files_to_send, files_to_exclude)
+            rsync.send(files_to_send)
 
         if build_steps:
             Logger().remote('Running Remote Build')

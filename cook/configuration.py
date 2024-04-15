@@ -141,10 +141,6 @@ class Configuration:
 
         return files_to_send
 
-    def get_files_to_exclude(self):
-        files_to_exclude = self._get_nested_item(self.projects, self.project, 'exclude')
-        return files_to_exclude
-
     def get_files_to_receive(self):
         files_to_receive = self._get_nested_item(self.projects, self.project, 'receive')
 

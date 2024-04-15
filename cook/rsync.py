@@ -40,35 +40,39 @@ class Rsync:
         '--delete',
         '--links',
         '--recursive',
+        '--mkpath',
         '--times',
         '--info=progress2',
-        '--mkpath',
     )
     exclude = '--exclude='
 
-    def __init__(self, hostname, local_base, remote_base, logger=None):  # TODO: add rsync for local
+    # TODO: add rsync for local build
+    def __init__(self, hostname, local_base, remote_base, logger=None):
         self.hostname = hostname
         self.logger = logger
         self.local_base = local_base
         self.remote_base = remote_base
 
-    def send(self, rsync_items, exclude=None):
+    def sync(self, src, dst):
+            # TODO: add exclude
+            cmd = list(Rsync.command)
+            cmd.append(src)
+            cmd.append(dst)
+
+            if self.logger is not None:
+                self.logger.rich(f'Transferring: {src} to {dst}\n')
+
+            # TODO: throw process exception
+            subprocess.check_output(' '.join(cmd), shell=True)
+
+    def send(self, rsync_items):
         for rsync_item in rsync_items:
             src_base = self.local_base
             dst_base = self.hostname + ':' + self.remote_base
 
             src, dst = rsync_item.parse(src_base=src_base, dst_base=dst_base)
 
-            if self.logger is not None:
-                self.logger.remote(f'Transfering {src} to {dst}')
-
-            # TODO: add exclude
-
-            cmd = list(Rsync.command)
-            cmd.append(src)
-            cmd.append(dst)
-
-            subprocess.check_output(' '.join(cmd), shell=True)
+            self.sync(src, dst)
 
     def receive(self, rsync_items):
         for rsync_item in rsync_items:
@@ -77,13 +81,4 @@ class Rsync:
 
             src, dst = rsync_item.parse(src_base=src_base, dst_base=dst_base)
 
-            if self.logger is not None:
-                self.logger.remote(f'Transfering {src} to {dst}')
-
-            # TODO: add exclude
-
-            cmd = list(Rsync.command)
-            cmd.append(src)
-            cmd.append(dst)
-
-            subprocess.check_output(' '.join(cmd), shell=True)
+            self.sync(src, dst)
