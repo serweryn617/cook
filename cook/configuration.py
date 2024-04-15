@@ -130,15 +130,16 @@ class Configuration:
     def get_build_server(self):
         return self.build_server.name
 
+    def get_base_paths(self):
+        return self.base_path.as_posix(), self.build_path.as_posix()
+
     def get_files_to_send(self):
         files_to_send = self._get_nested_item(self.projects, self.project, 'send')
 
         if files_to_send is None:
             return None
 
-        src = [(self.base_path / file).as_posix() for file in files_to_send]
-        dst = [(self.build_path / file).as_posix() for file in files_to_send]
-        return zip(src, dst)
+        return files_to_send
 
     def get_files_to_exclude(self):
         files_to_exclude = self._get_nested_item(self.projects, self.project, 'exclude')
@@ -150,9 +151,7 @@ class Configuration:
         if files_to_receive is None:
             return None
 
-        src = [(self.build_path / file).as_posix() for file in files_to_receive]
-        dst = [(self.base_path / file).as_posix() for file in files_to_receive]
-        return zip(src, dst)
+        return files_to_receive
 
     def get_build_steps(self):
         if self.skip == True:

@@ -1,6 +1,6 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
-from cook import (BuildStep, LocalBuildServer, RemoteBuildServer, Responder,
+from cook import (BuildStep, LocalBuildServer, RemoteBuildServer, Responder, RsyncDirectory, RsyncFile,
                   settings)
 
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
@@ -40,12 +40,13 @@ projects = {
         ],
 
         'send': [
-            '',  # Everything in this directory
+            RsyncDirectory(''),  # Everything in this directory
         ],
 
-        'exclude': [
-            'build',
-        ],
+        # TODO
+        # 'exclude': [
+        #     RsyncDirectory('build'),
+        # ],
 
         'build_steps': [
             BuildStep(
@@ -60,7 +61,7 @@ projects = {
         ],
 
         'receive': [
-            'my_project_source/build',
+            RsyncFile('my_project_source/build/output'),
         ],
     },
 
