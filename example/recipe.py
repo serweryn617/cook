@@ -43,11 +43,6 @@ projects = {
             RsyncDirectory(''),  # Everything in this directory
         ],
 
-        # TODO
-        # 'exclude': [
-        #     RsyncDirectory('build'),
-        # ],
-
         'build_steps': [
             BuildStep(
                 workdir='my_project_source',

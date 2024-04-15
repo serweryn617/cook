@@ -62,11 +62,9 @@ class Rsync:
             if self.logger is not None:
                 self.logger.remote(f'Transfering {src} to {dst}')
 
+            # TODO: add exclude
+
             cmd = list(Rsync.command)
-
-            # if exclude:
-            #     cmd += [Rsync.exclude + pattern for pattern in exclude]
-
             cmd.append(src)
             cmd.append(dst)
 
@@ -81,6 +79,8 @@ class Rsync:
 
             if self.logger is not None:
                 self.logger.remote(f'Transfering {src} to {dst}')
+
+            # TODO: add exclude
 
             cmd = list(Rsync.command)
             cmd.append(src)
