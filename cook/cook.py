@@ -35,19 +35,18 @@ class Cook:
             executor.run_multiple(build_steps)
 
     def _remote_build(self):
+        build_steps = self.configuration.get_build_steps()
+        local_base, remote_base = self.configuration.get_base_paths()
         files_to_send = self.configuration.get_files_to_send()
         files_to_exclude = self.configuration.get_files_to_exclude()
-        build_steps = self.configuration.get_build_steps()
         files_to_receive = self.configuration.get_files_to_receive()
 
         ssh_name = self.configuration.get_build_server()
 
-        setup_rsync = files_to_send or files_to_receive
+        setup_rsync = bool(files_to_send or files_to_receive)
 
         if setup_rsync:
-            source_files_path = self.configuration.get_source_files_path()
-            project_remote_path = self.configuration.get_project_build_path()
-            rsync = Rsync(source_files_path, ssh_name, project_remote_path)
+            rsync = Rsync(ssh_name, local_base, remote_base, Logger())
 
         if files_to_send:
             Logger().remote('Sending Files')

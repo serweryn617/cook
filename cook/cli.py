@@ -33,7 +33,7 @@ def cli():
     parser.add_argument('user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format: `key=value`')
 
     args = parser.parse_args()
-    settings.recipe_base_path = pathlib.Path.cwd() / args.recipe_path
+    settings.recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()
     settings.build_server = args.build_server
     if args.project and '=' in args.project:
         settings.project = None
