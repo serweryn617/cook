@@ -1,6 +1,8 @@
 import subprocess
 from pathlib import Path
 
+from .executors import ProcessError
+
 
 class RsyncDirectory:
     def __init__(self, path: str):
@@ -62,8 +64,9 @@ class Rsync:
             if self.logger is not None:
                 self.logger.rich(f'Transferring: {src} to {dst}\n')
 
-            # TODO: throw process exception
-            subprocess.check_output(' '.join(cmd), shell=True)
+            result = subprocess.run(' '.join(cmd), shell=True)
+            if result.returncode != 0:
+                raise ProcessError('rsync returned an error!', result.returncode)
 
     def send(self, rsync_items):
         for rsync_item in rsync_items:

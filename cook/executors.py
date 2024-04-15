@@ -6,7 +6,7 @@ import invoke
 from .watchers import RichPrinter
 
 
-class ExecutorProcessError(Exception):
+class ProcessError(Exception):
     def __init__(self, message, return_code):
         super().__init__(message)
         self.return_code = return_code
@@ -28,11 +28,12 @@ class Executor:
             run_args['watchers'].extend(responders)
 
         with context.cd(workdir):
+            # TODO: catch ssh error
             result = context.run(command, warn=True, pty=True, **run_args)
 
         return_code = result.return_code
         if return_code != 0:
-            raise ExecutorProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
+            raise ProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
 
 
 class LocalExecutor(Executor):

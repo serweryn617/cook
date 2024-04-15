@@ -1,6 +1,6 @@
 from .configuration import Configuration, ConfigurationError
 from .cook import Cook
-from .executors import ExecutorProcessError
+from .executors import ProcessError
 from .logger import Logger
 from .recipe import Recipe, RecipeError, RecipeNotFound
 
@@ -34,6 +34,6 @@ def main():
         Logger().error(e)
         exit(1)
 
-    except ExecutorProcessError as e:
+    except ProcessError as e:
         Logger().error(e)
         exit(e.return_code)
