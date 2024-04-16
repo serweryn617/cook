@@ -4,11 +4,13 @@ from pathlib import Path
 from .exception import ProcessError
 
 
-class RsyncDirectory:
+class RsyncItem:
     def __init__(self, path: str):
         self.path = path
 
-    def parse(self, src_base: str = '', dst_base: str = '') -> (str, str):
+
+class SyncDirectory(RsyncItem):
+    def parse(self, src_host: str = '', src_base: str = '', dst_host: str = '', dst_base: str = '') -> (str, str):
         # TODO: add support for absolute paths
         src = Path(src_base) / self.path
         # Add slash at the end to treat source as directory
@@ -20,11 +22,8 @@ class RsyncDirectory:
         return src, dst
 
 
-class RsyncFile:
-    def __init__(self, path: str):
-        self.path = path
-
-    def parse(self, src_base: str = '', dst_base: str = '') -> (str, str):
+class SyncFile(RsyncItem):
+    def parse(self, src_host: str = '', src_base: str = '', dst_host: str = '', dst_base: str = '') -> (str, str):
         # TODO: add support for absolute paths
         src = Path(src_base) / self.path
         src = src.as_posix()
@@ -33,6 +32,13 @@ class RsyncFile:
         dst = dst.as_posix()
 
         return src, dst
+
+
+class SyncExclude(RsyncItem):
+    is_exclude = True
+
+    def parse(self, src_host: str = '', src_base: str = '', dst_host: str = '', dst_base: str = '') -> str:
+        return self.path
 
 
 class Rsync:
@@ -55,33 +61,63 @@ class Rsync:
         self.local_base = local_base
         self.remote_base = remote_base
 
-    def sync(self, src, dst):
-            # TODO: add exclude
+    def sync(self, src, dst, exludes):
+            if self.logger is not None:
+                self.logger.rich(f'Transferring: {src} to {dst}\n')
+
             cmd = list(Rsync.command)
             cmd.append(src)
             cmd.append(dst)
-
-            if self.logger is not None:
-                self.logger.rich(f'Transferring: {src} to {dst}\n')
+            cmd.extend([Rsync.exclude + e for e in exludes])
 
             result = subprocess.run(' '.join(cmd), shell=True)
             if result.returncode != 0:
                 raise ProcessError('rsync returned an error!', result.returncode)
 
-    def send(self, rsync_items):
+    def _get_exclude_list(self, rsync_items):
+        excludes = []
         for rsync_item in rsync_items:
+            is_exclude = getattr(rsync_item, 'is_exclude', False)
+            if is_exclude:
+                excludes.append(rsync_item.parse())
+        return excludes
+
+    def send(self, rsync_items):
+        excludes = self._get_exclude_list(rsync_items)
+
+        if self.logger is not None and excludes:
+            self.logger.rich('Excluding:\n')
+            for exclude in excludes:
+                self.logger.rich(f'  {exclude}\n')
+
+        for rsync_item in rsync_items:
+            is_exclude = getattr(rsync_item, 'is_exclude', False)
+            if is_exclude:
+                continue
+
             src_base = self.local_base
             dst_base = self.hostname + ':' + self.remote_base
 
             src, dst = rsync_item.parse(src_base=src_base, dst_base=dst_base)
 
-            self.sync(src, dst)
+            self.sync(src, dst, excludes)
 
     def receive(self, rsync_items):
+        excludes = self._get_exclude_list(rsync_items)
+
+        if self.logger is not None and excludes:
+            self.logger.rich('Excluding:\n')
+            for exclude in excludes:
+                self.logger.rich(f' - {exclude}\n')
+
         for rsync_item in rsync_items:
+            is_exclude = getattr(rsync_item, 'is_exclude', False)
+            if is_exclude:
+                continue
+
             src_base = self.hostname + ':' + self.remote_base
             dst_base = self.local_base
 
             src, dst = rsync_item.parse(src_base=src_base, dst_base=dst_base)
 
-            self.sync(src, dst)
+            self.sync(src, dst, excludes)
