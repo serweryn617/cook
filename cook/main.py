@@ -1,9 +1,9 @@
 from .configuration import Configuration, ConfigurationError
 from .cook import Cook
-from .executors import ProcessError
+from .exception import ProcessError
 from .logger import Logger
 from .recipe import Recipe, RecipeError, RecipeNotFound
-
+from .executors import ExecutorError
 
 class Settings:
     def __init__(self):
@@ -36,4 +36,8 @@ def main():
 
     except ProcessError as e:
         Logger().error(e)
+        exit(e.return_code)
+
+    except ExecutorError as e:
+        Logger().error(f'{e.name}: {e}')
         exit(e.return_code)

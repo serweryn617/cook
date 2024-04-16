@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 
-from .executors import ProcessError
+from .exception import ProcessError
 
 
 class RsyncDirectory:

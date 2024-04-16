@@ -1,19 +1,24 @@
 import subprocess
+from socket import gaierror
 
 import fabric
 import invoke
 
 from .watchers import RichPrinter
+from .exception import ProcessError
 
 
-class ProcessError(Exception):
-    def __init__(self, message, return_code):
+class ExecutorError(Exception):
+    def __init__(self, message, name, return_code):
         super().__init__(message)
+        self.name = name
         self.return_code = return_code
 
 
 class Executor:
-    def __init__(self, rich_output=False):
+    def __init__(self, name=None, logger=None, rich_output=False):
+        self.name = name
+        self.logger = logger
         self.rich_output = rich_output
 
     def run(self, context, workdir, command, responders):
@@ -27,9 +32,11 @@ class Executor:
         if responders:
             run_args['watchers'].extend(responders)
 
-        with context.cd(workdir):
-            # TODO: catch ssh error
-            result = context.run(command, warn=True, pty=True, **run_args)
+        try:
+            with context.cd(workdir):
+                result = context.run(command, warn=True, pty=True, **run_args)
+        except gaierror as e:
+            raise ExecutorError(e.strerror, self.name, e.errno)
 
         return_code = result.return_code
         if return_code != 0:
@@ -37,10 +44,6 @@ class Executor:
 
 
 class LocalExecutor(Executor):
-    def __init__(self, logger=None, rich_output=False):
-        self.logger = logger
-        self.rich_output = rich_output
-
     def run_multiple(self, steps):
         context = invoke.context.Context()
         for step in steps:
@@ -51,15 +54,10 @@ class LocalExecutor(Executor):
 
 
 class RemoteExecutor(Executor):
-    def __init__(self, ssh_name, logger=None, rich_output=False):
-        self.logger = logger
-        self.ssh_name = ssh_name
-        self.rich_output = rich_output
-
     def run_multiple(self, steps):
-        with fabric.Connection(self.ssh_name) as context:
+        with fabric.Connection(self.name) as context:
             for step in steps:
                 if self.logger:
-                    self.logger.remote(f'Remote Workdir/Command: {self.ssh_name}:{step.workdir}: {step.command}')
+                    self.logger.remote(f'Remote Workdir/Command: {self.name}:{step.workdir}: {step.command}')
 
                 self.run(context, step.workdir, step.command, step.responders)
