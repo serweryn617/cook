@@ -15,9 +15,11 @@ class BuildType(Enum):
 
 
 class BuildStep:
-    def __init__(self, workdir='.', command='', responders=None):
+    def __init__(self, workdir='.', command='', responders=None, expected_return_code=0, check=True):
         self.command = command
         self.workdir = workdir
+        self.expected_return_code = expected_return_code
+        self.check = check
 
         if responders:
             self.responders = responders
@@ -165,15 +167,19 @@ class Configuration:
                 workdir = '.'
                 command = step
                 responders = None
+                expected_return_code = 0
+                check = True
             elif isinstance(step, BuildStep):
                 workdir = step.workdir
                 command = step.command
                 responders = step.responders
+                expected_return_code = step.expected_return_code
+                check = step.check
             else:
                 raise ConfigurationError(f'Expected build step to be of type str of BuildStep, was {type(step)}')
 
             workdir = self.build_path / workdir
-            parsed_step = BuildStep(workdir=workdir, command=command, responders=responders)
+            parsed_step = BuildStep(workdir=workdir, command=command, responders=responders, expected_return_code=expected_return_code, check=check)
             parsed_build_steps.append(parsed_step)
 
         return parsed_build_steps
