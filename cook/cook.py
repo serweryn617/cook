@@ -31,7 +31,7 @@ class Cook:
 
         if build_steps:
             Logger().local('Running local build')
-            executor = LocalExecutor(Logger(), self.rich_output)
+            executor = LocalExecutor('local', Logger(), self.rich_output)
             executor.run_multiple(build_steps)
 
     def _remote_build(self):
@@ -63,7 +63,7 @@ class Cook:
     def _composite_build(self):
         components = self.configuration.get_components()
 
-        if not components:
+        if not components:  # TODO required?
             return
 
         Logger().local('Executing Components')
