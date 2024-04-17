@@ -32,14 +32,14 @@ class Executor:
         if responders:
             run_args['watchers'].extend(responders)
 
-        try:
+        try:  # TODO: move this outside of run step
             with context.cd(workdir):
                 result = context.run(command, warn=True, pty=True, **run_args)
         except gaierror as e:
             raise ExecutorError(e.strerror, self.name, e.errno)
 
         return_code = result.return_code
-        if return_code != 0:
+        if return_code != 0:  # TODO make this a parameter
             raise ProcessError(f'Encountered non-zero exit code: {return_code}', return_code)
 
 
