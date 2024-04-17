@@ -15,9 +15,13 @@ class SyncDirectory(RsyncItem):
         src = Path(src_base) / self.path
         # Add slash at the end to treat source as directory
         src = src.as_posix() + '/'
+        if src_host:
+            src = src_host + ':' + src
 
         dst = Path(dst_base) / self.path
         dst = dst.as_posix()
+        if dst_host:
+            dst = dst_host + ':' + dst
 
         return src, dst
 
@@ -27,9 +31,13 @@ class SyncFile(RsyncItem):
         # TODO: add support for absolute paths
         src = Path(src_base) / self.path
         src = src.as_posix()
+        if src_host:
+            src = src_host + ':' + src
 
         dst = Path(dst_base) / self.path
         dst = dst.as_posix()
+        if dst_host:
+            dst = dst_host + ':' + dst
 
         return src, dst
 
@@ -82,7 +90,7 @@ class Rsync:
                 excludes.append(rsync_item.parse())
         return excludes
 
-    def send(self, rsync_items):
+    def sync_multiple(self, rsync_items, **parser_args):
         excludes = self._get_exclude_list(rsync_items)
 
         if self.logger is not None and excludes:
@@ -95,29 +103,12 @@ class Rsync:
             if is_exclude:
                 continue
 
-            src_base = self.local_base
-            dst_base = self.hostname + ':' + self.remote_base
-
-            src, dst = rsync_item.parse(src_base=src_base, dst_base=dst_base)
+            src, dst = rsync_item.parse(**parser_args)
 
             self.sync(src, dst, excludes)
+
+    def send(self, rsync_items):
+        self.sync_multiple(rsync_items, src_base=self.local_base, dst_host=self.hostname, dst_base=self.remote_base)
 
     def receive(self, rsync_items):
-        excludes = self._get_exclude_list(rsync_items)
-
-        if self.logger is not None and excludes:
-            self.logger.rich('Excluding:\n')
-            for exclude in excludes:
-                self.logger.rich(f' - {exclude}\n')
-
-        for rsync_item in rsync_items:
-            is_exclude = getattr(rsync_item, 'is_exclude', False)
-            if is_exclude:
-                continue
-
-            src_base = self.hostname + ':' + self.remote_base
-            dst_base = self.local_base
-
-            src, dst = rsync_item.parse(src_base=src_base, dst_base=dst_base)
-
-            self.sync(src, dst, excludes)
+        self.sync_multiple(rsync_items, src_host=self.hostname, src_base=self.remote_base, dst_base=self.local_base)
