@@ -4,8 +4,8 @@ from socket import gaierror
 import fabric
 import invoke
 
-from .watchers import RichPrinter
 from .exception import ProcessError
+from .watchers import RichPrinter
 
 
 class ExecutorError(Exception):

@@ -1,7 +1,7 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
-from cook import (BuildStep, LocalBuildServer, RemoteBuildServer, Responder, SyncDirectory, SyncFile, SyncExclude,
-                  settings)
+from cook import (BuildStep, LocalBuildServer, RemoteBuildServer, Responder,
+                  SyncDirectory, SyncExclude, SyncFile, settings)
 
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
 default_project = 'my_project'  # Project to build when none were explicitly selected.

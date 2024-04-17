@@ -62,17 +62,17 @@ class Rsync:
         self.remote_base = remote_base
 
     def sync(self, src, dst, exludes):
-            if self.logger is not None:
-                self.logger.rich(f'Transferring: {src} to {dst}\n')
+        if self.logger is not None:
+            self.logger.rich(f'Transferring: {src} to {dst}\n')
 
-            cmd = list(Rsync.command)
-            cmd.append(src)
-            cmd.append(dst)
-            cmd.extend([Rsync.exclude + e for e in exludes])
+        cmd = list(Rsync.command)
+        cmd.append(src)
+        cmd.append(dst)
+        cmd.extend([Rsync.exclude + e for e in exludes])
 
-            result = subprocess.run(' '.join(cmd), shell=True)
-            if result.returncode != 0:
-                raise ProcessError('rsync returned an error!', result.returncode)
+        result = subprocess.run(' '.join(cmd), shell=True)
+        if result.returncode != 0:
+            raise ProcessError('rsync returned an error!', result.returncode)
 
     def _get_exclude_list(self, rsync_items):
         excludes = []

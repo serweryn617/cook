@@ -1,9 +1,10 @@
 from .configuration import Configuration, ConfigurationError
 from .cook import Cook
 from .exception import ProcessError
+from .executors import ExecutorError
 from .logger import Logger
 from .recipe import Recipe, RecipeError, RecipeNotFound
-from .executors import ExecutorError
+
 
 class Settings:
     def __init__(self):
