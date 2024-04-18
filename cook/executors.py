@@ -24,7 +24,7 @@ class Executor:
     def run(self, context, step):
         run_args = {'watchers': []}
 
-        if self.rich_output:
+        if self.rich_output and self.logger:
             rich_printer = RichPrinter(self.logger)
             run_args['hide'] = 'both'
             run_args['watchers'].append(rich_printer)
@@ -32,11 +32,8 @@ class Executor:
         if step.responders:
             run_args['watchers'].extend(step.responders)
 
-        try:  # TODO: move this outside of run step
-            with context.cd(step.workdir):
-                result = context.run(step.command, warn=True, pty=True, **run_args)
-        except gaierror as e:
-            raise ExecutorError(e.strerror, self.name, e.errno)
+        with context.cd(step.workdir):
+            result = context.run(step.command, warn=True, pty=True, **run_args)
 
         return_code = result.return_code
         if step.check and return_code != step.expected_return_code:
@@ -54,10 +51,17 @@ class LocalExecutor(Executor):
 
 
 class RemoteExecutor(Executor):
+    def _execute_step(self, context, step):
+        if self.logger:
+            self.logger.remote(f'Remote Workdir/Command: {self.name}:{step.workdir}: {step.command}')
+
+        try:
+            self.run(context, step)
+        except gaierror as e:
+            raise ExecutorError(e.strerror, self.name, e.errno)
+
     def run_multiple(self, steps):
         with fabric.Connection(self.name) as context:
             for step in steps:
-                if self.logger:
-                    self.logger.remote(f'Remote Workdir/Command: {self.name}:{step.workdir}: {step.command}')
+                self._execute_step(context, step)
 
-                self.run(context, step)
