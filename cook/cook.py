@@ -16,6 +16,7 @@ class Cook:
 
     def cook(self):
         build_type = self.configuration.get_build_type()
+        self.build_server = self.configuration.get_build_server()
 
         if build_type == BuildType.LOCAL:
             self._local_build()
@@ -39,11 +40,10 @@ class Cook:
         local_base, remote_base = self.configuration.get_base_paths()
         files_to_send = self.configuration.get_files_to_send()
         files_to_receive = self.configuration.get_files_to_receive()
-        ssh_name = self.configuration.get_build_server()
 
-        setup_rsync = bool(files_to_send or files_to_receive)
+        setup_rsync = files_to_send or files_to_receive
         if setup_rsync:
-            rsync = Rsync(ssh_name, local_base, remote_base, Logger())
+            rsync = Rsync(self.build_server, local_base, remote_base, Logger())
 
         if files_to_send:
             Logger().remote('Sending Files')
@@ -51,7 +51,7 @@ class Cook:
 
         if build_steps:
             Logger().remote('Running Remote Build')
-            executor = RemoteExecutor(ssh_name, Logger(), self.rich_output)
+            executor = RemoteExecutor(self.build_server, Logger(), self.rich_output)
             executor.run_multiple(build_steps)
 
         if files_to_receive:
@@ -68,11 +68,15 @@ class Cook:
 
         for component in components:
             Logger().local(f'Component: {component}')
+            self._run_component(component)
 
+    def _run_component(self, component):
+        try:
             sub_configuration = Configuration(self.recipe)
-
-            build_server = self.configuration.get_build_server()
-            sub_configuration.setup(component, build_server)
+            sub_configuration.setup(component, self.build_server)
 
             sub_cook = Cook(self.recipe, sub_configuration, self.rich_output)
             sub_cook.cook()
+        except Exception as e:
+            Logger().error(f'Component {component} failed!')
+            raise e
