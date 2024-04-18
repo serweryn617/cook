@@ -1,5 +1,6 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
+# TODO create separate namespaces
 from cook import (BuildStep, LocalBuildServer, RemoteBuildServer, Responder,
                   SyncDirectory, SyncExclude, SyncFile, settings)
 
@@ -40,7 +41,7 @@ projects = {
         ],
 
         'send': [
-            SyncDirectory(''),  # Everything in this directory
+            SyncDirectory(),  # Everything in this directory
         ],
 
         'build_steps': [

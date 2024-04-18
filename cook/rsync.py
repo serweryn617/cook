@@ -10,6 +10,9 @@ class RsyncItem:
 
 
 class SyncDirectory(RsyncItem):
+    def __init__(self, path: str = ''):
+        self.path = path
+
     def parse(self, src_host: str = '', src_base: str = '', dst_host: str = '', dst_base: str = '') -> (str, str):
         # TODO: add support for absolute paths
         src = Path(src_base) / self.path
