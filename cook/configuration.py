@@ -1,3 +1,4 @@
+from copy import copy
 from enum import Enum, auto
 from pathlib import Path
 
@@ -166,23 +167,9 @@ class Configuration:
         parsed_build_steps = []
 
         for step in build_steps:
-            if isinstance(step, str):
-                workdir = '.'
-                command = step
-                responders = None
-                expected_return_code = 0
-                check = True
-            elif isinstance(step, BuildStep):
-                workdir = step.workdir
-                command = step.command
-                responders = step.responders
-                expected_return_code = step.expected_return_code
-                check = step.check
-            else:
-                raise ConfigurationError(f'Expected build step to be of type str of BuildStep, was {type(step)}')
-
-            workdir = self.build_path / workdir
-            parsed_step = BuildStep(workdir=workdir, command=command, responders=responders, expected_return_code=expected_return_code, check=check)
+            # shallow copy is enough as only a str is modified but be careful
+            parsed_step = copy(step)
+            parsed_step.workdir = self.build_path / parsed_step.workdir
             parsed_build_steps.append(parsed_step)
 
         return parsed_build_steps

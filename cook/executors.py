@@ -64,4 +64,3 @@ class RemoteExecutor(Executor):
         with fabric.Connection(self.name) as context:
             for step in steps:
                 self._execute_step(context, step)
-

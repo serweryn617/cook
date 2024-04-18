@@ -30,7 +30,7 @@ projects = {
         ],
 
         'build_steps': [
-            'mkdir -p ~/cook_example',
+            BuildStep(command='mkdir -p ~/cook_example'),
         ],
     },
 
@@ -67,8 +67,8 @@ projects = {
         ],
 
         'build_steps': [
-            f'cp my_project_source/build/output {out_file_name}',
-            f'cat {out_file_name}',
+            BuildStep(command=f'cp my_project_source/build/output {out_file_name}'),
+            BuildStep(command=f'cat {out_file_name}'),
         ],
     },
 
@@ -78,8 +78,8 @@ projects = {
         ],
 
         'build_steps': [
-            'rm -rf my_project_source/build',
-            f'rm -f {out_file_name}',
+            BuildStep(command='rm -rf my_project_source/build'),
+            BuildStep(command=f'rm -f {out_file_name}'),
         ],
     },
 
@@ -89,7 +89,7 @@ projects = {
         ],
 
         'build_steps': [
-            'rm -rf cook_example',
+            BuildStep(command='rm -rf cook_example'),
         ],
     },
 }
