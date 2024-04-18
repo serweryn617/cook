@@ -50,6 +50,9 @@ class Configuration:
         if not self._is_composite():
             self._update_paths()
 
+        # TODO: validate recipe contents and print warnings
+
+    # TODO: make this a function
     def _get_nested_item(self, source_dict, *keys):
         nested_item = source_dict
         for key in keys:
