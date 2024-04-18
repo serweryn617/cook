@@ -40,5 +40,6 @@ def main():
         exit(e.return_code)
 
     except ExecutorError as e:
+        # TODO: print which component failed
         Logger().error(f'{e.name}: {e}')
         exit(e.return_code)

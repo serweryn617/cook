@@ -32,6 +32,9 @@ def cli():
     parser.add_argument('project', nargs='?', help='Project to build. Uses value of `default_project` if left unspecified.')
     parser.add_argument('user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format: `key=value`')
 
+    # TODO: add dry run
+    # TODO: add quiet option
+
     args = parser.parse_args()
     settings.recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()
     settings.build_server = args.build_server
