@@ -1,6 +1,7 @@
 from rich.console import Console
 from rich.theme import Theme
 
+# TODO: refactor
 GREEN = '#00cc52'
 PURPLE = '#d849ff'
 RED = '#ff0000'

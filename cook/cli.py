@@ -34,6 +34,8 @@ def cli():
 
     # TODO: add dry run
     # TODO: add quiet option
+    # TODO: add user flag args
+    # TODO: use better user args, e.g. --name latest
 
     args = parser.parse_args()
     settings.recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()

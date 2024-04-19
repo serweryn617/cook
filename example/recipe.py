@@ -1,5 +1,6 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
+# TODO: split into separate examples
 # TODO create separate namespaces
 from cook import (BuildStep, LocalBuildServer, RemoteBuildServer, Responder,
                   SyncDirectory, SyncExclude, SyncFile, settings)
