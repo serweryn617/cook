@@ -5,6 +5,15 @@ from pathlib import Path
 from .build import BuildServer
 
 
+def get_nested_item(source_dict, *keys, default=None):
+    nested_item = source_dict
+    for key in keys:
+        if key not in nested_item:
+            return default
+        nested_item = nested_item[key]
+    return nested_item
+
+
 class ConfigurationError(Exception):
     pass
 
@@ -40,15 +49,6 @@ class Configuration:
 
         # TODO: validate recipe contents and print warnings
 
-    # TODO: make this a function
-    def _get_nested_item(self, source_dict, *keys):
-        nested_item = source_dict
-        for key in keys:
-            if key not in nested_item:
-                return None
-            nested_item = nested_item[key]
-        return nested_item
-
     def _set_project(self, project):
         project_defined = project in self.projects
 
@@ -66,7 +66,7 @@ class Configuration:
             self.build_server = BuildServer(name=build_server_name)
             return
 
-        for build_server in self._get_nested_item(self.projects, self.project, 'build_servers'):
+        for build_server in get_nested_item(self.projects, self.project, 'build_servers'):
             if build_server.name == build_server_name:
                 self.build_server = build_server
                 break
@@ -78,7 +78,7 @@ class Configuration:
             return
 
     def _get_build_server_override(self):
-        build_servers = self._get_nested_item(self.projects, self.project, 'build_servers')
+        build_servers = get_nested_item(self.projects, self.project, 'build_servers')
         if build_servers is None:
             return None
 
@@ -127,7 +127,7 @@ class Configuration:
         return self.base_path.as_posix(), self.build_path.as_posix()
 
     def get_files_to_send(self):
-        files_to_send = self._get_nested_item(self.projects, self.project, 'send')
+        files_to_send = get_nested_item(self.projects, self.project, 'send')
 
         if files_to_send is None:
             return None
@@ -135,7 +135,7 @@ class Configuration:
         return files_to_send
 
     def get_files_to_receive(self):
-        files_to_receive = self._get_nested_item(self.projects, self.project, 'receive')
+        files_to_receive = get_nested_item(self.projects, self.project, 'receive')
 
         if files_to_receive is None:
             return None
@@ -146,7 +146,7 @@ class Configuration:
         if self.skip == True:
             return None
 
-        build_steps = self._get_nested_item(self.projects, self.project, 'build_steps')
+        build_steps = get_nested_item(self.projects, self.project, 'build_steps')
 
         if build_steps is None:
             return None
@@ -162,5 +162,5 @@ class Configuration:
         return parsed_build_steps
 
     def get_components(self):
-        components = self._get_nested_item(self.projects, self.project, 'components')
+        components = get_nested_item(self.projects, self.project, 'components')
         return components
