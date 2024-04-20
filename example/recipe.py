@@ -1,9 +1,9 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
 # TODO: split into separate examples
-# TODO create separate namespaces
-from cook import (BuildStep, LocalBuildServer, RemoteBuildServer, Responder,
-                  SyncDirectory, SyncExclude, SyncFile, settings)
+from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer, Responder
+from cook.main import settings
+from cook.sync import SyncDirectory, SyncExclude, SyncFile
 
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
 default_project = 'my_project'  # Project to build when none were explicitly selected.

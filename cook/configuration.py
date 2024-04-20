@@ -2,7 +2,7 @@ from copy import copy
 from enum import Enum, auto
 from pathlib import Path
 
-from .build_server import BuildServer
+from .build import BuildServer
 
 
 class ConfigurationError(Exception):
@@ -13,19 +13,6 @@ class BuildType(Enum):
     LOCAL = auto()
     REMOTE = auto()
     COMPOSITE = auto()
-
-
-class BuildStep:
-    def __init__(self, workdir='.', command='', responders=None, expected_return_code=0, check=True):
-        self.command = command
-        self.workdir = workdir
-        self.expected_return_code = expected_return_code
-        self.check = check
-
-        if responders:
-            self.responders = responders
-        else:
-            self.responders = tuple()
 
 
 class Configuration:
