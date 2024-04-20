@@ -1,38 +1,29 @@
 from rich.console import Console
 from rich.theme import Theme
 
-# TODO: refactor
-GREEN = '#00cc52'
-PURPLE = '#d849ff'
-RED = '#ff0000'
-
 
 class Logger:
-    def __init__(self):
+    GREEN = '#00cc52'
+    PURPLE = '#d849ff'
+
+    def __init__(self, log_rich_output):
         cook_console_theme = Theme(
             {
-                'local': GREEN,
-                'remote': PURPLE,
-                'error': RED,
+                'local': Logger.GREEN,
+                'remote': Logger.PURPLE,
+                'warning': 'dark_orange',
+                'error': 'red',
             }
         )
         self.console = Console(theme=cook_console_theme)
+        self.log_rich_output = log_rich_output
 
-    def _internal_message(self, message, style):
+    def print(self, style, message):
         message = '=== ' + str(message) + ' ==='
         self.console.print(message, style=style, highlight=False)
 
-    def local(self, message):
-        self._internal_message(message, 'local')
-
-    def remote(self, message):
-        self._internal_message(message, 'remote')
-
-    def error(self, message):
-        self._internal_message(message, 'error')
-
-    def rich(self, message):
-        self.console.print(message, end='')
-
-    def raw(self, message):
-        print(message, end='')
+    def log(self, message):
+        if self.log_rich_output:
+            self.console.print(message, end='')
+        else:
+            print(message, end='')

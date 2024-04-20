@@ -26,7 +26,7 @@ class Rsync:
 
     def sync(self, src, dst, exludes):
         if self.logger is not None:
-            self.logger.rich(f'Transferring: {src} to {dst}\n')
+            self.logger.log(f'Transferring: {src} to {dst}\n')
 
         cmd = list(Rsync.command)
         cmd.append(src)
@@ -49,9 +49,9 @@ class Rsync:
         excludes = self._get_exclude_list(rsync_items)
 
         if self.logger is not None and excludes:
-            self.logger.rich('Excluding:\n')
+            self.logger.log('Excluding:\n')
             for exclude in excludes:
-                self.logger.rich(f'  {exclude}\n')
+                self.logger.log(f'  {exclude}\n')
 
         for rsync_item in rsync_items:
             is_exclude = getattr(rsync_item, 'is_exclude', False)

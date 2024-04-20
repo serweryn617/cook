@@ -12,6 +12,6 @@ class RichPrinter(invoke.watchers.StreamWatcher):
         new = stream[self.index : last_line + 1]
         self.index += len(new)
 
-        self.logger.rich(new)
+        self.logger.log(new)
 
         return tuple()

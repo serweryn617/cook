@@ -21,6 +21,8 @@ settings = Settings()
 def main():
     global settings
 
+    logger = Logger(settings.rich_output)
+
     try:
         recipe = Recipe(settings.recipe_base_path)
         recipe.load()
@@ -28,17 +30,17 @@ def main():
         configuration = Configuration(recipe)
         configuration.setup(settings.project, settings.build_server)
 
-        cook = Cook(recipe, configuration, settings.rich_output)
+        cook = Cook(recipe, configuration, logger)
         cook.cook()
 
     except (RecipeNotFound, RecipeError, ConfigurationError) as e:
-        Logger().error(e)
+        logger.print('error', e)
         exit(1)
 
     except ProcessError as e:
-        Logger().error(e)
+        logger.print('error', e)
         exit(e.return_code)
 
     except ExecutorError as e:
-        Logger().error(f'{e.name}: {e}')
+        logger.print('error', f'{e.name}: {e}')
         exit(e.return_code)
