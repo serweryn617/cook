@@ -6,6 +6,12 @@ from .logger import Logger
 from .recipe import Recipe, RecipeError, RecipeNotFound
 
 
+def print_targets(recipe: Recipe):
+    print(f'Projects defined in {recipe.base_path / "recipe.py"}:')
+    for key in recipe.projects.keys():
+        print('  ' + key, '<- default' if key == recipe.default_project else '')
+
+
 class Settings:
     def __init__(self):
         self.recipe_base_path = None
@@ -13,6 +19,7 @@ class Settings:
         self.rich_output = None
         self.project = None
         self.user_args = {}
+        self.mode = None
 
 
 settings = Settings()
@@ -26,6 +33,10 @@ def main():
     try:
         recipe = Recipe(settings.recipe_base_path)
         recipe.load()
+        
+        if settings.mode == 'targets':
+            print_targets(recipe)
+            return
 
         configuration = Configuration(recipe)
         configuration.setup(settings.project, settings.build_server)
