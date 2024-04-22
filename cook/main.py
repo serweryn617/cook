@@ -28,6 +28,8 @@ settings = Settings()
 def main():
     global settings
 
+    is_dry_run = settings.mode == 'dry'
+
     logger = Logger(settings.rich_output)
 
     try:
@@ -42,6 +44,7 @@ def main():
         configuration.setup(settings.project, settings.build_server)
 
         cook = Cook(recipe, configuration, logger)
+        cook.set_dry_run(is_dry_run)
         cook.cook()
 
     except (RecipeNotFound, RecipeError, ConfigurationError) as e:

@@ -23,11 +23,12 @@ class Rsync:
         self.logger = logger
         self.local_base = local_base
         self.remote_base = remote_base
+        self.dry_run = False
+
+    def set_dry_run(self, dry_run: bool):
+        self.dry_run = dry_run
 
     def sync(self, src, dst, exludes):
-        if self.logger is not None:
-            self.logger.log(f'Transferring: {src} to {dst}\n')
-
         cmd = list(Rsync.command)
         cmd.append(src)
         cmd.append(dst)
@@ -59,6 +60,12 @@ class Rsync:
                 continue
 
             src, dst = rsync_item.parse(**parser_args)
+
+            if self.logger is not None:
+                self.logger.log(f'Transferring: {src} to {dst}\n')
+
+            if self.dry_run:
+                return
 
             self.sync(src, dst, excludes)
 

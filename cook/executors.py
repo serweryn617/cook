@@ -20,8 +20,15 @@ class Executor:
         self.name = name
         self.logger = logger
         self.rich_output = rich_output
+        self.dry_run = False
+
+    def set_dry_run(self, dry_run: bool):
+        self.dry_run = dry_run
 
     def run(self, context, step):
+        if self.dry_run:
+            return
+
         run_args = {'watchers': []}
 
         if self.rich_output and self.logger:

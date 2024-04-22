@@ -12,6 +12,10 @@ class Cook:
         self.recipe = recipe
         self.configuration = configuration
         self.logger = logger
+        self.dry_run = False
+
+    def set_dry_run(self, dry_run: bool):
+        self.dry_run = dry_run
 
     def cook(self):
         build_type = self.configuration.get_build_type()
@@ -32,6 +36,7 @@ class Cook:
         if build_steps:
             self.logger.print('local', 'Running local build')
             executor = LocalExecutor('local', self.logger)
+            executor.set_dry_run(self.dry_run)
             executor.run_multiple(build_steps)
 
     def _remote_build(self):
@@ -43,6 +48,7 @@ class Cook:
         setup_rsync = files_to_send or files_to_receive
         if setup_rsync:
             rsync = Rsync(self.build_server, local_base, remote_base, self.logger)
+            rsync.set_dry_run(self.dry_run)
 
         if files_to_send:
             self.logger.print('remote', 'Sending Files')
@@ -51,6 +57,7 @@ class Cook:
         if build_steps:
             self.logger.print('remote', 'Running Remote Build')
             executor = RemoteExecutor(self.build_server, self.logger)
+            executor.set_dry_run(self.dry_run)
             executor.run_multiple(build_steps)
 
         if files_to_receive:
@@ -75,6 +82,7 @@ class Cook:
             sub_configuration.setup(component, self.build_server)
 
             sub_cook = Cook(self.recipe, sub_configuration, self.logger)
+            sub_cook.set_dry_run(self.dry_run)
             sub_cook.cook()
         except Exception as e:
             self.logger.print('error', f'Component {component} failed!')
