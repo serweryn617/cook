@@ -28,8 +28,8 @@ def cli():
 
     parser.add_argument('-p', '--recipe_path', default='.', help='Path to directory containing `recipe.py` file.')
     parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
-    parser.add_argument('-r', '--rich_output', action='store_true')
-    parser.add_argument('-t', '--targets', action='store_true')
+    parser.add_argument('-r', '--rich_output', action='store_true', help='Use Rich to format output.')
+    parser.add_argument('-t', '--targets', action='store_true', help='List available projects.')
     parser.add_argument('project', nargs='?', help='Project to build. Uses value of `default_project` if left unspecified.')
     parser.add_argument('user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format: `key=value`')
 
