@@ -25,6 +25,9 @@ class Main:
     def initialize(self):
         self.logger = Logger(self.rich_output, self.quiet)
 
+        if self.rich_output and self.quiet:
+            self.logger.print('warning', 'Suppressing stdout and using formatted output will also suppress stderr!')
+
         try:
             self.recipe = Recipe(self.recipe_base_path)
             self.recipe.load()
@@ -40,8 +43,8 @@ class Main:
 
     def run(self, dry_run=False):
         try:
-            cook.set_dry_run(dry_run)
-            cook.cook()
+            self.cook.set_dry_run(dry_run)
+            self.cook.cook()
 
         except ProcessError as e:
             logger.print('error', e)
