@@ -1,7 +1,7 @@
 import argparse
 import pathlib
 
-from .main import main
+from .main import Main
 
 
 class Settings:
@@ -60,4 +60,15 @@ def cli():
     list_targets = args.targets
     dry_run = args.dry
 
-    main(recipe_base_path, project, build_server, rich_output, quiet, dry_run, list_targets)
+    main_program = Main(recipe_base_path, project, build_server, rich_output=rich_output, quiet=quiet)
+    main_program.initialize()
+
+    if list_targets:
+        projects, default_project = main_program.get_projects()
+        recipe_path = main_program.get_recipe_path()
+        print(f'Projects defined in {recipe_path}:')
+        for project in projects:
+            print('  ' + project, '<- default' if project == default_project else '')
+        return
+
+    main_program.run(dry_run=dry_run)

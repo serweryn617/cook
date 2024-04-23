@@ -6,39 +6,47 @@ from .logger import Logger
 from .recipe import Recipe, RecipeError, RecipeNotFound
 
 
-def print_targets(recipe: Recipe):
-    print(f'Projects defined in {recipe.base_path / "recipe.py"}:')
-    for key in recipe.projects.keys():
-        print('  ' + key, '<- default' if key == recipe.default_project else '')
+class Main:
+    def __init__(self, recipe_base_path, project, build_server, rich_output=False, quiet=False):
+        self.recipe_base_path = recipe_base_path
+        self.project = project
+        self.build_server = build_server
+        self.rich_output = rich_output
+        self.quiet = quiet
 
+    def get_recipe_path(self):
+        return (self.recipe.base_path / "recipe.py").as_posix()
 
-# TODO: create class
-def main(recipe_base_path, project, build_server, rich_output=False, quiet=False, dry_run=False, list_targets=False):
-    logger = Logger(rich_output, quiet)
+    def get_projects(self):
+        projects = list(self.recipe.projects.keys())
+        default_project = self.recipe.default_project
+        return projects, default_project
 
-    try:
-        recipe = Recipe(recipe_base_path)
-        recipe.load()
-        
-        if list_targets:
-            print_targets(recipe)
-            return
+    def initialize(self):
+        self.logger = Logger(self.rich_output, self.quiet)
 
-        configuration = Configuration(recipe)
-        configuration.setup(project, build_server)
+        try:
+            self.recipe = Recipe(self.recipe_base_path)
+            self.recipe.load()
 
-        cook = Cook(recipe, configuration, logger)
-        cook.set_dry_run(dry_run)
-        cook.cook()
+            self.configuration = Configuration(self.recipe)
+            self.configuration.setup(self.project, self.build_server)
 
-    except (RecipeNotFound, RecipeError, ConfigurationError) as e:
-        logger.print('error', e)
-        exit(1)
+            self.cook = Cook(self.recipe, self.configuration, self.logger)
 
-    except ProcessError as e:
-        logger.print('error', e)
-        exit(e.return_code)
+        except (RecipeNotFound, RecipeError, ConfigurationError) as e:
+            logger.print('error', e)
+            exit(1)
 
-    except ExecutorError as e:
-        logger.print('error', f'{e.name}: {e}')
-        exit(e.return_code)
+    def run(self, dry_run=False):
+        try:
+            cook.set_dry_run(dry_run)
+            cook.cook()
+
+        except ProcessError as e:
+            logger.print('error', e)
+            exit(e.return_code)
+
+        except ExecutorError as e:
+            logger.print('error', f'{e.name}: {e}')
+            exit(e.return_code)
