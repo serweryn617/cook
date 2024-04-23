@@ -12,41 +12,23 @@ def print_targets(recipe: Recipe):
         print('  ' + key, '<- default' if key == recipe.default_project else '')
 
 
-class Settings:
-    def __init__(self):
-        self.recipe_base_path = None
-        self.build_server = None
-        self.rich_output = None
-        self.quiet = None
-        self.project = None
-        self.user_args = {}
-        self.mode = None
-
-
-settings = Settings()
-
-
-# TODO: create class and don't use global settings
-def main():
-    global settings
-
-    is_dry_run = settings.mode == 'dry'
-
-    logger = Logger(settings.rich_output, settings.quiet)
+# TODO: create class
+def main(recipe_base_path, project, build_server, rich_output=False, quiet=False, dry_run=False, list_targets=False):
+    logger = Logger(rich_output, quiet)
 
     try:
-        recipe = Recipe(settings.recipe_base_path)
+        recipe = Recipe(recipe_base_path)
         recipe.load()
         
-        if settings.mode == 'targets':
+        if list_targets:
             print_targets(recipe)
             return
 
         configuration = Configuration(recipe)
-        configuration.setup(settings.project, settings.build_server)
+        configuration.setup(project, build_server)
 
         cook = Cook(recipe, configuration, logger)
-        cook.set_dry_run(is_dry_run)
+        cook.set_dry_run(dry_run)
         cook.cook()
 
     except (RecipeNotFound, RecipeError, ConfigurationError) as e:

@@ -2,15 +2,15 @@
 
 # TODO: split into separate examples
 from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer, Responder
-from cook.main import settings
+from cook.cli import settings
 from cook.sync import SyncDirectory, SyncExclude, SyncFile
 
 default_build_server = 'argon'  # Build server used when none were explicitly selected. Use 'local' to build locally.
 default_project = 'my_project'  # Project to build when none were explicitly selected.
 
 
-if 'name' in settings.user_args:
-    out_file_name = f'output_{settings.user_args["name"]}'
+if 'name' in settings.args:
+    out_file_name = f'output_{settings.args["name"]}'
 else:
     out_file_name = 'output_latest'
 

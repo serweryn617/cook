@@ -1,7 +1,16 @@
 import argparse
 import pathlib
 
-from .main import main, settings
+from .main import main
+
+
+class Settings:
+    def __init__(self):
+        self.args = {}
+        self.flags = []
+
+
+settings = Settings()
 
 
 def parse_user_args(user_args):
@@ -13,8 +22,6 @@ def parse_user_args(user_args):
 
 
 def cli():
-    global settings
-
     epilog_text = '\n'.join(
         (
             'example usage:',
@@ -39,20 +46,18 @@ def cli():
     # TODO: use better user args, e.g. --name latest
 
     args = parser.parse_args()
-    settings.recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()
-    settings.build_server = args.build_server
+    recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()
+    build_server = args.build_server
     if args.project and '=' in args.project:
-        settings.project = None
+        project = None
         args.user_args.insert(0, args.project)
     else:
-        settings.project = args.project
-    settings.user_args.update(parse_user_args(args.user_args))
-    settings.rich_output = args.rich_output
-    settings.quiet = args.quiet
+        project = args.project
+    settings.args.update(parse_user_args(args.user_args))
+    rich_output = args.rich_output
+    quiet = args.quiet
 
-    if args.targets:
-        settings.mode = 'targets'
-    elif args.dry:
-        settings.mode = 'dry'
+    list_targets = args.targets
+    dry_run = args.dry
 
-    main()
+    main(recipe_base_path, project, build_server, rich_output, quiet, dry_run, list_targets)
