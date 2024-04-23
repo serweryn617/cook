@@ -44,7 +44,9 @@ def cli():
     parser.add_argument('-t', '--targets', action='store_true', help='List available projects.')
     parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress stdout.')
-    parser.add_argument('-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.')
+    parser.add_argument(
+        '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
+    )
     parser.add_argument('-p', '--project', default=None, help='Project to build. Uses value of `default_project` if left unspecified.')
 
     args = parser.parse_args()
