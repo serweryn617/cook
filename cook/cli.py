@@ -81,7 +81,7 @@ def cli():
 
     if args.interactive:
         projects, default_project = main_program.get_projects()
-        project = questionary.select("Project", choices=projects, default=default_project).ask()
+        project = questionary.select('Project', choices=projects, default=default_project).ask()
         if project is None:
             exit(1)
 
