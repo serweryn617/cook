@@ -14,11 +14,16 @@ settings = Settings()
 
 
 def parse_user_args(user_args):
-    res = {}
-    for arg in user_args:
-        key, value = arg.split('=')
-        res[key] = value
-    return res
+    args = {}
+    flags = []
+
+    for user_arg in user_args:
+        if '=' in user_arg:
+            key, value = user_arg.split('=')
+            args[key] = value
+        else:
+            flags.append(user_arg)
+    return args, flags
 
 
 def cli():
@@ -39,17 +44,19 @@ def cli():
     parser.add_argument('-t', '--targets', action='store_true', help='List available projects.')
     parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress stdout.')
-    parser.add_argument('-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format: `key=value`')
+    parser.add_argument('-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.')
     parser.add_argument('-p', '--project', default=None, help='Project to build. Uses value of `default_project` if left unspecified.')
 
-    # TODO: add user flag args
-    # TODO: use better user args, e.g. --name latest
-
     args = parser.parse_args()
+
     recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()
     build_server = args.build_server
     project = args.project
-    settings.args.update(parse_user_args(args.user_args))
+
+    user_args, user_flags = parse_user_args(args.user_args)
+    settings.args.update(user_args)
+    settings.flags.extend(user_flags)
+
     rich_output = args.format
     quiet = args.quiet
 
