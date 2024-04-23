@@ -17,6 +17,7 @@ class Settings:
         self.recipe_base_path = None
         self.build_server = None
         self.rich_output = None
+        self.quiet = None
         self.project = None
         self.user_args = {}
         self.mode = None
@@ -25,12 +26,13 @@ class Settings:
 settings = Settings()
 
 
+# TODO: create class and don't use global settings
 def main():
     global settings
 
     is_dry_run = settings.mode == 'dry'
 
-    logger = Logger(settings.rich_output)
+    logger = Logger(settings.rich_output, settings.quiet)
 
     try:
         recipe = Recipe(settings.recipe_base_path)

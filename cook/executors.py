@@ -16,11 +16,17 @@ class ExecutorError(Exception):
 
 
 class Executor:
-    def __init__(self, name=None, logger=None, rich_output=False):
+    def __init__(self, name=None, logger=None):
         self.name = name
-        self.logger = logger
-        self.rich_output = rich_output
         self.dry_run = False
+
+        self.logger = logger
+        if self.logger:
+            self.rich_output = self.logger.use_rich_output()
+            self.quiet = self.logger.is_quiet()
+        else:
+            self.rich_output = False
+            self.quiet = False
 
     def set_dry_run(self, dry_run: bool):
         self.dry_run = dry_run
@@ -31,6 +37,9 @@ class Executor:
 
         run_args = {'watchers': []}
 
+        if self.quiet:
+            run_args['hide'] = 'out'
+
         if self.rich_output and self.logger:
             rich_printer = RichPrinter(self.logger)
             run_args['hide'] = 'both'
@@ -40,7 +49,7 @@ class Executor:
             run_args['watchers'].extend(step.responders)
 
         with context.cd(step.workdir):
-            result = context.run(step.command, warn=True, pty=True, **run_args)
+            result = context.run(step.command, warn=True, **run_args)
 
         return_code = result.return_code
         if step.check and return_code != step.expected_return_code:
