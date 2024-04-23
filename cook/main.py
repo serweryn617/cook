@@ -7,12 +7,12 @@ from .recipe import Recipe, RecipeError, RecipeNotFound
 
 
 class Main:
-    def __init__(self, recipe_base_path, project, build_server, rich_output=False, quiet=False):
+    def __init__(self, recipe_base_path):
         self.recipe_base_path = recipe_base_path
-        self.project = project
-        self.build_server = build_server
-        self.rich_output = rich_output
-        self.quiet = quiet
+        self.project = None
+        self.build_server = None
+        self.rich_output = False
+        self.quiet = False
 
     def get_recipe_path(self):
         return (self.recipe.base_path / "recipe.py").as_posix()
@@ -22,29 +22,43 @@ class Main:
         default_project = self.recipe.default_project
         return projects, default_project
 
-    def initialize(self):
-        self.logger = Logger(self.rich_output, self.quiet)
+    def configure(self, project, build_server):
+        self.project = project
+        self.build_server = build_server
+
+    def set_output(self, rich=False, quiet=False):
+        self.rich_output = rich
+        self.quiet = quiet
 
         if self.rich_output and self.quiet:
             self.logger.print('warning', 'Suppressing stdout and using formatted output will also suppress stderr!')
+
+    def initialize(self):
+        self.logger = Logger(self.rich_output, self.quiet)
 
         try:
             self.recipe = Recipe(self.recipe_base_path)
             self.recipe.load()
 
-            self.configuration = Configuration(self.recipe)
-            self.configuration.setup(self.project, self.build_server)
-
-            self.cook = Cook(self.recipe, self.configuration, self.logger)
-
-        except (RecipeNotFound, RecipeError, ConfigurationError) as e:
+        except (RecipeNotFound, RecipeError) as e:
             self.logger.print('error', e)
             exit(1)
 
     def run(self, dry_run=False):
+        if dry_run:
+            self.logger.print('warning', 'Dry run')
+
         try:
+            self.configuration = Configuration(self.recipe)
+            self.configuration.setup(self.project, self.build_server)
+
+            self.cook = Cook(self.recipe, self.configuration, self.logger)
             self.cook.set_dry_run(dry_run)
             self.cook.cook()
+
+        except ConfigurationError as e:
+            self.logger.print('error', e)
+            exit(1)
 
         except ProcessError as e:
             self.logger.print('error', e)

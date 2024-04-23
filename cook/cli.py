@@ -1,6 +1,8 @@
 import argparse
 import pathlib
 
+import questionary
+
 from .main import Main
 
 
@@ -48,6 +50,7 @@ def cli():
         '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
     )
     parser.add_argument('-p', '--project', default=None, help='Project to build. Uses value of `default_project` if left unspecified.')
+    parser.add_argument('-i', '--interactive', action='store_true', help='Interactive project selection.')
 
     args = parser.parse_args()
 
@@ -65,7 +68,7 @@ def cli():
     list_targets = args.targets
     dry_run = args.dry
 
-    main_program = Main(recipe_base_path, project, build_server, rich_output=rich_output, quiet=quiet)
+    main_program = Main(recipe_base_path)
     main_program.initialize()
 
     if list_targets:
@@ -75,5 +78,14 @@ def cli():
         for project in projects:
             print('  ' + project, '<- default' if project == default_project else '')
         return
+
+    if args.interactive:
+        projects, default_project = main_program.get_projects()
+        project = questionary.select("Project", choices=projects, default=default_project).ask()
+        if project is None:
+            exit(1)
+
+    main_program.configure(project, build_server)
+    main_program.set_output(rich_output, quiet)
 
     main_program.run(dry_run=dry_run)
