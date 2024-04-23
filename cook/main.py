@@ -38,7 +38,7 @@ class Main:
             self.cook = Cook(self.recipe, self.configuration, self.logger)
 
         except (RecipeNotFound, RecipeError, ConfigurationError) as e:
-            logger.print('error', e)
+            self.logger.print('error', e)
             exit(1)
 
     def run(self, dry_run=False):
@@ -47,9 +47,9 @@ class Main:
             self.cook.cook()
 
         except ProcessError as e:
-            logger.print('error', e)
+            self.logger.print('error', e)
             exit(e.return_code)
 
         except ExecutorError as e:
-            logger.print('error', f'{e.name}: {e}')
+            self.logger.print('error', f'{e.name}: {e}')
             exit(e.return_code)
