@@ -49,7 +49,7 @@ class Executor:
             run_args['watchers'].extend(step.responders)
 
         with context.cd(step.workdir):
-            result = context.run(step.command, warn=True, **run_args)
+            result = context.run(step.command, warn=True, pty=True, **run_args)
 
         return_code = result.return_code
         if step.check and return_code != step.expected_return_code:
