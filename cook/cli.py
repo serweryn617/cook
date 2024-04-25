@@ -32,7 +32,7 @@ def cli():
     epilog_text = '\n'.join(
         (
             'example usage:',
-            '  %(prog)s my_project name=latest -p ./example/ -b local',
+            '  %(prog)s -p my_project -u name=latest -r ./example/ -b local',
         )
     )
 
