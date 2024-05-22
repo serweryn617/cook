@@ -40,17 +40,17 @@ def cli():
         description='Build script aggregator and remote executor', epilog=epilog_text, formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('-r', '--recipe_path', default='.', help='Path to directory containing `recipe.py` file.')
+    parser.add_argument('recipe_path', default='.', help='Path to directory containing `recipe.py` file.')
     parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
     parser.add_argument('-f', '--format', action='store_true', help='Format output using Rich.')
-    parser.add_argument('-t', '--targets', action='store_true', help='List available projects.')
+    parser.add_argument('-l', '--list_projects', action='store_true', help='List available projects.')
     parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress stdout.')
     parser.add_argument(
         '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
     )
     parser.add_argument('-p', '--project', default=None, help='Project to build. Uses value of `default_project` if left unspecified.')
-    parser.add_argument('-i', '--interactive', action='store_true', help='Interactive project selection.')
+    parser.add_argument('-i', '--interactive', action='store_true', help='Force interactive selection.')
 
     args = parser.parse_args()
 
@@ -65,13 +65,13 @@ def cli():
     rich_output = args.format
     quiet = args.quiet
 
-    list_targets = args.targets
+    list_projects = args.list_projects
     dry_run = args.dry
 
     main_program = Main(recipe_base_path)
     main_program.initialize()
 
-    if list_targets:
+    if list_projects:
         projects, default_project = main_program.get_projects()
         recipe_path = main_program.get_recipe_path()
         print(f'Projects defined in {recipe_path}:')
@@ -79,10 +79,16 @@ def cli():
             print('  ' + project, '<- default' if project == default_project else '')
         return
 
+    # TODO: parse user args interactively before loading the recipe
     if args.interactive:
         projects, default_project = main_program.get_projects()
         project = questionary.select('Project', choices=projects, default=default_project).ask()
         if project is None:
+            exit(1)
+
+        build_servers, default_build_server = main_program.get_build_servers()
+        build_server = questionary.select('Build Server', choices=build_servers, default=default_build_server).ask()
+        if build_server is None:
             exit(1)
 
     main_program.configure(project, build_server)
