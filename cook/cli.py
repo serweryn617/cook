@@ -2,6 +2,7 @@ import argparse
 import pathlib
 
 import questionary
+from rich import print as rprint
 
 from .main import Main
 
@@ -76,7 +77,11 @@ def cli():
         recipe_path = main_program.get_recipe_path()
         print(f'Projects defined in {recipe_path}:')
         for project in projects:
-            print('  ' + project, '<- default' if project == default_project else '')
+            if project == default_project:
+                msg = f'  [#555555 on #cccccc]{project}[/]'
+            else:
+                msg = f'  {project}'
+            rprint(msg)
         return
 
     # TODO: parse user args interactively before loading the recipe
