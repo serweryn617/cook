@@ -73,9 +73,20 @@ def cli():
     main_program.initialize()
 
     if list_projects:
-        projects, default_project = main_program.get_projects()
         recipe_path = main_program.get_recipe_path()
-        print(f'Projects defined in {recipe_path}:')
+        rprint(f'[bold]Items defined in {recipe_path}')
+
+        build_servers, default_build_server = main_program.get_build_servers()
+        rprint('[bold #fcac00]Build Servers[/]:')
+        for build_server in build_servers:
+            if build_server == default_build_server:
+                msg = f'  [#555555 on #cccccc]{build_server}[/]'
+            else:
+                msg = f'  {build_server}'
+            rprint(msg)
+
+        projects, default_project = main_program.get_projects()
+        rprint('[bold #fcac00]Projects[/]:')
         for project in projects:
             if project == default_project:
                 msg = f'  [#555555 on #cccccc]{project}[/]'
