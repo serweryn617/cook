@@ -61,7 +61,7 @@ class LocalExecutor(Executor):
         context = invoke.context.Context()
         for step in steps:
             if self.logger:
-                self.logger.print('local', f'Local Workdir/Command: {step.workdir}: {step.command}')
+                self.logger.print('log', f'Local Step: {step.workdir}: {step.command}')
 
             self.run(context, step)
 
@@ -69,7 +69,7 @@ class LocalExecutor(Executor):
 class RemoteExecutor(Executor):
     def _execute_step(self, context, step):
         if self.logger:
-            self.logger.print('remote', f'Remote Workdir/Command: {self.name}:{step.workdir}: {step.command}')
+            self.logger.print('log', f'Remote Step: {self.name}:{step.workdir}: {step.command}')
 
         try:
             self.run(context, step)

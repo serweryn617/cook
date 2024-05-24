@@ -70,3 +70,8 @@ class Main:
         except ExecutorError as e:
             self.logger.print('error', f'{e.name}: {e}')
             exit(e.return_code)
+
+        self.logger.print('info', f'Finished running {self.project} on {self.build_server}')
+
+        if dry_run:
+            self.logger.print('warning', 'Dry run finished')

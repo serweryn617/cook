@@ -34,8 +34,7 @@ class Cook:
         build_steps = self.configuration.get_build_steps()
 
         if build_steps:
-            self.logger.print('local', 'Running local build')
-            executor = LocalExecutor('local', self.logger)
+            executor = LocalExecutor('log', self.logger)
             executor.set_dry_run(self.dry_run)
             executor.run_multiple(build_steps)
 
@@ -51,17 +50,16 @@ class Cook:
             rsync.set_dry_run(self.dry_run)
 
         if files_to_send:
-            self.logger.print('remote', 'Sending Files')
+            self.logger.print('log', 'Sending Files')
             rsync.send(files_to_send)
 
         if build_steps:
-            self.logger.print('remote', 'Running Remote Build')
             executor = RemoteExecutor(self.build_server, self.logger)
             executor.set_dry_run(self.dry_run)
             executor.run_multiple(build_steps)
 
         if files_to_receive:
-            self.logger.print('remote', 'Receiving Files')
+            self.logger.print('log', 'Receiving Files')
             rsync.receive(files_to_receive)
 
     def _composite_build(self):
@@ -70,10 +68,10 @@ class Cook:
         if not components:  # TODO required?
             return
 
-        self.logger.print('local', 'Executing Components')
+        self.logger.print('log', 'Running Composite Build')
 
         for component in components:
-            self.logger.print('local', f'Component: {component}')
+            self.logger.print('log', f'Component: {component}')
             self._run_component(component)
 
     def _run_component(self, component):
