@@ -41,10 +41,10 @@ def cli():
         description='Build script aggregator and remote executor', epilog=epilog_text, formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('recipe_path', default='.', help='Path to directory containing `recipe.py` file.')
+    parser.add_argument('recipe_path', default='.', help='Path to directory containing `recipe.py` file. Defaults to CWD.')
     parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
     parser.add_argument('-f', '--format', action='store_true', help='Format output using Rich.')
-    parser.add_argument('-l', '--list_projects', action='store_true', help='List available projects.')
+    parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers.')
     parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress stdout.')
     parser.add_argument(
