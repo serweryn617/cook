@@ -66,13 +66,13 @@ def cli():
     rich_output = args.format
     quiet = args.quiet
 
-    list_projects = args.list_projects
+    to_list = args.list
     dry_run = args.dry
 
     main_program = Main(recipe_base_path)
     main_program.initialize()
 
-    if list_projects:
+    if to_list:
         recipe_path = main_program.get_recipe_path()
         rprint(f'[bold]Items defined in {recipe_path}')
 
