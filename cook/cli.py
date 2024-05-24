@@ -55,10 +55,6 @@ def cli():
 
     args = parser.parse_args()
 
-    recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()
-    build_server = args.build_server
-    project = args.project
-
     user_args, user_flags = parse_user_args(args.user_args)
     settings.args.update(user_args)
     settings.flags.extend(user_flags)
@@ -69,14 +65,20 @@ def cli():
     to_list = args.list
     dry_run = args.dry
 
+    recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()
     main_program = Main(recipe_base_path)
     main_program.initialize()
+
+    projects, default_project = main_program.get_projects()
+    build_servers, default_build_server = main_program.get_build_servers()
+
+    project = args.project or default_project
+    build_server = args.build_server or default_build_server
 
     if to_list:
         recipe_path = main_program.get_recipe_path()
         rprint(f'[bold]Items defined in {recipe_path}')
 
-        build_servers, default_build_server = main_program.get_build_servers()
         rprint('[bold #fcac00]Build Servers[/]:')
         for build_server in build_servers:
             if build_server == default_build_server:
@@ -85,7 +87,6 @@ def cli():
                 msg = f'  {build_server}'
             rprint(msg)
 
-        projects, default_project = main_program.get_projects()
         rprint('[bold #fcac00]Projects[/]:')
         for project in projects:
             if project == default_project:
@@ -97,13 +98,11 @@ def cli():
 
     # TODO: parse user args interactively before loading the recipe
     if args.interactive or project is None:
-        projects, default_project = main_program.get_projects()
         project = questionary.select('Project', choices=projects, default=default_project).ask()
         if project is None:
             exit(1)
 
     if args.interactive or build_server is None:
-        build_servers, default_build_server = main_program.get_build_servers()
         build_server = questionary.select('Build Server', choices=build_servers, default=default_build_server).ask()
         if build_server is None:
             exit(1)
