@@ -16,6 +16,7 @@ class Recipe:
     default_project: str
     default_build_server: str
     projects: dict[dict[Any]]
+    build_servers: list[str]
 
     def __init__(self, base_path: Path):
         self.base_path = base_path
@@ -39,5 +40,6 @@ class Recipe:
             try:
                 value = settings[key]
             except KeyError:
-                raise RecipeError(f'{key} entry not found in recipe.')
+                # TODO: add separate validation
+                value = None
             setattr(self, key, value)

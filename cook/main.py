@@ -22,6 +22,9 @@ class Main:
         default_project = self.recipe.default_project
         return projects, default_project
 
+    def get_build_servers(self):
+        return self.recipe.build_servers, self.recipe.default_build_server
+
     def configure(self, project, build_server):
         self.project = project
         self.build_server = build_server
