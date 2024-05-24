@@ -96,12 +96,13 @@ def cli():
         return
 
     # TODO: parse user args interactively before loading the recipe
-    if args.interactive:
+    if args.interactive or project is None:
         projects, default_project = main_program.get_projects()
         project = questionary.select('Project', choices=projects, default=default_project).ask()
         if project is None:
             exit(1)
 
+    if args.interactive or build_server is None:
         build_servers, default_build_server = main_program.get_build_servers()
         build_server = questionary.select('Build Server', choices=build_servers, default=default_build_server).ask()
         if build_server is None:

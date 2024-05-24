@@ -40,5 +40,6 @@ class Recipe:
             try:
                 value = settings[key]
             except KeyError:
-                raise RecipeError(f'{key} entry not found in recipe.')
+                # TODO: add separate validation
+                value = None
             setattr(self, key, value)
