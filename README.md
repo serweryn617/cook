@@ -36,6 +36,7 @@ pip install -e .
 <!-- RELEASING
 1. Update version in pyproject.toml
 2. Build and upload wheels to PyPI:
+    pip install --upgrade build twine
     python3 -m build
     twine upload dist/*
 -->
