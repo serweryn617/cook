@@ -16,6 +16,34 @@ class Settings:
 settings = Settings()
 
 
+def list_items(recipe_path, build_servers, default_build_server, projects, default_project):
+    rprint(f'[bold]Items defined in {recipe_path}')
+
+    list_item('Build Servers', build_servers, default_build_server)
+    list_item('Projects', projects, default_project)
+
+
+def list_item(message, iterable, default):
+    if not iterable:
+        rprint(f'[bold][#fcac00]{message}[/] not defined.')
+        return
+
+    rprint(f'[bold #fcac00]{message}[/]:')
+    for item in iterable:
+        if item == default:
+            msg = f'  [#555555 on #cccccc]{item}[/]'
+        else:
+            msg = f'  {item}'
+        rprint(msg)
+
+
+def select_interactively(message, choices, default):
+    if choices is None:
+        return
+
+    return questionary.select(message, choices=choices, default=default).unsafe_ask()
+
+
 def parse_user_args(user_args):
     args = {}
     flags = []
@@ -50,7 +78,7 @@ def cli():
     parser.add_argument(
         '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
     )
-    parser.add_argument('-p', '--project', default=None, help='Project to build. Uses value of `default_project` if left unspecified.')
+    parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
     parser.add_argument('-i', '--interactive', action='store_true', help='Force interactive selection.')
 
     args = parser.parse_args()
@@ -77,35 +105,21 @@ def cli():
 
     if to_list:
         recipe_path = main_program.get_recipe_path()
-        rprint(f'[bold]Items defined in {recipe_path}')
-
-        rprint('[bold #fcac00]Build Servers[/]:')
-        for build_server in build_servers:
-            if build_server == default_build_server:
-                msg = f'  [#555555 on #cccccc]{build_server}[/]'
-            else:
-                msg = f'  {build_server}'
-            rprint(msg)
-
-        rprint('[bold #fcac00]Projects[/]:')
-        for project in projects:
-            if project == default_project:
-                msg = f'  [#555555 on #cccccc]{project}[/]'
-            else:
-                msg = f'  {project}'
-            rprint(msg)
-        return
+        list_items(recipe_path, build_servers, default_build_server, projects, default_project)
+        return 0
 
     # TODO: parse user args interactively before loading the recipe
-    if args.interactive or project is None:
-        project = questionary.select('Project', choices=projects, default=default_project).ask()
-        if project is None:
-            exit(1)
 
-    if args.interactive or build_server is None:
-        build_server = questionary.select('Build Server', choices=build_servers, default=default_build_server).ask()
-        if build_server is None:
-            exit(1)
+    try:
+        if args.interactive or project is None:
+            project = select_interactively('Project', projects, default_project)
+
+        if args.interactive or build_server is None:
+            build_server = select_interactively('Build Server', build_servers, default_build_server)
+
+    except KeyboardInterrupt:
+        print("\nCancelled by user\n")
+        return 1
 
     main_program.configure(project, build_server)
     main_program.set_output(rich_output, quiet)
