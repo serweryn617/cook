@@ -37,9 +37,13 @@ class Configuration:
     def setup(self, project=None, server=None):
         if project is None:
             project = self.default_project
+        if project is None:
+            raise ConfigurationError('No project selected!')
 
         if server is None:
             server = self.default_build_server
+        if server is None:
+            raise ConfigurationError('No build server selected!')
 
         self._set_project(project)
         self._set_build_server(server)
