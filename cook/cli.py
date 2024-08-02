@@ -58,15 +58,20 @@ def parse_user_args(user_args):
 
 
 def generate_template(base_path: Path):
-    recipe_path = base_path / 'recipe.py'
-    if recipe_path.is_file():
-        print('recipe.py already present in', base_path)
+    if not base_path.is_dir():
+        rprint(f'[#d849ff]{base_path} directory does not exist!')
         return 1
-    
+
+    recipe_path = base_path / 'recipe.py'
+
+    if recipe_path.is_file():
+        rprint('[#d849ff]recipe.py already present in', base_path)
+        return 1
+
     with open(recipe_path, 'w') as file:
         file.write(TEMPLATE)
 
-    print('recipe.py generated in', base_path)
+    rprint('[#00cc52]recipe.py generated in', base_path)
     return 0
 
 
