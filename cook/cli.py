@@ -1,11 +1,11 @@
 import argparse
-import pathlib
+from pathlib import Path
 
 import questionary
 from rich import print as rprint
 
 from .main import Main
-
+from .template.recipe_template import TEMPLATE
 
 class Settings:
     def __init__(self):
@@ -57,11 +57,24 @@ def parse_user_args(user_args):
     return args, flags
 
 
+def generate_template(base_path: Path):
+    recipe_path = base_path / 'recipe.py'
+    if recipe_path.is_file():
+        print('recipe.py already present in', base_path)
+        return 1
+    
+    with open(recipe_path, 'w') as file:
+        file.write(TEMPLATE)
+
+    print('recipe.py generated in', base_path)
+    return 0
+
+
 def cli():
     epilog_text = '\n'.join(
         (
             'example usage:',
-            '  %(prog)s -p my_project -u name=latest -r ./example/ -b local',
+            '  %(prog)s ./example -p my_project -b local -u name=latest --dry',
         )
     )
 
@@ -80,6 +93,7 @@ def cli():
     )
     parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
     parser.add_argument('-i', '--interactive', action='store_true', help='Force interactive selection.')
+    parser.add_argument('--generate_template', action='store_true', help='Genereta recipe template in a selected directory.')
 
     args = parser.parse_args()
 
@@ -89,11 +103,14 @@ def cli():
 
     rich_output = args.format
     quiet = args.quiet
-
     to_list = args.list
     dry_run = args.dry
 
-    recipe_base_path = (pathlib.Path.cwd() / args.recipe_path).resolve()
+    recipe_base_path = (Path.cwd() / args.recipe_path).resolve()
+
+    if args.generate_template:
+        return generate_template(recipe_base_path)
+
     main_program = Main(recipe_base_path)
     main_program.initialize()
 
