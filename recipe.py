@@ -1,11 +1,7 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
-from cook.build import BuildStep, LocalBuildServer
-
-
 default_build_server = 'local'
 default_project = 'release'
-
 
 projects = {
     'release': [
