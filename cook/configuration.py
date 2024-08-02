@@ -1,8 +1,35 @@
 from copy import copy
 from enum import Enum, auto
 from pathlib import Path
+from typing import Any
 
-from .build import BuildServer
+from .build import BuildServer, LocalBuildServer, BuildStep
+
+
+def build_steps_from_list(steps):
+    step_objects = []
+
+    for step in steps:
+        if isinstance(step, BuildStep):
+            step_objects.append(step)
+        elif isinstance(step, str):
+            step_objects.append(BuildStep(command=step))
+        elif isinstance(step, (list, tuple)) and len(step) == 2 and isinstance(step[0], str) and isinstance(step[1], str):
+            step_objects.append(BuildStep(workdir=step[0], command=step[1]))
+        else:
+            raise RuntimeError(step, "should be string or list/tuple of 2 strings")
+
+    return step_objects
+
+
+def local_build_from_list(steps):
+    return {
+        'build_servers': [
+            LocalBuildServer(),
+        ],
+
+        'build_steps': build_steps_from_list(steps)
+    }
 
 
 def get_nested_item(source_dict, *keys, default=None):
@@ -26,7 +53,7 @@ class BuildType(Enum):
 
 class Configuration:
     def __init__(self, recipe):
-        self.projects = recipe.projects
+        self.projects = self._preprocess_projects(recipe.projects)
 
         self.default_project = recipe.default_project
         self.default_build_server = recipe.default_build_server
@@ -52,6 +79,23 @@ class Configuration:
             self._update_paths()
 
         # TODO: validate recipe contents and print warnings
+
+    def _preprocess_projects(self, projects: dict[Any]):
+        preprocessed_projects = {}
+
+        for name, definition in projects.items():
+            if isinstance(definition, dict):
+                build_steps = get_nested_item(definition, 'build_steps')
+                if build_steps is not None and isinstance(build_steps, (list, tuple)):
+                    definition['build_steps'] = build_steps_from_list(build_steps)
+            elif isinstance(definition, (list, tuple)): 
+                definition = local_build_from_list(definition)
+            else:
+                raise ConfigurationError('Unknown project format!')
+
+            preprocessed_projects[name] = definition
+
+        return preprocessed_projects
 
     def _set_project(self, project):
         project_defined = project in self.projects

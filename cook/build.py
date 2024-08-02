@@ -32,27 +32,3 @@ class LocalBuildServer(BuildServer):
 class RemoteBuildServer(BuildServer):
     def __init__(self, name, build_path, sync_files=True, skip=False, override=False):
         super().__init__(name=name, build_path=build_path, sync_files=sync_files, skip=skip, override=override, is_local=False)
-
-
-def build_steps_from_list(steps):
-    step_objects = []
-
-    for step in steps:
-        if isinstance(step, str):
-            step_objects.append(BuildStep(command=step))
-        elif isinstance(step, (list, tuple)) and len(step) == 2 and isinstance(step[0], str) and isinstance(step[1], str):
-            step_objects.append(BuildStep(workdir=step[0], command=step[1]))
-        else:
-            raise RuntimeError(step, "should be string or list/tuple of 2 strings")
-
-    return step_objects
-
-
-def local_build_from_list(steps):
-    return {
-        'build_servers': [
-            LocalBuildServer(),
-        ],
-
-        'build_steps': build_steps_from_list(steps)
-    }
