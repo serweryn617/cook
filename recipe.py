@@ -8,16 +8,10 @@ default_project = 'release'
 
 
 projects = {
-    'release': {
-        'build_servers': [
-            LocalBuildServer(),
-        ],
-
-        'build_steps': [
-            # pip install --upgrade build twine
-            BuildStep(command='rm -rf dist'),
-            BuildStep(command='python3 -m build'),
-            BuildStep(command='twine upload dist/*'),
-        ],
-    },
+    'release': [
+        # pip install --upgrade build twine
+        'rm -rf dist',
+        'python3 -m build',
+        'twine upload dist/*',
+    ]
 }
