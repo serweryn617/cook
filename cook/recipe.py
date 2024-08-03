@@ -18,16 +18,15 @@ class Recipe:
     projects: dict[Any]
     build_servers: list[str]
 
-    def __init__(self, base_path: Path):
-        self.base_path = base_path
+    def __init__(self, base_path: str | Path):
+        self.base_path = Path(base_path)
 
     def load(self):
-        recipes = list(self.base_path.glob('recipe.py'))
+        recipe_file_path = self.base_path / 'recipe.py'
 
-        if len(recipes) == 0:
+        if not recipe_file_path.is_file():
             raise RecipeNotFound(f'Recipe file not found in {self.base_path}')
 
-        recipe_file_path = Path(recipes[0])
         module_name = 'recipe'
 
         sys.path.insert(0, recipe_file_path.parent.as_posix())
