@@ -3,7 +3,7 @@ from .cook import Cook
 from .exception import ProcessError
 from .executors import ExecutorError
 from .logger import Logger
-from .recipe import Recipe, RecipeError, RecipeNotFound
+from .recipe import Recipe, RecipeNotFound
 
 
 class Main:
@@ -43,7 +43,7 @@ class Main:
             self.recipe = Recipe(self.recipe_base_path)
             self.recipe.load()
 
-        except (RecipeNotFound, RecipeError) as e:
+        except RecipeNotFound as e:
             self.logger.print('error', e)
             exit(1)
 

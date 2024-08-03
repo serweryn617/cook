@@ -27,7 +27,7 @@ def restore_sys_path():
     sys.path = original
 
 
-def test_recipe_is_loaded(monkeypatch, tmp_recipe, restore_sys_path):
+def test_recipe_is_loaded(tmp_recipe, restore_sys_path):
     recipe = Recipe(tmp_recipe)
     recipe.load()
 

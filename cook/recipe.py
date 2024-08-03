@@ -8,10 +8,6 @@ class RecipeNotFound(Exception):
     pass
 
 
-class RecipeError(Exception):
-    pass
-
-
 class Recipe:
     default_project: str
     default_build_server: str
@@ -32,9 +28,9 @@ class Recipe:
         sys.path.insert(0, recipe_file_path.parent.as_posix())
         recipe = importlib.import_module(module_name)
 
-        self.update(vars(recipe))
+        self._update(vars(recipe))
 
-    def update(self, settings):
+    def _update(self, settings):
         for key in self.__annotations__.keys():
             try:
                 value = settings[key]
