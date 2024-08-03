@@ -7,6 +7,7 @@ from rich import print as rprint
 from .main import Main
 from .template.recipe_template import TEMPLATE
 
+
 class Settings:
     def __init__(self):
         self.args = {}

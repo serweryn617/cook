@@ -3,7 +3,7 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import Any
 
-from .build import BuildServer, LocalBuildServer, BuildStep
+from .build import BuildServer, BuildStep, LocalBuildServer
 
 
 def build_steps_from_list(steps):
@@ -27,8 +27,7 @@ def local_build_from_list(steps):
         'build_servers': [
             LocalBuildServer(),
         ],
-
-        'build_steps': build_steps_from_list(steps)
+        'build_steps': build_steps_from_list(steps),
     }
 
 
@@ -81,6 +80,7 @@ class Configuration:
         # TODO: validate recipe contents and print warnings
 
     def _preprocess_projects(self, projects: dict[Any]):
+        # TODO: move preprocessing to Model class and create generic config model
         preprocessed_projects = {}
 
         for name, definition in projects.items():
@@ -88,7 +88,7 @@ class Configuration:
                 build_steps = get_nested_item(definition, 'build_steps')
                 if build_steps is not None and isinstance(build_steps, (list, tuple)):
                     definition['build_steps'] = build_steps_from_list(build_steps)
-            elif isinstance(definition, (list, tuple)): 
+            elif isinstance(definition, (list, tuple)):
                 definition = local_build_from_list(definition)
             else:
                 raise ConfigurationError('Unknown project format!')
