@@ -141,3 +141,49 @@ def test_configuration_build_server_skip():
     assert configuration.get_files_to_send() is None
     assert configuration.get_files_to_receive() is None
     assert configuration.get_build_steps() is None
+
+
+def test_configuration_build_steps_from_list():
+    mock_recipe = MockRecipe()
+    mock_recipe.projects['steps_list'] = {
+        'build_servers': [
+            LocalBuildServer()
+        ],
+        'build_steps': [
+            'build step',
+            ('workdir', 'step with workdir')
+        ],
+    }
+
+    configuration = Configuration(mock_recipe)
+    configuration.setup(project='steps_list', server='local')
+
+    build_steps = configuration.get_build_steps()
+    assert len(build_steps) == 2
+    assert build_steps[0].workdir.as_posix() == '/recipe/path'
+    assert build_steps[0].command == 'build step'
+    assert build_steps[1].workdir.as_posix() == '/recipe/path/workdir'
+    assert build_steps[1].command == 'step with workdir'
+
+
+def test_configuration_local_project_from_list():
+    mock_recipe = MockRecipe()
+    mock_recipe.projects['steps_list'] = [
+        'build step',
+        ('workdir', 'step with workdir')
+    ]
+
+    configuration = Configuration(mock_recipe)
+    configuration.setup(project='steps_list', server='local')
+
+    assert configuration.get_build_server() == 'local'
+
+    build_steps = configuration.get_build_steps()
+    assert len(build_steps) == 2
+    assert build_steps[0].workdir.as_posix() == '/recipe/path'
+    assert build_steps[0].command == 'build step'
+    assert build_steps[1].workdir.as_posix() == '/recipe/path/workdir'
+    assert build_steps[1].command == 'step with workdir'
+
+
+
