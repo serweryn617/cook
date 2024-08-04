@@ -1,11 +1,10 @@
-import pytest
-
-from cook.configuration import Configuration, BuildType
-from cook.build import LocalBuildServer, RemoteBuildServer, BuildStep
-from cook.sync import SyncFile
-
 from pathlib import Path
 
+import pytest
+
+from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer
+from cook.configuration import BuildType, Configuration
+from cook.sync import SyncFile
 
 # get_build_type
 # get_build_server

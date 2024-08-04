@@ -2,7 +2,6 @@ import pytest
 
 from cook.sync import SyncDirectory, SyncExclude, SyncFile
 
-
 HOSTNAME = 'argon'
 LOCAL_PATH_BASE = 'cook/local'
 REMOTE_PATH_BASE = 'cook/remote'
@@ -104,4 +103,3 @@ def test_sync_directory_receive():
     # dir source must end with /
     assert src == f'{HOSTNAME}:/test/sync/dir/'
     assert dst == '/test/sync/dir'
-
