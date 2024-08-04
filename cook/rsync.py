@@ -41,8 +41,7 @@ class Rsync:
     def _get_exclude_list(self, rsync_items):
         excludes = []
         for rsync_item in rsync_items:
-            is_exclude = getattr(rsync_item, 'is_exclude', False)
-            if is_exclude:
+            if rsync_item.is_exclude:
                 excludes.append(rsync_item.parse())
         return excludes
 
@@ -70,7 +69,7 @@ class Rsync:
             self.sync(src, dst, excludes)
 
     def send(self, rsync_items):
-        self.sync_multiple(rsync_items, src_base=self.local_base, dst_host=self.hostname, dst_base=self.remote_base)
+        self.sync_multiple(rsync_items, src_path=self.local_base, dst_hostname=self.hostname, dst_path=self.remote_base)
 
     def receive(self, rsync_items):
-        self.sync_multiple(rsync_items, src_host=self.hostname, src_base=self.remote_base, dst_base=self.local_base)
+        self.sync_multiple(rsync_items, src_hostname=self.hostname, src_path=self.remote_base, dst_path=self.local_base)
