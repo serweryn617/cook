@@ -174,20 +174,16 @@ class Configuration:
         return self.base_path.as_posix(), self.build_path.as_posix()
 
     def get_files_to_send(self):
-        files_to_send = get_nested_item(self.projects, self.project, 'send')
-
-        if files_to_send is None:
+        if self.skip == True:
             return None
 
-        return files_to_send
+        return get_nested_item(self.projects, self.project, 'send')
 
     def get_files_to_receive(self):
-        files_to_receive = get_nested_item(self.projects, self.project, 'receive')
-
-        if files_to_receive is None:
+        if self.skip == True:
             return None
 
-        return files_to_receive
+        return get_nested_item(self.projects, self.project, 'receive')
 
     def get_build_steps(self):
         if self.skip == True:

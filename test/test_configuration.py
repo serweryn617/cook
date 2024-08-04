@@ -6,14 +6,6 @@ from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer
 from cook.configuration import BuildType, Configuration
 from cook.sync import SyncFile
 
-# get_build_type
-# get_build_server
-# get_base_paths
-# get_files_to_send
-# get_files_to_receive
-# get_build_steps
-# get_components
-
 
 class MockRecipe:
     def __init__(self):
@@ -101,3 +93,51 @@ def test_configuration_composite():
     configuration.setup(project='composite')
 
     assert configuration.get_components() == ['build', 'test']
+
+
+def test_configuration_build_server_override():
+    mock_recipe = MockRecipe()
+    mock_recipe.projects['override_project'] = {
+        'build_servers': [
+            RemoteBuildServer('remote', 'remote/path', override=True)
+        ],
+        'build_steps': [
+            BuildStep(command='cwd test command'),
+        ],
+    }
+
+    configuration = Configuration(mock_recipe)
+    configuration.setup(project='override_project', server='local')
+
+    assert configuration.get_build_server() == 'remote'
+    
+    build_steps = configuration.get_build_steps()
+    assert len(build_steps) == 1
+    assert build_steps[0].workdir.as_posix() == 'remote/path'
+    assert build_steps[0].command == 'cwd test command'
+
+
+def test_configuration_build_server_skip():
+    mock_recipe = MockRecipe()
+    mock_recipe.projects['skip_project'] = {
+        'build_servers': [
+            RemoteBuildServer('remote', 'remote/path', skip=True)
+        ],
+        'send': [
+            SyncFile('test/input/file'),
+        ],
+        'build_steps': [
+            BuildStep(command='cwd test command'),
+        ],
+        'receive': [
+            SyncFile('test/output/file'),
+        ],
+    }
+
+    configuration = Configuration(mock_recipe)
+    configuration.setup(project='skip_project', server='remote')
+
+    assert configuration.get_build_server() == 'remote'
+    assert configuration.get_files_to_send() is None
+    assert configuration.get_files_to_receive() is None
+    assert configuration.get_build_steps() is None
