@@ -10,7 +10,8 @@ class RsyncItem:
 
 class SyncFile(RsyncItem):
     def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> (str, str):
-        # TODO: add support for absolute paths
+        # TODO: how to handle absolute paths?
+        # different base path on remote server not supported at the moment for absolute paths
         src = Path(src_path) / self.path
         src = src.as_posix()
         if src_hostname:
