@@ -28,7 +28,7 @@ class Rsync:
     def set_dry_run(self, dry_run: bool):
         self.dry_run = dry_run
 
-    def sync(self, src, dst, exludes):
+    def _sync(self, src, dst, exludes):
         cmd = list(Rsync.command)
         cmd.append(src)
         cmd.append(dst)
@@ -45,7 +45,7 @@ class Rsync:
                 excludes.append(rsync_item.parse())
         return excludes
 
-    def sync_multiple(self, rsync_items, **parser_args):
+    def _sync_multiple(self, rsync_items, **parser_args):
         excludes = self._get_exclude_list(rsync_items)
 
         if self.logger is not None and excludes:
@@ -54,8 +54,7 @@ class Rsync:
                 self.logger.log(f'  {exclude}\n')
 
         for rsync_item in rsync_items:
-            is_exclude = getattr(rsync_item, 'is_exclude', False)
-            if is_exclude:
+            if rsync_item.is_exclude:
                 continue
 
             src, dst = rsync_item.parse(**parser_args)
@@ -64,12 +63,12 @@ class Rsync:
                 self.logger.log(f'Transferring: {src} to {dst}\n')
 
             if self.dry_run:
-                return
+                continue
 
-            self.sync(src, dst, excludes)
+            self._sync(src, dst, excludes)
 
     def send(self, rsync_items):
-        self.sync_multiple(rsync_items, src_path=self.local_base, dst_hostname=self.hostname, dst_path=self.remote_base)
+        self._sync_multiple(rsync_items, src_path=self.local_base, dst_hostname=self.hostname, dst_path=self.remote_base)
 
     def receive(self, rsync_items):
-        self.sync_multiple(rsync_items, src_hostname=self.hostname, src_path=self.remote_base, dst_path=self.local_base)
+        self._sync_multiple(rsync_items, src_hostname=self.hostname, src_path=self.remote_base, dst_path=self.local_base)
