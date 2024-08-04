@@ -82,12 +82,14 @@ def test_configuration_remote():
 
 def test_configuration_composite():
     mock_recipe = MockRecipe()
+    # fmt: off
     mock_recipe.projects['composite'] = {
         'components': [
             'build',
             'test',
         ],
     }
+    # fmt: on
 
     configuration = Configuration(mock_recipe)
     configuration.setup(project='composite')
@@ -97,6 +99,7 @@ def test_configuration_composite():
 
 def test_configuration_build_server_override():
     mock_recipe = MockRecipe()
+    # fmt: off
     mock_recipe.projects['override_project'] = {
         'build_servers': [
             RemoteBuildServer('remote', 'remote/path', override=True)
@@ -105,12 +108,13 @@ def test_configuration_build_server_override():
             BuildStep(command='cwd test command'),
         ],
     }
+    # fmt: on
 
     configuration = Configuration(mock_recipe)
     configuration.setup(project='override_project', server='local')
 
     assert configuration.get_build_server() == 'remote'
-    
+
     build_steps = configuration.get_build_steps()
     assert len(build_steps) == 1
     assert build_steps[0].workdir.as_posix() == 'remote/path'
@@ -119,6 +123,7 @@ def test_configuration_build_server_override():
 
 def test_configuration_build_server_skip():
     mock_recipe = MockRecipe()
+    # fmt: off
     mock_recipe.projects['skip_project'] = {
         'build_servers': [
             RemoteBuildServer('remote', 'remote/path', skip=True)
@@ -133,6 +138,7 @@ def test_configuration_build_server_skip():
             SyncFile('test/output/file'),
         ],
     }
+    # fmt: on
 
     configuration = Configuration(mock_recipe)
     configuration.setup(project='skip_project', server='remote')
@@ -145,6 +151,7 @@ def test_configuration_build_server_skip():
 
 def test_configuration_build_steps_from_list():
     mock_recipe = MockRecipe()
+    # fmt: off
     mock_recipe.projects['steps_list'] = {
         'build_servers': [
             LocalBuildServer()
@@ -154,6 +161,7 @@ def test_configuration_build_steps_from_list():
             ('workdir', 'step with workdir')
         ],
     }
+    # fmt: on
 
     configuration = Configuration(mock_recipe)
     configuration.setup(project='steps_list', server='local')
@@ -168,10 +176,12 @@ def test_configuration_build_steps_from_list():
 
 def test_configuration_local_project_from_list():
     mock_recipe = MockRecipe()
+    # fmt: off
     mock_recipe.projects['steps_list'] = [
         'build step',
         ('workdir', 'step with workdir')
     ]
+    # fmt: on
 
     configuration = Configuration(mock_recipe)
     configuration.setup(project='steps_list', server='local')
@@ -184,6 +194,3 @@ def test_configuration_local_project_from_list():
     assert build_steps[0].command == 'build step'
     assert build_steps[1].workdir.as_posix() == '/recipe/path/workdir'
     assert build_steps[1].command == 'step with workdir'
-
-
-
