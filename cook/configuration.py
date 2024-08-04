@@ -123,7 +123,6 @@ class Configuration:
 
         if self.build_server.skip == True:
             self.skip = True
-            return
 
     def _get_build_server_override(self):
         build_servers = get_nested_item(self.projects, self.project, 'build_servers')
