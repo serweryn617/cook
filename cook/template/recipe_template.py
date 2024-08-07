@@ -24,6 +24,7 @@ projects['clean'] = (
 projects['build'] = (
     # 'mkdir -p build',
     'echo "creating build directory"',
+
     # ('build', 'cmake ..'),
     # ('build', 'cmake --build .'),
     'echo "running cmake in build directory"',

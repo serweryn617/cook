@@ -34,3 +34,4 @@ pip install -e .
 ```
 
 <!-- TODO: add tests -->
+<!-- TODO: is it possible remove build_servers for local build server if it is used in at least one project? -->
