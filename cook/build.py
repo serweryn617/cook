@@ -1,6 +1,3 @@
-from invoke.watchers import Responder
-
-
 class BuildStep:
     def __init__(self, workdir='.', command='', responders=None, expected_return_code=0, check=True):
         self.command = command
@@ -8,10 +5,10 @@ class BuildStep:
         self.expected_return_code = expected_return_code
         self.check = check
 
-        if responders:
-            self.responders = responders
-        else:
-            self.responders = tuple()
+        # if responders:
+        #     self.responders = responders
+        # else:
+        #     self.responders = tuple()
 
 
 class BuildServer:

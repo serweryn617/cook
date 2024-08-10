@@ -1,8 +1,5 @@
-import subprocess
-from socket import gaierror
-
 from .exception import ProcessError
-from .watchers import RichPrinter
+# from .watchers import RichPrinter
 from .library.process import ProcessRunner, SSHProcessRunner
 
 class ExecutorError(Exception):
