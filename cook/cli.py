@@ -1,12 +1,11 @@
 import argparse
 from pathlib import Path
 
-from rich import print as rprint
-
 from .main import Main
 from .template.recipe_template import TEMPLATE
 from .library.selector import SelectionInterrupt, Selector
 
+rprint = print
 
 class Settings:
     def __init__(self):

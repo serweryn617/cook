@@ -1,36 +1,33 @@
-from rich.console import Console
-from rich.theme import Theme
+from .library.terminal import ansi
 
 
 class Logger:
-    GREEN = '#00cc52'
-    PURPLE = '#d849ff'
+    GREEN = 0x00, 0xcc, 0x52
+    PURPLE = 0xd8, 0x49, 0xff
+    ORANGE = 0xff, 0x88, 0x00
+    RED = 0xff, 0x00, 0x00
+
+    theme = {
+        'log': GREEN,
+        'info': PURPLE,
+        'warning': ORANGE,
+        'error': RED,
+    }
 
     def __init__(self, rich_output, quiet):
-        cook_console_theme = Theme(
-            {
-                'log': Logger.GREEN,
-                'info': Logger.PURPLE,
-                'warning': 'dark_orange',
-                'error': 'red',
-            }
-        )
-        self.console = Console(theme=cook_console_theme)
         self.rich_output = rich_output
         self.quiet = quiet
 
     def print(self, style, message):
         message = '=== ' + str(message) + ' ==='
-        self.console.print(message, style=style, highlight=False)
+        color = ansi.fg(*self.theme[style])
+        print(color + message)
 
     def log(self, message):
         if self.quiet:
             return
 
-        if self.rich_output:
-            self.console.print(message, end='')
-        else:
-            print(message, end='')
+        print(message, end='')
 
     def use_rich_output(self):
         return self.rich_output
