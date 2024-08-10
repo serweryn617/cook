@@ -140,7 +140,7 @@ def cli():
         if args.interactive or build_server is None:
             build_server = select_interactively('Build Server', build_servers, default_build_server)
 
-    except KeyboardInterrupt:
+    except SelectionInterrupt:
         print("\nCancelled by user\n")
         return 1
 
