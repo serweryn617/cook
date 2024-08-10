@@ -1,4 +1,5 @@
 import subprocess
+import shlex
 from pathlib import Path
 
 from .exception import ProcessError
@@ -34,7 +35,7 @@ class Rsync:
         cmd.append(dst)
         cmd.extend([Rsync.exclude + e for e in exludes])
 
-        result = subprocess.run(' '.join(cmd), shell=True)
+        result = subprocess.run(shlex.join(cmd), shell=True)
         if result.returncode != 0:
             raise ProcessError('rsync returned an error!', result.returncode)
 

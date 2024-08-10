@@ -1,11 +1,11 @@
 import argparse
 from pathlib import Path
 
-import questionary
 from rich import print as rprint
 
 from .main import Main
 from .template.recipe_template import TEMPLATE
+from .library.selector import SelectionInterrupt, Selector
 
 
 class Settings:
@@ -38,11 +38,11 @@ def list_item(message, iterable, default):
         rprint(msg)
 
 
-def select_interactively(message, choices, default):
-    if choices is None:
+def select_interactively(message, elements, default):
+    if elements is None:
         return
 
-    return questionary.select(message, choices=choices, default=default).unsafe_ask()
+    return Selector(elements, message).select()
 
 
 def parse_user_args(user_args):

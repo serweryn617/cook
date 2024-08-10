@@ -1,7 +1,7 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
 # TODO: split into separate examples
-from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer, Responder
+from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer #, Responder
 from cook.cli import settings
 from cook.sync import SyncDirectory, SyncExclude, SyncFile
 
@@ -59,7 +59,7 @@ projects = {
             BuildStep(
                 workdir='my_project_source/build',
                 command='python3 ../my_script.py',
-                responders=[Responder(pattern=r'Execute example script\? \[y/n\]: ', response='y\n')]
+                # responders=[Responder(pattern=r'Execute example script\? \[y/n\]: ', response='y\n')]
             ),
         ],
 
