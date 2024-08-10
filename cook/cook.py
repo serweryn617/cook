@@ -1,7 +1,5 @@
 import subprocess
 
-import fabric
-
 from .configuration import BuildType, Configuration
 from .executors import LocalExecutor, RemoteExecutor
 from .rsync import Rsync

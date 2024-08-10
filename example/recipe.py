@@ -11,13 +11,13 @@ else:
     out_file_name = 'output_latest'
 
 
-default_build_server = 'argon'
+default_build_server = 'build'
 default_project = 'my_project'
 
 
 build_servers = [
     'local',
-    'argon',
+    'build',
 ]
 
 
@@ -33,7 +33,7 @@ projects = {
     'my_project_create_workdir': {
         'build_servers': [
             LocalBuildServer(skip=True),
-            RemoteBuildServer(name='argon', build_path='~'),
+            RemoteBuildServer(name='build', build_path='~'),
         ],
 
         'build_steps': [
@@ -44,7 +44,7 @@ projects = {
     'my_project_build': {
         'build_servers': [
             LocalBuildServer(),
-            RemoteBuildServer(name='argon', build_path='~/cook_example'),
+            RemoteBuildServer(name='build', build_path='~/cook_example'),
         ],
 
         'send': [
@@ -92,7 +92,7 @@ projects = {
 
     'clean_remote': {
         'build_servers': [
-            RemoteBuildServer(name='argon', build_path='~'),
+            RemoteBuildServer(name='build', build_path='~'),
         ],
 
         'build_steps': [

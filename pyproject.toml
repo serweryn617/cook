@@ -4,9 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cook_builder"
-version = "0.1.9"
+version = "0.2.0"
 dependencies = [
-  "fabric==3.2.2",
   "rich==13.7.1",
   "questionary==2.0.1",
 ]
