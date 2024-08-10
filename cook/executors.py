@@ -1,6 +1,9 @@
 from .exception import ProcessError
+
 # from .watchers import RichPrinter
 from .library.process import ProcessRunner, SSHProcessRunner
+from .logger import log
+
 
 class ExecutorError(Exception):
     def __init__(self, message, name, return_code):
@@ -10,17 +13,9 @@ class ExecutorError(Exception):
 
 
 class Executor:
-    def __init__(self, name=None, logger=None):
+    def __init__(self, name=None):
         self.name = name
         self.dry_run = False
-
-        self.logger = logger
-        if self.logger:
-            self.rich_output = self.logger.use_rich_output()
-            self.quiet = self.logger.is_quiet()
-        else:
-            self.rich_output = False
-            self.quiet = False
 
     def set_dry_run(self, dry_run: bool):
         self.dry_run = dry_run
@@ -53,8 +48,7 @@ class LocalExecutor(Executor):
     def run_multiple(self, steps):
         runner = ProcessRunner()
         for step in steps:
-            if self.logger:
-                self.logger.print('log', f'Local Step: {step.workdir}: {step.command}')
+            log(f'Local Step: {step.workdir}: {step.command}', 'log')
 
             self.run(runner, step)
 
@@ -63,7 +57,6 @@ class RemoteExecutor(Executor):
     def run_multiple(self, steps):
         runner = SSHProcessRunner(self.name)
         for step in steps:
-            if self.logger:
-                self.logger.print('log', f'Remote Step: {self.name}:{step.workdir}: {step.command}')
-            
+            log(f'Remote Step: {self.name}:{step.workdir}: {step.command}', 'log')
+
             self.run(runner, step)

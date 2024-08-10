@@ -1,11 +1,11 @@
 import argparse
 from pathlib import Path
 
+from .library.selector import SelectionInterrupt, Selector
+from .logger import log
 from .main import Main
 from .template.recipe_template import TEMPLATE
-from .library.selector import SelectionInterrupt, Selector
 
-rprint = print
 
 class Settings:
     def __init__(self):
@@ -17,7 +17,7 @@ settings = Settings()
 
 
 def list_items(recipe_path, build_servers, default_build_server, projects, default_project):
-    rprint(f'[bold]Items defined in {recipe_path}')
+    log(f'Items defined in {recipe_path}', bold=True)
 
     list_item('Build Servers', build_servers, default_build_server)
     list_item('Projects', projects, default_project)
@@ -25,16 +25,16 @@ def list_items(recipe_path, build_servers, default_build_server, projects, defau
 
 def list_item(message, iterable, default):
     if not iterable:
-        rprint(f'[bold][#fcac00]{message}[/] not defined.')
+        log(f'[#fcac00]{message}[/] not defined.', bold=True)
         return
 
-    rprint(f'[bold #fcac00]{message}[/]:')
+    log(f'[bold #fcac00]{message}[/]:', bold=True)
     for item in iterable:
         if item == default:
             msg = f'  [#555555 on #cccccc]{item}[/]'
         else:
             msg = f'  {item}'
-        rprint(msg)
+        log(msg)
 
 
 def select_interactively(message, elements, default):
@@ -59,19 +59,19 @@ def parse_user_args(user_args):
 
 def generate_template(base_path: Path):
     if not base_path.is_dir():
-        rprint(f'[#d849ff]{base_path} directory does not exist!')
+        log(f'[#d849ff]{base_path} directory does not exist!')
         return 1
 
     recipe_path = base_path / 'recipe.py'
 
     if recipe_path.is_file():
-        rprint('[#d849ff]recipe.py already present in', base_path)
+        log(f'[#d849ff]recipe.py already present in {base_path}')
         return 1
 
     with open(recipe_path, 'w') as file:
         file.write(TEMPLATE)
 
-    rprint('[#00cc52]recipe.py generated in', base_path)
+    log(f'[#00cc52]recipe.py generated in {base_path}')
     return 0
 
 

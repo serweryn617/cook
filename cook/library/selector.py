@@ -1,5 +1,6 @@
-from .key import getkey
 import sys
+
+from .key import getkey
 
 
 class SelectionInterrupt(Exception):
@@ -41,7 +42,7 @@ class Selector:
         prev_current = 0
 
         if current:
-            print(ansi.down(current), end = '')
+            print(ansi.down(current), end='')
         print(self.cursor + ansi.left(self.cursor_len), end='')
         sys.stdout.flush()
 

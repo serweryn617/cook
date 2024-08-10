@@ -14,7 +14,9 @@ class Getchar:
 
 class GetcharUnix:
     def __init__(self):
-        import tty, termios
+        import termios
+        import tty
+
         self.tty = tty
         self.termios = termios
 
@@ -32,6 +34,7 @@ class GetcharUnix:
 class GetcharWindows:
     def __init__(self):
         import msvcrt
+
         self.msvcrt = msvcrt
 
     def getchar(self):
@@ -47,4 +50,3 @@ def getkey() -> str:
     if c == '\x1B':
         c += getchar.getchar(2)
     return c
-

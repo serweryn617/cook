@@ -1,7 +1,7 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
 # TODO: split into separate examples
-from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer #, Responder
+from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer  # , Responder
 from cook.cli import settings
 from cook.sync import SyncDirectory, SyncExclude, SyncFile
 
