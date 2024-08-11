@@ -87,16 +87,17 @@ def cli():
     )
 
     parser.add_argument('recipe_path', default='.', nargs='?', help='Path to directory containing `recipe.py` file. Defaults to CWD.')
+    parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
     parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
-    parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers.')
-    parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
+    parser.add_argument('-i', '--interactive', action='store_true', help='Use interactive project and build server selection.')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress stdout.')
+    parser.add_argument('-s', '--silent', action='store_true', help='Suppress all output, including internal messages.')
+    parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
     parser.add_argument(
         '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
     )
-    parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
-    parser.add_argument('-i', '--interactive', action='store_true', help='Force interactive selection.')
-    parser.add_argument('--generate_template', action='store_true', help='Genereta recipe template in a selected directory.')
+    parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers and exit.')
+    parser.add_argument('-t', '--generate_template', action='store_true', help='Genereta recipe template in a selected directory.')
 
     args = parser.parse_args()
 
