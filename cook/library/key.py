@@ -1,4 +1,5 @@
 import sys
+
 from .terminal import EscapeCodes
 
 
@@ -21,9 +22,11 @@ def getchar_windows():
 if sys.platform.startswith('linux'):
     import termios
     import tty
+
     getchar = getchars_unix
 else:
     import msvcrt
+
     getchar = getchar_windows
 
 

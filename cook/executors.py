@@ -1,7 +1,6 @@
 from .exception import ProcessError
-
-from .library.process import ProcessRunner, SSHProcessRunner
 from .library.logger import log
+from .library.process import ProcessRunner, SSHProcessRunner
 
 
 class ExecutorError(Exception):

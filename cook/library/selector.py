@@ -3,6 +3,7 @@ import sys
 from .key import getkey
 from .terminal import EscapeCodes
 
+
 class SelectionInterrupt(Exception):
     pass
 

@@ -1,8 +1,8 @@
 import argparse
 from pathlib import Path
 
-from .library.selector import SelectionInterrupt, Selector
 from .library.logger import log
+from .library.selector import SelectionInterrupt, Selector
 from .main import Main
 from .template.recipe_template import TEMPLATE
 
@@ -31,9 +31,9 @@ def list_item(message, iterable, default):
     log(f'{message}:', bold=True, internal=False)
     for item in iterable:
         if item == default:
-            log(f'  {item}', internal=False)
+            log(f' - {item} (default)', internal=False)
         else:
-            log(f'  {item}', internal=False)
+            log(f' - {item}', internal=False)
 
 
 def select_interactively(message, elements, default):
