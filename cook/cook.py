@@ -2,7 +2,7 @@ import subprocess
 
 from .configuration import BuildType, Configuration
 from .executors import LocalExecutor, RemoteExecutor
-from .logger import log
+from .library.logger import log
 from .rsync import Rsync
 
 

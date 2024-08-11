@@ -2,7 +2,7 @@ from .exception import ProcessError
 
 # from .watchers import RichPrinter
 from .library.process import ProcessRunner, SSHProcessRunner
-from .logger import log
+from .library.logger import log
 
 
 class ExecutorError(Exception):

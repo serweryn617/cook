@@ -2,7 +2,7 @@ from .configuration import Configuration, ConfigurationError
 from .cook import Cook
 from .exception import ProcessError
 from .executors import ExecutorError
-from .logger import log
+from .library.logger import log
 from .recipe import Recipe, RecipeNotFound
 
 

@@ -1,4 +1,4 @@
-from .library.terminal import ansi
+from .terminal import ansi
 
 
 class Logger:

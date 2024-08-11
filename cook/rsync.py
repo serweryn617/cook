@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 
 from .exception import ProcessError
-from .logger import log
+from .library.logger import log
 
 
 class Rsync:

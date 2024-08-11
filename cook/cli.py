@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 from .library.selector import SelectionInterrupt, Selector
-from .logger import log
+from .library.logger import log
 from .main import Main
 from .template.recipe_template import TEMPLATE
 
