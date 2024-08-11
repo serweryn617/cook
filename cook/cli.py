@@ -17,7 +17,7 @@ settings = Settings()
 
 
 def list_items(recipe_path, build_servers, default_build_server, projects, default_project):
-    log(f'Items defined in {recipe_path}', bold=True)
+    log(f'Items defined in {recipe_path}', bold=True, internal=False)
 
     list_item('Build Servers', build_servers, default_build_server)
     list_item('Projects', projects, default_project)
@@ -25,16 +25,15 @@ def list_items(recipe_path, build_servers, default_build_server, projects, defau
 
 def list_item(message, iterable, default):
     if not iterable:
-        log(f'[#fcac00]{message}[/] not defined.', bold=True)
+        log(f'{message} not defined.', 'warning')
         return
 
-    log(f'[bold #fcac00]{message}[/]:', bold=True)
+    log(f'{message}:', bold=True, internal=False)
     for item in iterable:
         if item == default:
-            msg = f'  [#555555 on #cccccc]{item}[/]'
+            log(f'  {item}', internal=False)
         else:
-            msg = f'  {item}'
-        log(msg)
+            log(f'  {item}', internal=False)
 
 
 def select_interactively(message, elements, default):
@@ -59,19 +58,19 @@ def parse_user_args(user_args):
 
 def generate_template(base_path: Path):
     if not base_path.is_dir():
-        log(f'[#d849ff]{base_path} directory does not exist!')
+        log(f'{base_path} directory does not exist!', 'info')
         return 1
 
     recipe_path = base_path / 'recipe.py'
 
     if recipe_path.is_file():
-        log(f'[#d849ff]recipe.py already present in {base_path}')
+        log(f'recipe.py already present in {base_path}', 'info')
         return 1
 
     with open(recipe_path, 'w') as file:
         file.write(TEMPLATE)
 
-    log(f'[#00cc52]recipe.py generated in {base_path}')
+    log(f'recipe.py generated in {base_path}', 'log')
     return 0
 
 
@@ -89,7 +88,6 @@ def cli():
 
     parser.add_argument('recipe_path', default='.', nargs='?', help='Path to directory containing `recipe.py` file. Defaults to CWD.')
     parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
-    parser.add_argument('-f', '--format', action='store_true', help='Format output using Rich.')
     parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers.')
     parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress stdout.')
@@ -106,7 +104,6 @@ def cli():
     settings.args.update(user_args)
     settings.flags.extend(user_flags)
 
-    rich_output = args.format
     quiet = args.quiet
     to_list = args.list
     dry_run = args.dry
@@ -144,6 +141,6 @@ def cli():
         return 1
 
     main_program.configure(project, build_server)
-    main_program.set_output(rich_output, quiet)
+    main_program.set_output(quiet)
 
     main_program.run(dry_run=dry_run)

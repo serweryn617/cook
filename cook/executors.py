@@ -24,19 +24,6 @@ class Executor:
         if self.dry_run:
             return
 
-        # run_args = {'watchers': []}
-
-        # if self.quiet:
-        #     run_args['hide'] = 'out'
-
-        # if self.rich_output and self.logger:
-        #     rich_printer = RichPrinter(self.logger)
-        #     run_args['hide'] = 'both'
-        #     run_args['watchers'].append(rich_printer)
-
-        # if step.responders:
-        #     run_args['watchers'].extend(step.responders)
-
         result = runner.run(step.command, workdir=step.workdir)
 
         return_code = result.returncode

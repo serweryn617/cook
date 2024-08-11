@@ -69,7 +69,7 @@ class Cook:
         log('Running Composite Build', 'log')
 
         for component in components:
-            log('log', f'Component: {component}')
+            log(f'Component: {component}', 'log')
             self._run_component(component)
 
     def _run_component(self, component):
@@ -81,5 +81,5 @@ class Cook:
             sub_cook.set_dry_run(self.dry_run)
             sub_cook.cook()
         except Exception as e:
-            log('error', f'Component {component} failed!')
+            log(f'Component {component} failed!', 'error')
             raise e

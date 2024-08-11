@@ -14,27 +14,27 @@ class Logger:
         'error': RED,
     }
 
-    def __init__(self, rich_output=True):
-        self.rich_output = True
-        self.quiet = False
+    def __init__(self):
+        self.formatted = True
         self.silent = False
 
-    def __call__(self, message, style=None, bold=False):
-        if self.quiet:
+    def __call__(self, message, style=None, bold=False, internal=True):
+        if self.silent:
             return
 
-        if style is None:
-            print(message)
-            return
+        message = str(message)
 
-        message = '=== ' + str(message) + ' ==='
-        color = ansi.fg(*self.theme[style])
-        message = color + message
+        if internal:
+            message = '==> ' + message
 
         if bold:
-            message = ansi.bold + message
+            message = ansi.bold + message + ansi.reset
 
-        print(message + ansi.reset)
+        if style:
+            color = ansi.fg(*self.theme[style])
+            message = color + message + ansi.reset
+
+        print(message)
 
 
 log = Logger()

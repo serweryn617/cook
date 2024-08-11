@@ -11,7 +11,6 @@ class Main:
         self.recipe_base_path = recipe_base_path
         self.project = None
         self.build_server = None
-        self.rich_output = False
         self.quiet = False
 
     def get_recipe_path(self):
@@ -29,16 +28,12 @@ class Main:
         self.project = project
         self.build_server = build_server
 
-    def set_output(self, rich=False, quiet=False):
-        self.rich_output = rich
+    def set_output(self, quiet=False):
+        # TODO remove
         self.quiet = quiet
 
-        if self.rich_output and self.quiet:
-            log('Suppressing stdout and using formatted output will also suppress stderr!', 'warning')
-
     def initialize(self):
-        log.rich_output = self.rich_output
-        log.quiet = self.quiet
+        # log.quiet = self.quiet
 
         try:
             self.recipe = Recipe(self.recipe_base_path)
