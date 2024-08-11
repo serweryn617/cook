@@ -40,7 +40,9 @@ def select_interactively(message, elements, default):
     if elements is None:
         return
 
-    return Selector(elements, message).select()
+    selected = Selector(elements, message, default=default).select()
+    log(f'Selected {message}: {selected}', 'log')
+    return selected
 
 
 def parse_user_args(user_args):
@@ -105,6 +107,7 @@ def cli():
     settings.args.update(user_args)
     settings.flags.extend(user_flags)
 
+    # TODO add silent mode
     quiet = args.quiet
     to_list = args.list
     dry_run = args.dry

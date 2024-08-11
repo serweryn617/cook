@@ -22,13 +22,15 @@ class ansi:
 
 
 class Selector:
-    def __init__(self, elements: tuple | list, message: str = '', cursor: str = '>'):
+    def __init__(self, elements: tuple | list, message: str = '', cursor: str = '>', default=None):
         self.elements = elements
         self.num = len(elements)
         self.cursor = cursor
         self.cursor_len = len(cursor)
         self.message = message
         assert self.cursor_len > 0, 'Cursor must be at least 1 character!'
+
+        self.default_index = elements.index(default) if default is not None else 0
 
     def select(self):
         print(f'Select{' ' + self.message if self.message else ''}')
@@ -38,8 +40,8 @@ class Selector:
             print(' ', ' ' * self.cursor_len, ' ', elem, sep='')
         print(ansi.up(self.num) + ansi.right(1), end='')
 
-        current = 0
-        prev_current = 0
+        current = self.default_index
+        prev_current = current
 
         if current:
             print(ansi.down(current), end='')
@@ -69,7 +71,6 @@ class Selector:
                 sys.stdout.flush()
 
         self._cleanup(current)
-        print(f'Selected{' ' + self.message if self.message else ''}:', self.elements[current])
         return self.elements[current]
 
     def _cleanup(self, current):
