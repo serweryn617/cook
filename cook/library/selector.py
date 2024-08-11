@@ -1,24 +1,10 @@
 import sys
 
 from .key import getkey
-
+from .terminal import EscapeCodes
 
 class SelectionInterrupt(Exception):
     pass
-
-
-class ansi:
-    up = lambda n: f'\x1B[{n}A'
-    down = lambda n: f'\x1B[{n}B'
-    right = lambda n: f'\x1B[{n}C'
-    left = lambda n: f'\x1B[{n}D'
-
-    line_begin = '\x1B[1G'
-
-    hide_cursor = '\x1B[?25l'
-    show_cursor = '\x1B[?25h'
-
-    clear_after_cursor = '\x1B[0J'
 
 
 class Selector:
@@ -34,18 +20,18 @@ class Selector:
 
     def select(self):
         print(f'Select{' ' + self.message if self.message else ''}')
-        print(ansi.hide_cursor, end='')
+        print(EscapeCodes.hide_cursor, end='')
 
         for elem in self.elements:
             print(' ', ' ' * self.cursor_len, ' ', elem, sep='')
-        print(ansi.up(self.num) + ansi.right(1), end='')
+        print(EscapeCodes.up(self.num) + EscapeCodes.right(1), end='')
 
         current = self.default_index
         prev_current = current
 
         if current:
-            print(ansi.down(current), end='')
-        print(self.cursor + ansi.left(self.cursor_len), end='')
+            print(EscapeCodes.down(current), end='')
+        print(self.cursor + EscapeCodes.left(self.cursor_len), end='')
         sys.stdout.flush()
 
         while True:
@@ -62,19 +48,19 @@ class Selector:
             current %= self.num
 
             if current != prev_current:
-                move = ansi.down(current - prev_current) if current > prev_current else ansi.up(prev_current - current)
+                move = EscapeCodes.down(current - prev_current) if current > prev_current else EscapeCodes.up(prev_current - current)
                 prev_current = current
 
-                print(' ' * self.cursor_len + ansi.left(self.cursor_len), end='')
+                print(' ' * self.cursor_len + EscapeCodes.left(self.cursor_len), end='')
                 print(move, end='')
-                print(self.cursor + ansi.left(self.cursor_len), end='')
+                print(self.cursor + EscapeCodes.left(self.cursor_len), end='')
                 sys.stdout.flush()
 
         self._cleanup(current)
         return self.elements[current]
 
     def _cleanup(self, current):
-        print(ansi.up(current + 1) + ansi.line_begin, end='')
-        print(ansi.clear_after_cursor, end='')
-        print(ansi.show_cursor, end='')
+        print(EscapeCodes.up(current + 1) + EscapeCodes.line_begin, end='')
+        print(EscapeCodes.clear_after_cursor, end='')
+        print(EscapeCodes.show_cursor, end='')
         sys.stdout.flush()

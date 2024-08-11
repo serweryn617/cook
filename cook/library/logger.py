@@ -1,4 +1,4 @@
-from .terminal import ansi
+from .terminal import EscapeCodes
 
 
 class Logger:
@@ -28,11 +28,11 @@ class Logger:
             message = '==> ' + message
 
         if bold:
-            message = ansi.bold + message + ansi.reset
+            message = EscapeCodes.bold + message + EscapeCodes.reset
 
         if style:
-            color = ansi.fg(*self.theme[style])
-            message = color + message + ansi.reset
+            color = EscapeCodes.fg(*self.theme[style])
+            message = color + message + EscapeCodes.reset
 
         print(message)
 
