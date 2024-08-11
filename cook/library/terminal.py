@@ -1,4 +1,6 @@
 class EscapeCodes:
+    escape = '\x1B'
+
     up = lambda n: f'\x1B[{n}A'
     down = lambda n: f'\x1B[{n}B'
     right = lambda n: f'\x1B[{n}C'
