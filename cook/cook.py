@@ -7,12 +7,9 @@ from .rsync import Rsync
 
 
 class Cook:
-    def __init__(self, recipe, configuration):
+    def __init__(self, recipe, configuration, dry_run=False):
         self.recipe = recipe
         self.configuration = configuration
-        self.dry_run = False
-
-    def set_dry_run(self, dry_run: bool):
         self.dry_run = dry_run
 
     def cook(self):
@@ -32,8 +29,7 @@ class Cook:
         build_steps = self.configuration.get_build_steps()
 
         if build_steps:
-            executor = LocalExecutor('local')
-            executor.set_dry_run(self.dry_run)
+            executor = LocalExecutor('local', self.dry_run)
             executor.run_multiple(build_steps)
 
     def _remote_build(self):
@@ -44,16 +40,14 @@ class Cook:
 
         setup_rsync = files_to_send or files_to_receive
         if setup_rsync:
-            rsync = Rsync(self.build_server, local_base, remote_base)
-            rsync.set_dry_run(self.dry_run)
+            rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
 
         if files_to_send:
             log('Sending Files', 'log')
             rsync.send(files_to_send)
 
         if build_steps:
-            executor = RemoteExecutor(self.build_server)
-            executor.set_dry_run(self.dry_run)
+            executor = RemoteExecutor(self.build_server, self.dry_run)
             executor.run_multiple(build_steps)
 
         if files_to_receive:
@@ -77,8 +71,7 @@ class Cook:
             sub_configuration = Configuration(self.recipe)
             sub_configuration.setup(component, self.build_server)
 
-            sub_cook = Cook(self.recipe, sub_configuration)
-            sub_cook.set_dry_run(self.dry_run)
+            sub_cook = Cook(self.recipe, sub_configuration, self.dry_run)
             sub_cook.cook()
         except Exception as e:
             log(f'Component {component} failed!', 'error')

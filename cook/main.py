@@ -43,8 +43,7 @@ class Main:
             self.configuration = Configuration(self.recipe)
             self.configuration.setup(self.project, self.build_server)
 
-            self.cook = Cook(self.recipe, self.configuration)
-            self.cook.set_dry_run(dry_run)
+            self.cook = Cook(self.recipe, self.configuration, dry_run)
             self.cook.cook()
 
         except ConfigurationError as e:

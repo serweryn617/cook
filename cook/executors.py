@@ -4,11 +4,8 @@ from .process import ProcessRunner, SSHProcessRunner
 
 
 class Executor:
-    def __init__(self, name=None):
+    def __init__(self, name=None, dry_run=False):
         self.name = name
-        self.dry_run = False
-
-    def set_dry_run(self, dry_run: bool):
         self.dry_run = dry_run
 
     def _run(self, runner, step):

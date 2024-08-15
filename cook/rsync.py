@@ -20,13 +20,10 @@ class Rsync:
     exclude = '--exclude='
 
     # TODO: add rsync for local build
-    def __init__(self, hostname, local_base, remote_base):
+    def __init__(self, hostname, local_base, remote_base, dry_run=False):
         self.hostname = hostname
         self.local_base = local_base
         self.remote_base = remote_base
-        self.dry_run = False
-
-    def set_dry_run(self, dry_run: bool):
         self.dry_run = dry_run
 
     def _sync(self, src, dst, exludes):

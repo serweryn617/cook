@@ -157,8 +157,7 @@ def test_rsync_dry_run(mock_subprocess_run):
         SyncFile('path/to/file.txt'),
     ]
 
-    rsync = Rsync('server', 'local/dir', 'remote/dir')
-    rsync.set_dry_run(True)
+    rsync = Rsync('server', 'local/dir', 'remote/dir', dry_run=True)
 
     rsync.send(file_list)
     rsync.receive(file_list)

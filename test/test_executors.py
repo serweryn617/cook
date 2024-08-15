@@ -87,8 +87,7 @@ def test_local_executor_dry_run(mock_subprocess_run):
         BuildStep(command='cwd test command'),
     ]
 
-    executor = LocalExecutor()
-    executor.set_dry_run(True)
+    executor = LocalExecutor(dry_run=True)
     executor.run_multiple(steps)
 
     assert not mock_subprocess_run.called
@@ -102,8 +101,7 @@ def test_remote_executor_dry_run(mock_subprocess_run):
         BuildStep(command='cwd test command'),
     ]
 
-    executor = RemoteExecutor('remote_host')
-    executor.set_dry_run(True)
+    executor = RemoteExecutor('remote_host', dry_run=True)
     executor.run_multiple(steps)
 
     assert not mock_subprocess_run.called
