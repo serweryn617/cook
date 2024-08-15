@@ -5,11 +5,6 @@ class BuildStep:
         self.expected_return_code = expected_return_code
         self.check = check
 
-        # if responders:
-        #     self.responders = responders
-        # else:
-        #     self.responders = tuple()
-
 
 class BuildServer:
     def __init__(self, name, build_path=None, sync_files=None, skip=False, override=False, is_local=None):
