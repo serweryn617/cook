@@ -2,6 +2,7 @@ import sys
 
 from .key import getkey
 from .terminal import EscapeCodes
+from .logger import ORANGE
 
 
 class SelectionInterrupt(Exception):
@@ -20,7 +21,7 @@ class Selector:
         self.default_index = elements.index(default) if default is not None else 0
 
     def select(self):
-        print(f'Select{' ' + self.message if self.message else ''}')
+        print(EscapeCodes.fg(*ORANGE) + f'Select{' ' + self.message if self.message else ''}:' + EscapeCodes.reset)
         print(EscapeCodes.hide_cursor, end='')
 
         for elem in self.elements:
