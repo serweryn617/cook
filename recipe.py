@@ -14,6 +14,7 @@ projects = {
         # pip install --upgrade build twine
         'rm -rf dist',
         'python3 -m build',
+        'twine check --strict dist/*',
         'twine upload dist/*',
     ],
     'docs': [
