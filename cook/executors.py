@@ -3,13 +3,6 @@ from .library.logger import log
 from .process import ProcessRunner, SSHProcessRunner
 
 
-class ExecutorError(Exception):
-    def __init__(self, message, name, return_code):
-        super().__init__(message)
-        self.name = name
-        self.return_code = return_code
-
-
 class Executor:
     def __init__(self, name=None):
         self.name = name
@@ -18,7 +11,7 @@ class Executor:
     def set_dry_run(self, dry_run: bool):
         self.dry_run = dry_run
 
-    def run(self, runner, step):
+    def _run(self, runner, step):
         if self.dry_run:
             return
 
@@ -35,7 +28,7 @@ class LocalExecutor(Executor):
         for step in steps:
             log(f'Local Step: {step.workdir}: {step.command}', 'log')
 
-            self.run(runner, step)
+            self._run(runner, step)
 
 
 class RemoteExecutor(Executor):
@@ -44,4 +37,4 @@ class RemoteExecutor(Executor):
         for step in steps:
             log(f'Remote Step: {self.name}:{step.workdir}: {step.command}', 'log')
 
-            self.run(runner, step)
+            self._run(runner, step)

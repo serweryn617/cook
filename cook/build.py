@@ -1,5 +1,5 @@
 class BuildStep:
-    def __init__(self, workdir='.', command='', responders=None, expected_return_code=0, check=True):
+    def __init__(self, workdir='.', command='', expected_return_code=0, check=True):
         self.command = command
         self.workdir = workdir
         self.expected_return_code = expected_return_code

@@ -1,7 +1,6 @@
 from .configuration import Configuration, ConfigurationError
 from .cook import Cook
 from .exception import ProcessError
-from .executors import ExecutorError
 from .library.logger import log
 from .recipe import Recipe, RecipeNotFound
 
@@ -54,10 +53,6 @@ class Main:
 
         except ProcessError as e:
             log(e, 'error')
-            exit(e.return_code)
-
-        except ExecutorError as e:
-            log(f'{e.name}: {e}', 'error')
             exit(e.return_code)
 
         log(f'Finished running {self.project} on {self.build_server}', 'info')

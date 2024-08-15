@@ -46,5 +46,4 @@ Simply use ``cook`` command to run the recipe file.
 
 To see all available command line options use ``cook --help``.
 
-.. TODO: add tests
 .. TODO: is it possible remove build_servers for local build server if it is used in at least one project?
