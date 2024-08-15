@@ -1,9 +1,19 @@
-==========
+****
+Cook
+****
+
+Build script aggregator and remote executor.
+
+Documentation
+=============
+
+Checkout `cook-docs <https://serweryn617.github.io/cook-docs/>`_ GitHub Pages!
+
 Quickstart
 ==========
 
 Installation
-============
+------------
 
 Cook is available on PyPI as `cook-builder <https://pypi.org/project/cook-builder/>`_
 The recommended way is to install it using `pipx <https://pipx.pypa.io/stable/>`_:
@@ -13,7 +23,7 @@ The recommended way is to install it using `pipx <https://pipx.pypa.io/stable/>`
    pipx install cook-builder
 
 Generating recipe template
-==========================
+--------------------------
 
 Cook uses ``recipe.py`` files to store project configuration.
 
@@ -25,10 +35,8 @@ To generate a recipe template for your project run:
 
 You can open the created ``recipe.py`` file and adjust the projects/commands to your needs.
 
-For more information about recipe file format see :doc:`recipe`.
-
 Running Cook
-============
+------------
 
 Simply use ``cook`` command to run the recipe file.
 
@@ -37,3 +45,6 @@ Simply use ``cook`` command to run the recipe file.
    cook
 
 To see all available command line options use ``cook --help``.
+
+.. TODO: add tests
+.. TODO: is it possible remove build_servers for local build server if it is used in at least one project?
