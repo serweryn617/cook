@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cook_builder"
-version = "0.2.0"
+version = "0.2.1"
 requires-python = ">=3.10"
 authors = [
   { name="Seweryn Rusecki" },
 ]
 description = "Build script aggregator and remote executor"
-readme = "README.md"
+readme = "README.rst"
 license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -27,6 +27,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/serweryn617/cook"
+Documentation = "https://serweryn617.github.io/cook-docs/"
 Issues = "https://github.com/serweryn617/cook/issues"
 
 [project.scripts]
