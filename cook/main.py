@@ -11,7 +11,6 @@ class Main:
         self.recipe_base_path = recipe_base_path
         self.project = None
         self.build_server = None
-        self.quiet = False
 
     def get_recipe_path(self):
         return (self.recipe.base_path / "recipe.py").as_posix()
@@ -28,13 +27,7 @@ class Main:
         self.project = project
         self.build_server = build_server
 
-    def set_output(self, quiet=False):
-        # TODO remove
-        self.quiet = quiet
-
     def initialize(self):
-        # log.quiet = self.quiet
-
         try:
             self.recipe = Recipe(self.recipe_base_path)
             self.recipe.load()

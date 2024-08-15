@@ -92,8 +92,6 @@ def cli():
     parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
     parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
     parser.add_argument('-i', '--interactive', action='store_true', help='Use interactive project and build server selection.')
-    parser.add_argument('-q', '--quiet', action='store_true', help='Suppress stdout.')
-    parser.add_argument('-s', '--silent', action='store_true', help='Suppress all output, including internal messages.')
     parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
     parser.add_argument(
         '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
@@ -107,8 +105,6 @@ def cli():
     settings.args.update(user_args)
     settings.flags.extend(user_flags)
 
-    # TODO add silent mode
-    quiet = args.quiet
     to_list = args.list
     dry_run = args.dry
 
@@ -145,6 +141,4 @@ def cli():
         return 1
 
     main_program.configure(project, build_server)
-    main_program.set_output(quiet)
-
     main_program.run(dry_run=dry_run)

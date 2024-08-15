@@ -16,12 +16,8 @@ class Logger:
 
     def __init__(self):
         self.formatted = True
-        self.silent = False
 
     def __call__(self, message, style=None, bold=False, internal=True):
-        if self.silent:
-            return
-
         message = str(message)
 
         if internal:
