@@ -1,23 +1,33 @@
-.. cook-builder documentation master file, created by
-   sphinx-quickstart on Mon Aug 12 19:58:26 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+==================
+Cook documentation
+==================
 
-cook-builder documentation
-==========================
+What is Cook?
+=============
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+.. warning::
 
+    Section under development!
+
+Features
+========
+
+.. warning::
+
+    Section under development!
+
+Motivation
+==========
+
+.. warning::
+
+    Section under development!
+
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :glob:
 
-Contents
---------
-
-.. toctree::
-
-   usage
+   *
