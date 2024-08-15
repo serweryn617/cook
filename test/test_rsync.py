@@ -168,7 +168,7 @@ def test_rsync_dry_run(mock_subprocess_run):
 
 @patch('subprocess.run')
 def test_rsync_checks_returncode(mock_subprocess_run):
-    mock_subprocess_run.return_value.returncode = 1
+    mock_subprocess_run.return_value.returncode = 5
 
     file_list = [
         SyncFile('path/to/file.txt'),
@@ -176,5 +176,7 @@ def test_rsync_checks_returncode(mock_subprocess_run):
 
     rsync = Rsync('server', 'local/dir', 'remote/dir')
 
-    with pytest.raises(ProcessError) as e_info:
+    with pytest.raises(ProcessError) as excinfo:
         rsync.send(file_list)
+    
+    assert excinfo.value.return_code == 5
