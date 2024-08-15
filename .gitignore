@@ -161,3 +161,4 @@ cython_debug/
 
 example/output_*
 temp/
+docs/output/
