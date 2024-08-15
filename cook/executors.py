@@ -1,11 +1,6 @@
-import subprocess
-from socket import gaierror
-
-import fabric
-import invoke
-
 from .exception import ProcessError
-from .watchers import RichPrinter
+from .library.logger import log
+from .library.process import ProcessRunner, SSHProcessRunner
 
 
 class ExecutorError(Exception):
@@ -16,67 +11,37 @@ class ExecutorError(Exception):
 
 
 class Executor:
-    def __init__(self, name=None, logger=None):
+    def __init__(self, name=None):
         self.name = name
         self.dry_run = False
-
-        self.logger = logger
-        if self.logger:
-            self.rich_output = self.logger.use_rich_output()
-            self.quiet = self.logger.is_quiet()
-        else:
-            self.rich_output = False
-            self.quiet = False
 
     def set_dry_run(self, dry_run: bool):
         self.dry_run = dry_run
 
-    def run(self, context, step):
+    def run(self, runner, step):
         if self.dry_run:
             return
 
-        run_args = {'watchers': []}
+        result = runner.run(step.command, workdir=step.workdir)
 
-        if self.quiet:
-            run_args['hide'] = 'out'
-
-        if self.rich_output and self.logger:
-            rich_printer = RichPrinter(self.logger)
-            run_args['hide'] = 'both'
-            run_args['watchers'].append(rich_printer)
-
-        if step.responders:
-            run_args['watchers'].extend(step.responders)
-
-        with context.cd(step.workdir):
-            result = context.run(step.command, warn=True, pty=True, **run_args)
-
-        return_code = result.return_code
+        return_code = result.returncode
         if step.check and return_code != step.expected_return_code:
             raise ProcessError(f'Encountered unexpected exit code {return_code}, expected {step.expected_return_code}', return_code)
 
 
 class LocalExecutor(Executor):
     def run_multiple(self, steps):
-        context = invoke.context.Context()
+        runner = ProcessRunner()
         for step in steps:
-            if self.logger:
-                self.logger.print('log', f'Local Step: {step.workdir}: {step.command}')
+            log(f'Local Step: {step.workdir}: {step.command}', 'log')
 
-            self.run(context, step)
+            self.run(runner, step)
 
 
 class RemoteExecutor(Executor):
-    def _execute_step(self, context, step):
-        if self.logger:
-            self.logger.print('log', f'Remote Step: {self.name}:{step.workdir}: {step.command}')
-
-        try:
-            self.run(context, step)
-        except gaierror as e:
-            raise ExecutorError(e.strerror, self.name, e.errno)
-
     def run_multiple(self, steps):
-        with fabric.Connection(self.name) as context:
-            for step in steps:
-                self._execute_step(context, step)
+        runner = SSHProcessRunner(self.name)
+        for step in steps:
+            log(f'Remote Step: {self.name}:{step.workdir}: {step.command}', 'log')
+
+            self.run(runner, step)

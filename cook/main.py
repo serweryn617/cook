@@ -2,7 +2,7 @@ from .configuration import Configuration, ConfigurationError
 from .cook import Cook
 from .exception import ProcessError
 from .executors import ExecutorError
-from .logger import Logger
+from .library.logger import log
 from .recipe import Recipe, RecipeNotFound
 
 
@@ -11,7 +11,6 @@ class Main:
         self.recipe_base_path = recipe_base_path
         self.project = None
         self.build_server = None
-        self.rich_output = False
         self.quiet = False
 
     def get_recipe_path(self):
@@ -29,49 +28,46 @@ class Main:
         self.project = project
         self.build_server = build_server
 
-    def set_output(self, rich=False, quiet=False):
-        self.rich_output = rich
+    def set_output(self, quiet=False):
+        # TODO remove
         self.quiet = quiet
 
-        if self.rich_output and self.quiet:
-            self.logger.print('warning', 'Suppressing stdout and using formatted output will also suppress stderr!')
-
     def initialize(self):
-        self.logger = Logger(self.rich_output, self.quiet)
+        # log.quiet = self.quiet
 
         try:
             self.recipe = Recipe(self.recipe_base_path)
             self.recipe.load()
 
         except RecipeNotFound as e:
-            self.logger.print('error', e)
+            log(e, 'error')
             exit(1)
 
     def run(self, dry_run=False):
         if dry_run:
-            self.logger.print('warning', 'Dry run')
+            log('Dry run', 'warning')
 
         try:
             self.configuration = Configuration(self.recipe)
             self.configuration.setup(self.project, self.build_server)
 
-            self.cook = Cook(self.recipe, self.configuration, self.logger)
+            self.cook = Cook(self.recipe, self.configuration)
             self.cook.set_dry_run(dry_run)
             self.cook.cook()
 
         except ConfigurationError as e:
-            self.logger.print('error', e)
+            log(e, 'error')
             exit(1)
 
         except ProcessError as e:
-            self.logger.print('error', e)
+            log(e, 'error')
             exit(e.return_code)
 
         except ExecutorError as e:
-            self.logger.print('error', f'{e.name}: {e}')
+            log(f'{e.name}: {e}', 'error')
             exit(e.return_code)
 
-        self.logger.print('info', f'Finished running {self.project} on {self.build_server}')
+        log(f'Finished running {self.project} on {self.build_server}', 'info')
 
         if dry_run:
-            self.logger.print('warning', 'Dry run finished')
+            log('Dry run finished', 'warning')

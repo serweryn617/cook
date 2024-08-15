@@ -1,7 +1,7 @@
 # Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
 # TODO: split into separate examples
-from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer, Responder
+from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer  # , Responder
 from cook.cli import settings
 from cook.sync import SyncDirectory, SyncExclude, SyncFile
 
@@ -11,13 +11,13 @@ else:
     out_file_name = 'output_latest'
 
 
-default_build_server = 'argon'
+default_build_server = 'build'
 default_project = 'my_project'
 
 
 build_servers = [
     'local',
-    'argon',
+    'build',
 ]
 
 
@@ -33,7 +33,7 @@ projects = {
     'my_project_create_workdir': {
         'build_servers': [
             LocalBuildServer(skip=True),
-            RemoteBuildServer(name='argon', build_path='~'),
+            RemoteBuildServer(name='build', build_path='~'),
         ],
 
         'build_steps': [
@@ -44,7 +44,7 @@ projects = {
     'my_project_build': {
         'build_servers': [
             LocalBuildServer(),
-            RemoteBuildServer(name='argon', build_path='~/cook_example'),
+            RemoteBuildServer(name='build', build_path='~/cook_example'),
         ],
 
         'send': [
@@ -59,7 +59,7 @@ projects = {
             BuildStep(
                 workdir='my_project_source/build',
                 command='python3 ../my_script.py',
-                responders=[Responder(pattern=r'Execute example script\? \[y/n\]: ', response='y\n')]
+                # responders=[Responder(pattern=r'Execute example script\? \[y/n\]: ', response='y\n')]
             ),
         ],
 
@@ -92,7 +92,7 @@ projects = {
 
     'clean_remote': {
         'build_servers': [
-            RemoteBuildServer(name='argon', build_path='~'),
+            RemoteBuildServer(name='build', build_path='~'),
         ],
 
         'build_steps': [

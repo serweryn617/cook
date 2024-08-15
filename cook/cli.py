@@ -1,9 +1,8 @@
 import argparse
 from pathlib import Path
 
-import questionary
-from rich import print as rprint
-
+from .library.logger import log
+from .library.selector import SelectionInterrupt, Selector
 from .main import Main
 from .template.recipe_template import TEMPLATE
 
@@ -18,7 +17,7 @@ settings = Settings()
 
 
 def list_items(recipe_path, build_servers, default_build_server, projects, default_project):
-    rprint(f'[bold]Items defined in {recipe_path}')
+    log(f'Items defined in {recipe_path}', bold=True, internal=False)
 
     list_item('Build Servers', build_servers, default_build_server)
     list_item('Projects', projects, default_project)
@@ -26,23 +25,24 @@ def list_items(recipe_path, build_servers, default_build_server, projects, defau
 
 def list_item(message, iterable, default):
     if not iterable:
-        rprint(f'[bold][#fcac00]{message}[/] not defined.')
+        log(f'{message} not defined.', 'warning')
         return
 
-    rprint(f'[bold #fcac00]{message}[/]:')
+    log(f'{message}:', bold=True, internal=False)
     for item in iterable:
         if item == default:
-            msg = f'  [#555555 on #cccccc]{item}[/]'
+            log(f' - {item} (default)', internal=False)
         else:
-            msg = f'  {item}'
-        rprint(msg)
+            log(f' - {item}', internal=False)
 
 
-def select_interactively(message, choices, default):
-    if choices is None:
+def select_interactively(message, elements, default):
+    if elements is None:
         return
 
-    return questionary.select(message, choices=choices, default=default).unsafe_ask()
+    selected = Selector(elements, message, default=default).select()
+    log(f'Selected {message}: {selected}', 'log')
+    return selected
 
 
 def parse_user_args(user_args):
@@ -60,19 +60,19 @@ def parse_user_args(user_args):
 
 def generate_template(base_path: Path):
     if not base_path.is_dir():
-        rprint(f'[#d849ff]{base_path} directory does not exist!')
+        log(f'{base_path} directory does not exist!', 'info')
         return 1
 
     recipe_path = base_path / 'recipe.py'
 
     if recipe_path.is_file():
-        rprint('[#d849ff]recipe.py already present in', base_path)
+        log(f'recipe.py already present in {base_path}', 'info')
         return 1
 
     with open(recipe_path, 'w') as file:
         file.write(TEMPLATE)
 
-    rprint('[#00cc52]recipe.py generated in', base_path)
+    log(f'recipe.py generated in {base_path}', 'log')
     return 0
 
 
@@ -89,17 +89,17 @@ def cli():
     )
 
     parser.add_argument('recipe_path', default='.', nargs='?', help='Path to directory containing `recipe.py` file. Defaults to CWD.')
+    parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
     parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
-    parser.add_argument('-f', '--format', action='store_true', help='Format output using Rich.')
-    parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers.')
-    parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
+    parser.add_argument('-i', '--interactive', action='store_true', help='Use interactive project and build server selection.')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress stdout.')
+    parser.add_argument('-s', '--silent', action='store_true', help='Suppress all output, including internal messages.')
+    parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
     parser.add_argument(
         '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
     )
-    parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
-    parser.add_argument('-i', '--interactive', action='store_true', help='Force interactive selection.')
-    parser.add_argument('--generate_template', action='store_true', help='Genereta recipe template in a selected directory.')
+    parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers and exit.')
+    parser.add_argument('-t', '--generate_template', action='store_true', help='Genereta recipe template in a selected directory.')
 
     args = parser.parse_args()
 
@@ -107,7 +107,7 @@ def cli():
     settings.args.update(user_args)
     settings.flags.extend(user_flags)
 
-    rich_output = args.format
+    # TODO add silent mode
     quiet = args.quiet
     to_list = args.list
     dry_run = args.dry
@@ -140,11 +140,11 @@ def cli():
         if args.interactive or build_server is None:
             build_server = select_interactively('Build Server', build_servers, default_build_server)
 
-    except KeyboardInterrupt:
+    except SelectionInterrupt:
         print("\nCancelled by user\n")
         return 1
 
     main_program.configure(project, build_server)
-    main_program.set_output(rich_output, quiet)
+    main_program.set_output(quiet)
 
     main_program.run(dry_run=dry_run)

@@ -178,5 +178,3 @@ def test_rsync_checks_returncode(mock_subprocess_run):
 
     with pytest.raises(ProcessError) as e_info:
         rsync.send(file_list)
-
-

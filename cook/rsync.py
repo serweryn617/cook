@@ -1,7 +1,9 @@
+import shlex
 import subprocess
 from pathlib import Path
 
 from .exception import ProcessError
+from .library.logger import log
 
 
 class Rsync:
@@ -18,9 +20,8 @@ class Rsync:
     exclude = '--exclude='
 
     # TODO: add rsync for local build
-    def __init__(self, hostname, local_base, remote_base, logger=None):
+    def __init__(self, hostname, local_base, remote_base):
         self.hostname = hostname
-        self.logger = logger
         self.local_base = local_base
         self.remote_base = remote_base
         self.dry_run = False
@@ -34,7 +35,7 @@ class Rsync:
         cmd.append(dst)
         cmd.extend([Rsync.exclude + e for e in exludes])
 
-        result = subprocess.run(' '.join(cmd), shell=True)
+        result = subprocess.run(shlex.join(cmd), shell=True)
         if result.returncode != 0:
             raise ProcessError('rsync returned an error!', result.returncode)
 
@@ -48,10 +49,10 @@ class Rsync:
     def _sync_multiple(self, rsync_items, **parser_args):
         excludes = self._get_exclude_list(rsync_items)
 
-        if self.logger is not None and excludes:
-            self.logger.log('Excluding:\n')
+        if excludes:
+            log('Excluding:')
             for exclude in excludes:
-                self.logger.log(f'  {exclude}\n')
+                log(f'  {exclude}')
 
         for rsync_item in rsync_items:
             if rsync_item.is_exclude:
@@ -59,8 +60,7 @@ class Rsync:
 
             src, dst = rsync_item.parse(**parser_args)
 
-            if self.logger is not None:
-                self.logger.log(f'Transferring: {src} to {dst}\n')
+            log(f'Transferring: {src} to {dst}')
 
             if self.dry_run:
                 continue
