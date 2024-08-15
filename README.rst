@@ -1,21 +1,19 @@
-====
+****
 Cook
-====
+****
 
 Build script aggregator and remote executor.
 
-=============
 Documentation
 =============
 
 Checkout `cook-docs <https://serweryn617.github.io/cook-docs/>`_ GitHub Pages!
 
-==========
 Quickstart
 ==========
 
 Installation
-============
+------------
 
 Cook is available on PyPI as `cook-builder <https://pypi.org/project/cook-builder/>`_
 The recommended way is to install it using `pipx <https://pipx.pypa.io/stable/>`_:
@@ -25,7 +23,7 @@ The recommended way is to install it using `pipx <https://pipx.pypa.io/stable/>`
    pipx install cook-builder
 
 Generating recipe template
-==========================
+--------------------------
 
 Cook uses ``recipe.py`` files to store project configuration.
 
@@ -38,7 +36,7 @@ To generate a recipe template for your project run:
 You can open the created ``recipe.py`` file and adjust the projects/commands to your needs.
 
 Running Cook
-============
+------------
 
 Simply use ``cook`` command to run the recipe file.
 
