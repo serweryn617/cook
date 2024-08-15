@@ -8,7 +8,7 @@ Build script aggregator and remote executor.
 Documentation
 =============
 
-Checkout `cook-docs <https://serweryn617.github.io/cook-docs/>`_ at GitHub pages!
+Checkout `cook-docs <https://serweryn617.github.io/cook-docs/>`_ GitHub Pages!
 
 ==========
 Quickstart
