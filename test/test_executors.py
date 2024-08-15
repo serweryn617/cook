@@ -2,9 +2,9 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
+from cook.build import BuildStep
 from cook.exception import ProcessError
 from cook.executors import LocalExecutor, RemoteExecutor
-from cook.build import BuildStep
 
 
 @patch('subprocess.run')

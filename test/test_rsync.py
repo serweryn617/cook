@@ -177,5 +177,5 @@ def test_rsync_checks_returncode(mock_subprocess_run):
 
     with pytest.raises(ProcessError) as excinfo:
         rsync.send(file_list)
-    
+
     assert excinfo.value.return_code == 5
