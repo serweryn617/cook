@@ -57,9 +57,6 @@ class Cook:
     def _composite_build(self):
         components = self.configuration.get_components()
 
-        if not components:  # TODO required?
-            return
-
         log('Running Composite Build', 'log')
 
         for component in components:
