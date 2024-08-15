@@ -1,3 +1,15 @@
+====
+Cook
+====
+
+Build script aggregator and remote executor.
+
+=============
+Documentation
+=============
+
+Checkout `cook-docs <https://serweryn617.github.io/cook-docs/>`_ at GitHub pages!
+
 ==========
 Quickstart
 ==========
@@ -25,8 +37,6 @@ To generate a recipe template for your project run:
 
 You can open the created ``recipe.py`` file and adjust the projects/commands to your needs.
 
-For more information about recipe file format see :doc:`recipe`.
-
 Running Cook
 ============
 
@@ -37,3 +47,6 @@ Simply use ``cook`` command to run the recipe file.
    cook
 
 To see all available command line options use ``cook --help``.
+
+.. TODO: add tests
+.. TODO: is it possible remove build_servers for local build server if it is used in at least one project?
