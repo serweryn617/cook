@@ -1,6 +1,4 @@
 class EscapeCodes:
-    escape = '\x1B'
-
     up = lambda n: f'\x1B[{n}A'
     down = lambda n: f'\x1B[{n}B'
     right = lambda n: f'\x1B[{n}C'
@@ -18,3 +16,15 @@ class EscapeCodes:
     bold = '\x1B[1m'
     bold_reset = '\x1B[22m'
     reset = '\x1B[0m'
+
+
+class UnixKeys:
+    escape = '\x1B'
+    up = '\x1B[A'
+    down = '\x1B[B'
+
+
+class WindowsKeys:
+    escape = "\xE0"
+    up = "\xE0H"
+    down = "\xE0P"

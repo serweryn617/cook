@@ -2,7 +2,7 @@ import sys
 
 from .key import getkey
 from .logger import ORANGE
-from .terminal import EscapeCodes
+from .terminal import EscapeCodes, UnixKeys, WindowsKeys
 
 
 class SelectionInterrupt(Exception):
@@ -38,9 +38,9 @@ class Selector:
 
         while True:
             c = getkey()
-            if c == '\x1B[A':
+            if c in (UnixKeys.up, WindowsKeys.up, 'k'):
                 current -= 1
-            elif c == '\x1B[B':
+            elif c in (UnixKeys.down, WindowsKeys.down, 'j'):
                 current += 1
             elif c == '\r':
                 break
