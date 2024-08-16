@@ -2,7 +2,7 @@
 Cook
 ****
 
-Build script aggregator and remote executor.
+Local and remote shell commands executor written and configured in Python
 
 Documentation
 =============
@@ -45,5 +45,3 @@ Simply use ``cook`` command to run the recipe file.
    cook
 
 To see all available command line options use ``cook --help``.
-
-.. TODO: is it possible remove build_servers for local build server if it is used in at least one project?

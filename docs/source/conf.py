@@ -30,7 +30,7 @@ html_theme = 'alabaster'
 html_static_path = ['_static']
 
 html_theme_options = {
-    "description": "Build script aggregator and remote executor",
+    "description": "Local and remote shell commands executor written and configured in Python",
     "github_repo": "cook",
     "github_user": "serweryn617",
     "github_button": False,
