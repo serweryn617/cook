@@ -1,5 +1,5 @@
 ==================
-Cook documentation
+Cook Documentation
 ==================
 
 What is Cook?
@@ -57,6 +57,8 @@ Contents
 
 .. toctree::
    :maxdepth: 2
-   :glob:
 
-   *
+   quickstart
+   recipe
+   recipe_advanced
+   cli_reference

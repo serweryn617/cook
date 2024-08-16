@@ -18,7 +18,9 @@ projects = {
         'twine upload dist/*',
     ],
     'docs': [
+        'rm -r docs/output',
         'sphinx-build -M html docs/source docs/output',
+        'rm -r ../cook-docs/*',
         'cp -r docs/output/html/* ../cook-docs/',
     ],
 }
