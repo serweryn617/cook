@@ -9,7 +9,7 @@ build_servers = [
 
 projects = {}
 
-projects['run_all'] = {
+projects['clean_build'] = {
     'components': [
         'clean',
         'build',
