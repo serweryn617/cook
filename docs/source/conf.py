@@ -16,6 +16,7 @@ release = 'v0.2.0'
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosectionlabel',
 ]
 
 templates_path = ['_templates']
