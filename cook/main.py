@@ -20,7 +20,7 @@ class Main:
         return projects, default_project
 
     def get_build_servers(self):
-        return self.recipe.build_servers, self.recipe.default_build_server
+        return self.configuration.build_servers, self.recipe.default_build_server
 
     def configure(self, project, build_server):
         self.project = project
@@ -30,17 +30,17 @@ class Main:
         try:
             self.recipe = Recipe(self.recipe_base_path)
             self.recipe.load()
+            self.configuration = Configuration(self.recipe)
 
-        except RecipeNotFound as e:
+        except (RecipeNotFound, ConfigurationError) as e:
             log(e, 'error')
-            exit(1)
+            exit(1)  # TODO: use sys.exit?
 
     def run(self, dry_run=False):
         if dry_run:
             log('Dry run', 'warning')
 
         try:
-            self.configuration = Configuration(self.recipe)
             self.configuration.setup(self.project, self.build_server)
 
             self.cook = Cook(self.recipe, self.configuration, dry_run)

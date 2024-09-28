@@ -53,6 +53,7 @@ class BuildType(Enum):
 class Configuration:
     def __init__(self, recipe):
         self.projects = self._preprocess_projects(recipe.projects)
+        self.build_servers = self._preprocess_build_servers()
 
         self.default_project = recipe.default_project
         self.default_build_server = recipe.default_build_server
@@ -96,6 +97,14 @@ class Configuration:
             preprocessed_projects[name] = definition
 
         return preprocessed_projects
+
+    def _preprocess_build_servers(self):
+        build_servers = set()
+        for project in self.projects.values():
+            build_servers.update([b.name for b in project['build_servers']])
+
+        # TODO: sort alphabetically
+        return list(build_servers)
 
     def _set_project(self, project):
         project_defined = project in self.projects

@@ -12,7 +12,6 @@ class Recipe:
     default_project: str
     default_build_server: str
     projects: dict[Any]
-    build_servers: list[str]
 
     def __init__(self, base_path: str | Path):
         self.base_path = Path(base_path)
