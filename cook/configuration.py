@@ -101,6 +101,8 @@ class Configuration:
     def _preprocess_build_servers(self):
         build_servers = set()
         for name, project in self.projects.items():
+            if 'components' in project:
+                continue
             if 'build_servers' not in project:
                 raise ConfigurationError(f'Build servers list not defined for project {name}')
             build_servers.update([b.name for b in project['build_servers']])
