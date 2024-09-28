@@ -2,7 +2,7 @@ from .configuration import Configuration, ConfigurationError
 from .cook import Cook
 from .exception import ProcessError
 from .library.logger import log
-from .recipe import Recipe, RecipeNotFound
+from .recipe import Recipe, RecipeError
 
 
 class Main:
@@ -32,7 +32,7 @@ class Main:
             self.recipe.load()
             self.configuration = Configuration(self.recipe)
 
-        except (RecipeNotFound, ConfigurationError) as e:
+        except (RecipeError, ConfigurationError) as e:
             log(e, 'error')
             exit(1)  # TODO: use sys.exit?
 

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 
-class RecipeNotFound(Exception):
+class RecipeError(Exception):
     pass
 
 
@@ -20,7 +20,7 @@ class Recipe:
         recipe_file_path = self.base_path / 'recipe.py'
 
         if not recipe_file_path.is_file():
-            raise RecipeNotFound(f'Recipe file not found in {self.base_path}')
+            raise RecipeError(f'Recipe file not found in {self.base_path}')
 
         module_name = 'recipe'
 
@@ -34,6 +34,7 @@ class Recipe:
             try:
                 value = settings[key]
             except KeyError:
-                # TODO: add separate validation
+                if key == 'projects':
+                    raise RecipeError(f'Projects dictionary not found in recipe')
                 value = None
             setattr(self, key, value)
