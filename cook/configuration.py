@@ -100,11 +100,17 @@ class Configuration:
 
     def _preprocess_build_servers(self):
         build_servers = set()
-        for project in self.projects.values():
+        for name, project in self.projects.items():
+            if 'build_servers' not in project:
+                raise ConfigurationError(f'Build servers list not defined for project {name}')
             build_servers.update([b.name for b in project['build_servers']])
 
-        # TODO: sort alphabetically
-        return list(build_servers)
+        build_servers = sorted(build_servers)
+        if 'local' in build_servers:
+            build_servers.remove('local')
+            build_servers.insert(0, 'local')
+
+        return build_servers
 
     def _set_project(self, project):
         project_defined = project in self.projects
