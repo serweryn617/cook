@@ -7,7 +7,6 @@ from cook.recipe import Recipe
 TEST_RECIPE = '''
 default_project = 'build'
 default_build_server = 'remote'
-build_servers = ['local', 'remote']
 projects = {'build': 'test'}
 unknown_field = 'content'
 '''
@@ -33,6 +32,5 @@ def test_recipe_is_loaded(tmp_recipe, restore_sys_path):
 
     assert recipe.default_project == 'build'
     assert recipe.default_build_server == 'remote'
-    assert recipe.build_servers == ['local', 'remote']
     assert recipe.projects == {'build': 'test'}
     assert not hasattr(recipe, 'unknown_field')
