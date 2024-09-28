@@ -1,5 +1,3 @@
-import subprocess
-
 from .configuration import BuildType, Configuration
 from .executors import LocalExecutor, RemoteExecutor
 from .library.logger import log

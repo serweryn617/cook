@@ -40,7 +40,8 @@ def select_interactively(message, elements, default):
     if elements is None:
         return
 
-    selected = Selector(elements, message, default=default).select()
+    visible = tuple(filter(lambda s: not s.startswith("_"), elements))
+    selected = Selector(visible, message, default=default).select()
     log(f'Selected {message}: {selected}', 'log')
     return selected
 
