@@ -130,11 +130,14 @@ def cli():
 
     # TODO: parse user args interactively before loading the recipe
 
+    if build_server is None and len(build_servers) == 1:
+        build_server = build_servers[0]
+
     try:
         if args.interactive or project is None:
             project = select_interactively('Project', projects, default_project)
 
-        if args.interactive or build_server is None:
+        if (args.interactive and len(build_servers) > 1) or build_server is None:
             build_server = select_interactively('Build Server', build_servers, default_build_server)
 
     except SelectionInterrupt:

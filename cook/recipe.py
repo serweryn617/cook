@@ -35,6 +35,6 @@ class Recipe:
                 value = settings[key]
             except KeyError:
                 if key == 'projects':
-                    raise RecipeError(f'Projects dictionary not found in recipe')
+                    raise RecipeError('Projects dictionary not found in recipe')
                 value = None
             setattr(self, key, value)
