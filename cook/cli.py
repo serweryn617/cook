@@ -1,3 +1,6 @@
+import sys
+sys.dont_write_bytecode = True
+
 import argparse
 from pathlib import Path
 
