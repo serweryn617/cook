@@ -10,7 +10,7 @@ authors = [
   { name="Seweryn Rusecki" },
 ]
 description = "Build script aggregator and remote executor"
-readme = "README.rst"
+readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 4 - Beta",
