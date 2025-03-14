@@ -25,9 +25,10 @@ class Cook:
 
     def _local_build(self):
         build_steps = self.configuration.get_build_steps()
+        executable = self.configuration.get_executable()
 
         if build_steps:
-            executor = LocalExecutor('local', self.dry_run)
+            executor = LocalExecutor('local', self.dry_run, executable)
             executor.run_multiple(build_steps)
 
     def _remote_build(self):

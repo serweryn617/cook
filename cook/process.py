@@ -1,10 +1,29 @@
+import os
 import shlex
+import shutil
 import subprocess
+
+from .exception import ConfigurationError
+from .library.logger import log
 
 
 class ProcessRunner:
+    def __init__(self, executable=None):
+        if executable is not None:
+            self.executable = shutil.which(executable)
+            if self.executable is None:
+                raise ConfigurationError(f'Executable not found: {executable}')
+            return
+
+        if os.name == 'posix':
+            executable = "bash"
+        else:
+            executable = 'PowerShell'
+
+        self.executable = shutil.which(executable)
+
     def run(self, command, workdir=None):
-        return subprocess.run(command, cwd=workdir, shell=True)
+        return subprocess.run(command, cwd=workdir, shell=True, executable=self.executable)
 
 
 class SSHProcessRunner:

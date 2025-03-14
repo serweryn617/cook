@@ -4,9 +4,10 @@ from .process import ProcessRunner, SSHProcessRunner
 
 
 class Executor:
-    def __init__(self, name=None, dry_run=False):
+    def __init__(self, name=None, dry_run=False, executable=None):
         self.name = name
         self.dry_run = dry_run
+        self.executable = executable
 
     def _run(self, runner, step):
         if self.dry_run:
@@ -21,7 +22,7 @@ class Executor:
 
 class LocalExecutor(Executor):
     def run_multiple(self, steps):
-        runner = ProcessRunner()
+        runner = ProcessRunner(self.executable)
         for step in steps:
             log(f'Local Step: {step.workdir}: {step.command}', 'log')
 

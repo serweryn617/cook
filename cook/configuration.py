@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from .build import BuildServer, BuildStep, LocalBuildServer
+from .exception import ConfigurationError
 
 
 def build_steps_from_list(steps):
@@ -40,10 +41,6 @@ def get_nested_item(source_dict, *keys, default=None):
     return nested_item
 
 
-class ConfigurationError(Exception):
-    pass
-
-
 class BuildType(Enum):
     LOCAL = auto()
     REMOTE = auto()
@@ -57,6 +54,7 @@ class Configuration:
 
         self.default_project = recipe.default_project
         self.default_build_server = recipe.default_build_server
+        self.executable = recipe.executable
 
         self.base_path = recipe.base_path
         self.skip = False
@@ -224,3 +222,6 @@ class Configuration:
     def get_components(self):
         components = get_nested_item(self.projects, self.project, 'components')
         return components
+
+    def get_executable(self):
+        return self.executable

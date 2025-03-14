@@ -11,6 +11,7 @@ class RecipeError(Exception):
 class Recipe:
     default_project: str
     default_build_server: str
+    executable: str
     projects: dict[Any]
 
     def __init__(self, base_path: str | Path):
