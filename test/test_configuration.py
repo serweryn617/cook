@@ -12,6 +12,7 @@ class MockRecipe:
         self.default_project = 'build'
         self.default_build_server = 'local'
         self.build_servers = ['local', 'remote']
+        self.executable = '/bin/shell'
         self.projects = {
             'build': {
                 'build_servers': [

@@ -8,6 +8,9 @@ from .library.logger import log
 
 
 class ProcessRunner:
+    POSIX_EXECUTABLE = "bash"
+    NT_EXECUTABLE = "PowerShell"
+
     def __init__(self, executable=None):
         if executable is not None:
             self.executable = shutil.which(executable)
@@ -16,11 +19,11 @@ class ProcessRunner:
             return
 
         if os.name == 'posix':
-            executable = "bash"
+            executable = self.POSIX_EXECUTABLE
         else:
-            executable = 'PowerShell'
+            executable = self.NT_EXECUTABLE
 
-        self.executable = shutil.which(executable)
+        self.executable = shutil.which(executable)  # if not found default system shell will be used
 
     def run(self, command, workdir=None):
         return subprocess.run(command, cwd=workdir, shell=True, executable=self.executable)

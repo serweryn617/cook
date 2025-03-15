@@ -7,39 +7,39 @@ from cook.exception import ProcessError
 from cook.executors import LocalExecutor, RemoteExecutor
 
 
-@patch('subprocess.run')
-def test_local_executor(mock_subprocess_run):
-    mock_subprocess_run.return_value.returncode = 0
+@patch('cook.executors.ProcessRunner')
+def test_local_executor(MockProcessRunner):
+    mock_process_runner = MockProcessRunner.return_value
+    mock_process_runner.run.return_value.returncode = 0
 
+    executable = 'shell'
     steps = [
         BuildStep(command='cwd test command'),
         BuildStep(workdir='work', command='test command'),
         BuildStep(workdir='/work', command='absolute test command'),
     ]
 
-    executor = LocalExecutor()
+    executor = LocalExecutor(executable=executable)
     executor.run_multiple(steps)
 
     expected_calls = (
         call(
             'cwd test command',
-            cwd='.',
-            shell=True,
+            workdir='.',
         ),
         call(
             'test command',
-            cwd='work',
-            shell=True,
+            workdir='work',
         ),
         call(
             'absolute test command',
-            cwd='/work',
-            shell=True,
+            workdir='/work',
         ),
     )
 
-    assert mock_subprocess_run.call_count == 3
-    mock_subprocess_run.assert_has_calls(expected_calls)
+    MockProcessRunner.assert_called_once_with(executable)
+    assert mock_process_runner.run.call_count == 3
+    mock_process_runner.run.assert_has_calls(expected_calls)
 
 
 @patch('subprocess.run')
@@ -107,9 +107,10 @@ def test_remote_executor_dry_run(mock_subprocess_run):
     assert not mock_subprocess_run.called
 
 
-@patch('subprocess.run')
-def test_local_executor_checks_returncode(mock_subprocess_run):
-    mock_subprocess_run.return_value.returncode = 123
+@patch('cook.executors.ProcessRunner')
+def test_local_executor_checks_returncode(MockProcessRunner):
+    mock_process_runner = MockProcessRunner.return_value
+    mock_process_runner.run.return_value.returncode = 123
 
     steps = [
         BuildStep(command='cwd test command'),
@@ -139,9 +140,10 @@ def test_remote_executor_checks_returncode(mock_subprocess_run):
     assert excinfo.value.return_code == 123
 
 
-@patch('subprocess.run')
-def test_local_executor_returncodes(mock_subprocess_run):
-    mock_subprocess_run.return_value.returncode = 123
+@patch('cook.executors.ProcessRunner')
+def test_local_executor_returncodes(MockProcessRunner):
+    mock_process_runner = MockProcessRunner.return_value
+    mock_process_runner.run.return_value.returncode = 123
 
     steps = [
         BuildStep(command='cwd test command', check=False),
@@ -154,18 +156,16 @@ def test_local_executor_returncodes(mock_subprocess_run):
     expected_calls = (
         call(
             'cwd test command',
-            cwd='.',
-            shell=True,
+            workdir='.',
         ),
         call(
             'test command',
-            cwd='work',
-            shell=True,
+            workdir='work',
         ),
     )
 
-    assert mock_subprocess_run.call_count == 2
-    mock_subprocess_run.assert_has_calls(expected_calls)
+    assert mock_process_runner.run.call_count == 2
+    mock_process_runner.run.assert_has_calls(expected_calls)
 
 
 @patch('subprocess.run')
