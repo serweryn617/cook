@@ -7,7 +7,7 @@ from pathlib import Path
 from .library.logger import log
 from .library.selector import SelectionInterrupt, Selector
 from .main import Main
-from .template.recipe_template import TEMPLATE
+from .template import TEMPLATES
 
 
 class Settings:
@@ -62,21 +62,21 @@ def parse_user_args(user_args):
     return args, flags
 
 
-def generate_template(base_path: Path):
+def generate_template(base_path: Path, num: int):
     if not base_path.is_dir():
         log(f'{base_path} directory does not exist!', 'info')
         return 1
 
-    recipe_path = base_path / 'recipe.py'
+    recipe_path = base_path / f'recipe_template{num}.py'
 
     if recipe_path.is_file():
-        log(f'recipe.py already present in {base_path}', 'info')
+        log(f'recipe_template{num}.py already present in {base_path}', 'info')
         return 1
 
     with open(recipe_path, 'w') as file:
-        file.write(TEMPLATE)
+        file.write(TEMPLATES[num - 1])
 
-    log(f'recipe.py generated in {base_path}', 'log')
+    log(f'recipe_template{num}.py generated in {base_path}', 'log')
     return 0
 
 
@@ -100,8 +100,8 @@ def cli():
     parser.add_argument(
         '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
     )
-    parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers and exit.')
-    parser.add_argument('-t', '--generate_template', action='store_true', help='Genereta recipe template in a selected directory.')
+    parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers.')
+    parser.add_argument('-t', '--template', nargs='?', type=int, default=None, const=1, choices=(1, 2, 3, 4), help='Generate recipe template in a selected directory.')
 
     args = parser.parse_args()
 
@@ -114,8 +114,8 @@ def cli():
 
     recipe_base_path = (Path.cwd() / args.recipe_path).resolve()
 
-    if args.generate_template:
-        return generate_template(recipe_base_path)
+    if args.template is not None:
+        return generate_template(recipe_base_path, args.template)
 
     main_program = Main(recipe_base_path)
     main_program.initialize()
