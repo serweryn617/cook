@@ -1,4 +1,5 @@
 import sys
+
 sys.dont_write_bytecode = True
 
 import argparse
@@ -101,7 +102,16 @@ def cli():
         '-u', '--user_args', nargs='*', default=[], help='User arguments. Can be used in recipe file. Format either `key=value` or `flag`.'
     )
     parser.add_argument('-l', '--list', action='store_true', help='List available projects and build servers.')
-    parser.add_argument('-t', '--template', nargs='?', type=int, default=None, const=1, choices=(1, 2, 3, 4), help='Generate recipe template in a selected directory.')
+    parser.add_argument(
+        '-t',
+        '--template',
+        nargs='?',
+        type=int,
+        default=None,
+        const=1,
+        choices=(1, 2, 3, 4),
+        help='Generate recipe template in a selected directory.',
+    )
 
     args = parser.parse_args()
 

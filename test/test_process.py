@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
-from cook.process import ProcessRunner, SSHProcessRunner
 from cook.exception import ConfigurationError
+from cook.process import ProcessRunner, SSHProcessRunner
 
 
 @patch('os.name', 'posix')
@@ -19,7 +19,6 @@ def test_process_runner_default_executable(mock_subprocess_run, mock_shutil_whic
     mock_shutil_which.assert_called_once_with(ProcessRunner.POSIX_EXECUTABLE)
     mock_subprocess_run.assert_called_once_with('cwd test command', cwd=None, shell=True, executable='/bin/shell')
     assert result.returncode == 123
-
 
 
 @patch('os.name', 'nt')
