@@ -93,7 +93,7 @@ def cli():
         description='Build script aggregator and remote executor', epilog=epilog_text, formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('recipe_path', default='.', nargs='?', help='Path to directory containing `recipe.py` file. Defaults to CWD.')
+    parser.add_argument('recipe_path', default=None, nargs='?', help='Path to directory containing `recipe.py` file. Defaults to CWD.')
     parser.add_argument('-p', '--project', help='Project to build. Uses value of `default_project` if left unspecified.')
     parser.add_argument('-b', '--build_server', help='Build server to use. Uses value of `default_build_server` if left unspecified.')
     parser.add_argument('-i', '--interactive', action='store_true', help='Use interactive project and build server selection.')
@@ -122,10 +122,23 @@ def cli():
     to_list = args.list
     dry_run = args.dry
 
+    recipe_path_selected = True
+    if args.recipe_path is None:
+        args.recipe_path = '.'
+        recipe_path_selected = False
+
     recipe_base_path = (Path.cwd() / args.recipe_path).resolve()
 
     if args.template is not None:
         return generate_template(recipe_base_path, args.template)
+
+    if not recipe_path_selected:
+        dirs_to_check = [recipe_base_path] + list(recipe_base_path.parents)
+        for directory in dirs_to_check:
+            recipe_path = directory / 'recipe.py'
+            if recipe_path.is_file():
+                recipe_base_path = directory
+                break
 
     main_program = Main(recipe_base_path)
     main_program.initialize()
