@@ -58,3 +58,4 @@ class Main:
 
         if dry_run:
             log('Dry run finished', 'warning')
+

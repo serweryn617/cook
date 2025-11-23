@@ -142,3 +142,4 @@ def cli():
 
     main_program.configure(project, build_server)
     main_program.run(dry_run=dry_run)
+
