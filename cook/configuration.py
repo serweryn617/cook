@@ -183,6 +183,8 @@ class Configuration:
         return build_type
 
     def get_build_server(self):
+        if self.build_server.address is not None:
+            return self.build_server.address
         return self.build_server.name
 
     def get_base_paths(self):

@@ -7,8 +7,9 @@ class BuildStep:
 
 
 class BuildServer:
-    def __init__(self, name, build_path=None, sync_files=None, skip=False, override=False, is_local=None):
+    def __init__(self, name, *, address=None, build_path=None, sync_files=None, skip=False, override=False, is_local=None):
         self.name = name
+        self.address = address or name
         self.build_path = build_path
         self.sync_files = sync_files
         self.skip = skip
@@ -17,10 +18,10 @@ class BuildServer:
 
 
 class LocalBuildServer(BuildServer):
-    def __init__(self, skip=False, override=False):
+    def __init__(self, *, skip=False, override=False):
         super().__init__(name='local', build_path='.', sync_files=False, skip=skip, override=override, is_local=True)
 
 
 class RemoteBuildServer(BuildServer):
-    def __init__(self, name, build_path, sync_files=True, skip=False, override=False):
-        super().__init__(name=name, build_path=build_path, sync_files=sync_files, skip=skip, override=override, is_local=False)
+    def __init__(self, name, *, address, build_path, sync_files=True, skip=False, override=False):
+        super().__init__(name=name, address=address, build_path=build_path, sync_files=sync_files, skip=skip, override=override, is_local=False)
