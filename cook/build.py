@@ -24,4 +24,6 @@ class LocalBuildServer(BuildServer):
 
 class RemoteBuildServer(BuildServer):
     def __init__(self, name, *, build_path, address=None, sync_files=True, skip=False, override=False):
-        super().__init__(name=name, address=address, build_path=build_path, sync_files=sync_files, skip=skip, override=override, is_local=False)
+        super().__init__(
+            name=name, address=address, build_path=build_path, sync_files=sync_files, skip=skip, override=override, is_local=False
+        )

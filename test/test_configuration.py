@@ -17,7 +17,7 @@ class MockRecipe:
             'build': {
                 'build_servers': [
                     LocalBuildServer(),
-                    RemoteBuildServer('remote', '/remote/path'),
+                    RemoteBuildServer('remote', build_path='/remote/path'),
                 ],
                 'send': [
                     SyncFile('test/input/file'),
@@ -103,7 +103,7 @@ def test_configuration_build_server_override():
     # fmt: off
     mock_recipe.projects['override_project'] = {
         'build_servers': [
-            RemoteBuildServer('remote', 'remote/path', override=True)
+            RemoteBuildServer('remote', build_path='remote/path', override=True)
         ],
         'build_steps': [
             BuildStep(command='cwd test command'),
@@ -127,7 +127,7 @@ def test_configuration_build_server_skip():
     # fmt: off
     mock_recipe.projects['skip_project'] = {
         'build_servers': [
-            RemoteBuildServer('remote', 'remote/path', skip=True)
+            RemoteBuildServer('remote', build_path='remote/path', skip=True)
         ],
         'send': [
             SyncFile('test/input/file'),
