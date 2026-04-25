@@ -4,13 +4,13 @@ from .library.logger import log
 from .rsync import Rsync
 
 
-class Cook:
+class ProjectRunner:
     def __init__(self, recipe, configuration, dry_run=False):
         self.recipe = recipe
         self.configuration = configuration
         self.dry_run = dry_run
 
-    def cook(self):
+    def run_project(self):
         build_type = self.configuration.get_build_type()
         self.build_server = self.configuration.get_build_server()
 
@@ -64,11 +64,11 @@ class Cook:
 
     def _run_component(self, component):
         try:
-            sub_configuration = Configuration(self.recipe)
-            sub_configuration.setup(component, self.build_server)
+            component_configuration = Configuration(self.recipe)
+            component_configuration.setup(component, self.build_server)
 
-            sub_cook = Cook(self.recipe, sub_configuration, self.dry_run)
-            sub_cook.cook()
+            component_runner = ProjectRunner(self.recipe, component_configuration, self.dry_run)
+            component_runner.run_project()
         except Exception as e:
             log(f'Component {component} failed!', 'error')
             raise e

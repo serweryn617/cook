@@ -1,5 +1,5 @@
 from .configuration import Configuration, ConfigurationError
-from .cook import Cook
+from .runner import ProjectRunner
 from .exception import ProcessError
 from .library.logger import log
 from .recipe import Recipe, RecipeError
@@ -43,8 +43,8 @@ class Main:
         try:
             self.configuration.setup(self.project, self.build_server)
 
-            self.cook = Cook(self.recipe, self.configuration, dry_run)
-            self.cook.cook()
+            runner = ProjectRunner(self.recipe, self.configuration, dry_run)
+            runner.run_project()
 
         except ConfigurationError as e:
             log(e, 'error')
