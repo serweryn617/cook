@@ -157,7 +157,7 @@ class Configuration:
 
     def _update_paths(self):
         if self.build_server.build_path is None:
-            raise ConfigurationError(f'No build path defined for {self.project} on build server {build_server.name}')
+            raise ConfigurationError(f'No build path defined for {self.project} on build server {self.build_server.name}')
 
         build_path = Path(self.build_server.build_path)
         if self._is_local() and not build_path.is_absolute():

@@ -1,15 +1,15 @@
 from pathlib import Path
 
 
-class RsyncItem:
+class SyncItem:
     is_exclude = False
 
     def __init__(self, path: str):
         self.path = path
 
 
-class SyncFile(RsyncItem):
-    def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> (str, str):
+class SyncFile(SyncItem):
+    def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> tuple[str, str]:
         # TODO: how to handle absolute paths?
         # different base path on remote server not supported at the moment for absolute paths
         src = Path(src_path) / self.path
@@ -29,14 +29,14 @@ class SyncDirectory(SyncFile):
     def __init__(self, path: str = ''):
         self.path = path
 
-    def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> (str, str):
+    def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> tuple[str, str]:
         src, dst = super().parse(src_hostname, src_path, dst_hostname, dst_path)
 
         # Add slash at the end to treat source as directory
         return src + '/', dst
 
 
-class SyncExclude(RsyncItem):
+class SyncExclude(SyncItem):
     is_exclude = True
 
     def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> str:
