@@ -46,3 +46,23 @@ To see all available command-line options, use:
 ```bash
 cook --help
 ```
+
+### VS Code recipe autocomplete
+
+If `cook` is installed via pipx, VS Code's Pylance won't find it for autocomplete by default.
+Add the following to your **User** settings:
+
+```json
+{
+    "python.analysis.extraPaths": [
+        "~/.local/share/pipx/venvs/cook-builder/lib/python3.12/site-packages"
+    ]
+}
+```
+Adjust the Python version in the path if needed.
+
+To find the venvs path on your system, run:
+
+```bash
+pipx environment --value PIPX_LOCAL_VENVS
+```
