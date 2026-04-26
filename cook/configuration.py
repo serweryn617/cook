@@ -23,6 +23,7 @@ def build_steps_from_list(steps):
     return step_objects
 
 
+# TODO: Use Project class
 def local_build_from_list(steps):
     return {
         'build_servers': [
@@ -116,6 +117,7 @@ class Configuration:
         project_defined = project in self.projects
 
         if not project_defined:
+            # TODO: Print: did you mean xyz?
             raise ConfigurationError(f'No such project {project}')
 
         self.project = project
