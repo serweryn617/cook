@@ -6,7 +6,7 @@ class BuildStep:
         self.check = check
 
 
-def build_steps_converter(steps):
+def convert_build_steps(steps):
     step_objects = []
 
     for step in steps:
