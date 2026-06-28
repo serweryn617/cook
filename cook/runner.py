@@ -1,4 +1,4 @@
-from .configuration import BuildType, Configuration
+from .configuration import BuildType, ProjectConfiguration
 from .executors import LocalExecutor, RemoteExecutor
 from .library.logger import log
 from .rsync import Rsync
@@ -64,7 +64,7 @@ class ProjectRunner:
 
     def _run_component(self, component):
         try:
-            component_configuration = Configuration(self.recipe)
+            component_configuration = ProjectConfiguration(self.recipe)
             component_configuration.setup(component, self.build_server)
 
             component_runner = ProjectRunner(self.recipe, component_configuration, self.dry_run)

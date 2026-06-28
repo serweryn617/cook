@@ -1,10 +1,10 @@
 import sys
 
-from .configuration import Configuration, ConfigurationError
-from .runner import ProjectRunner
+from .configuration import ConfigurationError, ProjectConfiguration
 from .exception import ProcessError
 from .library.logger import log
 from .recipe import Recipe, RecipeError
+from .runner import ProjectRunner
 
 
 class Main:
@@ -17,7 +17,7 @@ class Main:
         try:
             self.recipe = Recipe(self.recipe_base_path)
             self.recipe.load()
-            self.configuration = Configuration(self.recipe)
+            self.configuration = ProjectConfiguration(self.recipe)
 
         except (RecipeError, ConfigurationError) as e:
             log(e, 'error')

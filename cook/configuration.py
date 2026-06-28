@@ -3,8 +3,8 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import Any
 
-from .build_step import BuildStep
 from .build_server import BuildServer, LocalBuildServer
+from .build_step import BuildStep
 from .exception import ConfigurationError
 from .project import convert_projects
 
@@ -15,7 +15,7 @@ class BuildType(Enum):
     COMPOSITE = auto()
 
 
-class Configuration:
+class ProjectConfiguration:
     def __init__(self, recipe):
         self.projects = convert_projects(recipe.projects)
         self.build_servers = self._preprocess_build_servers()
@@ -174,8 +174,7 @@ class Configuration:
         return parsed_build_steps
 
     def get_components(self):
-        components = self.project.components
-        return components
+        return self.project.components
 
     def get_executable(self):
         return self.executable

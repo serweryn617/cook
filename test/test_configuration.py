@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from cook.build_step import BuildStep
 from cook.build_server import LocalBuildServer, RemoteBuildServer
-from cook.configuration import BuildType, Configuration
+from cook.build_step import BuildStep
+from cook.configuration import BuildType, ProjectConfiguration
 from cook.sync import SyncFile
 
 
@@ -38,7 +38,7 @@ class MockRecipe:
 
 def test_configuration_basic():
     mock_recipe = MockRecipe()
-    configuration = Configuration(mock_recipe)
+    configuration = ProjectConfiguration(mock_recipe)
     configuration.setup()
 
     assert configuration.get_build_type() == BuildType.LOCAL
@@ -61,7 +61,7 @@ def test_configuration_basic():
 
 def test_configuration_remote():
     mock_recipe = MockRecipe()
-    configuration = Configuration(mock_recipe)
+    configuration = ProjectConfiguration(mock_recipe)
     configuration.setup(server='remote')
 
     assert configuration.get_build_type() == BuildType.REMOTE
@@ -93,7 +93,7 @@ def test_configuration_composite():
     }
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
+    configuration = ProjectConfiguration(mock_recipe)
     configuration.setup(project='composite')
 
     assert configuration.get_components() == ['build', 'test']
@@ -112,7 +112,7 @@ def test_configuration_build_server_override():
     }
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
+    configuration = ProjectConfiguration(mock_recipe)
     configuration.setup(project='override_project', server='local')
 
     assert configuration.get_build_server() == 'remote'
@@ -142,7 +142,7 @@ def test_configuration_build_server_skip():
     }
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
+    configuration = ProjectConfiguration(mock_recipe)
     configuration.setup(project='skip_project', server='remote')
 
     assert configuration.get_build_server() == 'remote'
@@ -165,7 +165,7 @@ def test_configuration_build_steps_from_list():
     }
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
+    configuration = ProjectConfiguration(mock_recipe)
     configuration.setup(project='steps_list', server='local')
 
     build_steps = configuration.get_build_steps()
@@ -185,7 +185,7 @@ def test_configuration_local_project_from_list():
     ]
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
+    configuration = ProjectConfiguration(mock_recipe)
     configuration.setup(project='steps_list', server='local')
 
     assert configuration.get_build_server() == 'local'
