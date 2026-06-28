@@ -1,3 +1,5 @@
+import sys
+
 from .configuration import Configuration, ConfigurationError
 from .runner import ProjectRunner
 from .exception import ProcessError
@@ -11,21 +13,6 @@ class Main:
         self.project = None
         self.build_server = None
 
-    def get_recipe_path(self):
-        return (self.recipe.base_path / "recipe.py").as_posix()
-
-    def get_projects(self):
-        projects = list(self.recipe.projects.keys())
-        default_project = self.recipe.default_project
-        return projects, default_project
-
-    def get_build_servers(self):
-        return self.configuration.build_servers, self.recipe.default_build_server
-
-    def configure(self, project, build_server):
-        self.project = project
-        self.build_server = build_server
-
     def initialize(self):
         try:
             self.recipe = Recipe(self.recipe_base_path)
@@ -34,7 +21,11 @@ class Main:
 
         except (RecipeError, ConfigurationError) as e:
             log(e, 'error')
-            exit(1)  # TODO: use sys.exit?
+            sys.exit(1)
+
+    def configure(self, project, build_server):
+        self.project = project
+        self.build_server = build_server
 
     def run(self, dry_run=False):
         if dry_run:
@@ -48,13 +39,24 @@ class Main:
 
         except ConfigurationError as e:
             log(e, 'error')
-            exit(1)
+            sys.exit(1)
 
         except ProcessError as e:
             log(e, 'error')
-            exit(e.return_code)
+            sys.exit(e.return_code)
 
         log(f'Finished running {self.project} on {self.build_server}', 'info')
 
         if dry_run:
             log('Dry run finished', 'warning')
+
+    def get_recipe_path(self):
+        return (self.recipe.base_path / "recipe.py").as_posix()
+
+    def get_projects(self):
+        projects = self.configuration.get_project_names()
+        default_project = self.recipe.default_project
+        return projects, default_project
+
+    def get_build_servers(self):
+        return self.configuration.build_servers, self.recipe.default_build_server

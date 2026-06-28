@@ -179,3 +179,7 @@ class Configuration:
 
     def get_executable(self):
         return self.executable
+
+    def get_project_names(self):
+        project_names = [p.name for p in self.projects]
+        return project_names
