@@ -89,8 +89,7 @@ class Cli:
         if not self.list_only:
             return
 
-        recipe_path = self.main_program.get_recipe_path()
-
+        recipe_path = self.recipe_base_path / 'recipe.py'
         log(f'Items defined in {recipe_path}', bold=True, internal=False)
 
         self.list_item('Build Servers', self.build_servers, self.default_build_server)

@@ -50,9 +50,6 @@ class Main:
         if dry_run:
             log('Dry run finished', 'warning')
 
-    def get_recipe_path(self):
-        return (self.recipe.base_path / "recipe.py").as_posix()
-
     def get_projects(self):
         projects = self.configuration.get_project_names()
         default_project = self.recipe.default_project
