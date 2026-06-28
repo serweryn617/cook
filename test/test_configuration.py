@@ -2,7 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer
+from cook.build_step import BuildStep
+from cook.build_server import LocalBuildServer, RemoteBuildServer
 from cook.configuration import BuildType, Configuration
 from cook.sync import SyncFile
 

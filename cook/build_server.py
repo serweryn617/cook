@@ -1,11 +1,3 @@
-class BuildStep:
-    def __init__(self, workdir='.', command='', expected_return_code=0, check=True):
-        self.command = command
-        self.workdir = workdir
-        self.expected_return_code = expected_return_code
-        self.check = check
-
-
 class BuildServer:
     def __init__(self, name, *, address=None, build_path=None, sync_files=None, skip=False, override=False, is_local=None):
         self.name = name

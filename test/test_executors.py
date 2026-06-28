@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
-from cook.build import BuildStep
+from cook.build_step import BuildStep
 from cook.exception import ProcessError
 from cook.executors import LocalExecutor, RemoteExecutor
 

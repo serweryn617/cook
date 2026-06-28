@@ -3,24 +3,10 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import Any
 
-from .build import BuildServer, BuildStep, LocalBuildServer
+from .build_step import BuildStep, build_steps_converter
+from .build_server import BuildServer, LocalBuildServer
 from .exception import ConfigurationError
 
-
-def build_steps_from_list(steps):
-    step_objects = []
-
-    for step in steps:
-        if isinstance(step, BuildStep):
-            step_objects.append(step)
-        elif isinstance(step, str):
-            step_objects.append(BuildStep(command=step))
-        elif isinstance(step, (list, tuple)) and len(step) == 2 and isinstance(step[0], str) and isinstance(step[1], str):
-            step_objects.append(BuildStep(workdir=step[0], command=step[1]))
-        else:
-            raise RuntimeError(step, "should be string or list/tuple of 2 strings")
-
-    return step_objects
 
 
 # TODO: Use Project class
@@ -29,7 +15,7 @@ def local_build_from_list(steps):
         'build_servers': [
             LocalBuildServer(),
         ],
-        'build_steps': build_steps_from_list(steps),
+        'build_steps': build_steps_converter(steps),
     }
 
 
@@ -87,7 +73,7 @@ class Configuration:
             if isinstance(definition, dict):
                 build_steps = get_nested_item(definition, 'build_steps')
                 if build_steps is not None and isinstance(build_steps, (list, tuple)):
-                    definition['build_steps'] = build_steps_from_list(build_steps)
+                    definition['build_steps'] = build_steps_converter(build_steps)
             elif isinstance(definition, (list, tuple)):
                 definition = local_build_from_list(definition)
             else:
