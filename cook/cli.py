@@ -8,31 +8,8 @@ from pathlib import Path
 from .library.logger import log
 from .library.selector import SelectionInterrupt, Selector
 from .main import Main
+from .settings import settings
 from .template import TEMPLATES
-
-
-class Settings:
-    def __init__(self):
-        self.args = {}
-        self.flags = []
-
-    @staticmethod
-    def _parse_user_args(user_args):
-        args = {}
-        flags = []
-
-        for user_arg in user_args:
-            if '=' in user_arg:
-                key, value = user_arg.split('=')
-                args[key] = value
-            else:
-                flags.append(user_arg)
-        return args, flags
-
-    def update_user_args(self, user_args):
-        user_args, user_flags = self._parse_user_args(user_args)
-        settings.args.update(user_args)
-        settings.flags.extend(user_flags)
 
 
 class Cli:
@@ -121,7 +98,7 @@ class Cli:
             if self.interactive or self.project is None:
                 self.project = select_interactively('Project', self.projects, self.default_project)
 
-            if (self.interactive and len(build_servers) > 1) or self.build_server is None:
+            if (self.interactive and len(self.build_servers) > 1) or self.build_server is None:
                 self.build_server = select_interactively('Build Server', self.build_servers, self.default_build_server)
 
         except SelectionInterrupt:
@@ -150,9 +127,6 @@ def select_interactively(message, elements, default):
     selected = Selector(visible, message, default=default).select()
     log(f'Selected {message}: {selected}', 'log')
     return selected
-
-
-settings = Settings()
 
 
 def cli():
