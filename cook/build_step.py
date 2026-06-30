@@ -1,12 +1,20 @@
+from collections.abc import Sequence
+
+
 class BuildStep:
-    def __init__(self, workdir='.', command='', expected_return_code=0, check=True):
+    def __init__(self, *, workdir: str = '.', command: str = '', expected_return_code: int = 0, check: bool = True) -> None:
         self.command = command
         self.workdir = workdir
         self.expected_return_code = expected_return_code
         self.check = check
 
 
-def convert_build_steps(steps):
+type Commands = Sequence[str]
+type WorkdirCommands = Sequence[Sequence[str]]
+type ClassSteps = Sequence[BuildStep]
+
+
+def convert_build_steps(steps: Commands | WorkdirCommands | ClassSteps) -> list[BuildStep]:
     step_objects = []
 
     for step in steps:

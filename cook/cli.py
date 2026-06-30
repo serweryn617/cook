@@ -10,20 +10,25 @@ from .library.selector import SelectionInterrupt, Selector
 from .main import Main
 from .settings import settings
 from .template import TEMPLATES
+from collections.abc import Sequence
+from collections.abc import Callable
 
+type StepResult = int | None
+type Step = Callable[[], StepResult]
 
 class Cli:
-    def __init__(self, args):
-        self.list_only = args.list
-        self.dry_run = args.dry
-        self.template = args.template
-        self.interactive = args.interactive
-        self.project = args.project
-        self.build_server = args.build_server
+    def __init__(self, project: str | None, build_server: str | None, interactive: bool, dry_run: bool, list_only: bool, template: int) -> None:
+        self.project = project
+        self.build_server = build_server
+
+        self.interactive = interactive
+        self.dry_run = dry_run
+        self.list_only = list_only
+        self.template = template
 
         self.recipe_base_path = Path.cwd().resolve()
 
-    def generate_template(self):
+    def generate_template(self) -> int | None:
         if self.template is None:
             return
 
@@ -41,17 +46,19 @@ class Cli:
             file.write(TEMPLATES[self.template - 1])
 
         log(f'recipe_template{self.template}.py generated in {self.recipe_base_path}', 'log')
-        sys.exit(0)
+        return 0
 
-    def search_for_recipe(self):
+    def search_for_recipe(self) -> int | None:
         dirs_to_check = [self.recipe_base_path] + list(self.recipe_base_path.parents)
         for directory in dirs_to_check:
             recipe_path = directory / 'recipe.py'
             if recipe_path.is_file():
                 self.recipe_base_path = directory
-                break
+                return
+        log(f'recipe file not found in {self.recipe_base_path} or parent directories!', 'info')
+        return 1
 
-    def initialize_main(self):
+    def initialize_main(self) -> None:
         self.main_program = Main(self.recipe_base_path)
         self.main_program.initialize()
 
@@ -61,7 +68,7 @@ class Cli:
         self.project = self.project or self.default_project
         self.build_server = self.build_server or self.default_build_server
 
-    def list_items(self):
+    def list_items(self) -> int | None:
         '''List build servers and projects defined in recipe file.'''
         if not self.list_only:
             return
@@ -72,12 +79,12 @@ class Cli:
         self.list_item('Build Servers', self.build_servers, self.default_build_server)
         self.list_item('Projects', self.projects, self.default_project)
 
-        sys.exit(0)
+        return 0
 
         # TODO: parse user args interactively before loading the recipe
 
     @staticmethod
-    def list_item(message, iterable, default):
+    def list_item(message: str, iterable: Sequence[str], default: str) -> None:
         if not iterable:
             log(f'{message} not defined.', 'warning')
             return
@@ -89,11 +96,11 @@ class Cli:
             else:
                 log(f' - {item}', internal=False)
 
-    def update_build_server(self):
+    def update_build_server(self) -> None:
         if self.build_server is None and len(self.build_servers) == 1:
             self.build_server = self.build_servers[0]
 
-    def select_parameters_interactively(self):
+    def select_parameters_interactively(self) -> int | None:
         try:
             if self.interactive or self.project is None:
                 self.project = select_interactively('Project', self.projects, self.default_project)
@@ -103,20 +110,28 @@ class Cli:
 
         except SelectionInterrupt:
             print("\nCancelled by user\n")
-            sys.exit(1)
+            return 1
 
-    def configure_and_execute(self):
+    def configure_and_execute(self) -> None:
         self.main_program.configure(self.project, self.build_server)
         self.main_program.run(dry_run=self.dry_run)
 
-    def run(self):
-        self.generate_template()
-        self.search_for_recipe()
-        self.initialize_main()
-        self.list_items()
-        self.update_build_server()
-        self.select_parameters_interactively()
-        self.configure_and_execute()
+    def run(self) -> int:
+        steps: tuple[Step, ...] = (
+            self.generate_template
+            self.search_for_recipe
+            self.initialize_main
+            self.list_items
+            self.update_build_server
+            self.select_parameters_interactively
+            self.configure_and_execute
+        )
+
+        for function in steps:
+            return_code = function()
+            if return_code is not None:
+                return return_code
+        return 0
 
 
 def select_interactively(message, elements, default):
@@ -162,4 +177,5 @@ def cli():
 
     args = parser.parse_args()
     settings.update_user_args(args.user_args)
-    Cli(args).run()
+    app = Cli(args)
+    return app.run()

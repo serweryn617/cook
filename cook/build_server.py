@@ -1,21 +1,28 @@
 class BuildServer:
-    def __init__(self, name, *, address=None, build_path=None, sync_files=None, skip=False, override=False, is_local=None):
+    def __init__(
+        self,
+        name: str,
+        *,
+        address: str | None = None,
+        build_path: str | None = None,
+        skip: bool = False,
+        override: bool = False,
+        is_local: bool = False,
+    ) -> None:
         self.name = name
+        # TODO: Add the ability to sync files locally
         self.address = address or name
         self.build_path = build_path
-        self.sync_files = sync_files
         self.skip = skip
         self.override = override
         self.is_local = is_local
 
 
 class LocalBuildServer(BuildServer):
-    def __init__(self, *, skip=False, override=False):
-        super().__init__(name='local', build_path='.', sync_files=False, skip=skip, override=override, is_local=True)
+    def __init__(self, *, skip: bool = False, override: bool = False) -> None:
+        super().__init__(name='local', build_path='.', skip=skip, override=override, is_local=True)
 
 
 class RemoteBuildServer(BuildServer):
-    def __init__(self, name, *, build_path='~', address=None, sync_files=True, skip=False, override=False):
-        super().__init__(
-            name=name, address=address, build_path=build_path, sync_files=sync_files, skip=skip, override=override, is_local=False
-        )
+    def __init__(self, name, *, build_path='~', address=None, skip=False, override=False) -> None:
+        super().__init__(name=name, address=address, build_path=build_path, skip=skip, override=override, is_local=False)
