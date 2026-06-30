@@ -118,13 +118,13 @@ class Cli:
 
     def run(self) -> int:
         steps: tuple[Step, ...] = (
-            self.generate_template
-            self.search_for_recipe
-            self.initialize_main
-            self.list_items
-            self.update_build_server
-            self.select_parameters_interactively
-            self.configure_and_execute
+            self.generate_template,
+            self.search_for_recipe,
+            self.initialize_main,
+            self.list_items,
+            self.update_build_server,
+            self.select_parameters_interactively,
+            self.configure_and_execute,
         )
 
         for function in steps:
@@ -177,5 +177,5 @@ def cli():
 
     args = parser.parse_args()
     settings.update_user_args(args.user_args)
-    app = Cli(args)
+    app = Cli(args.project, args.build_server, args.interactive, args.dry, args.list, args.template)
     return app.run()
