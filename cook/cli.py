@@ -3,6 +3,7 @@ import sys
 sys.dont_write_bytecode = True
 
 import argparse
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from .library.logger import log
@@ -10,14 +11,15 @@ from .library.selector import SelectionInterrupt, Selector
 from .main import Main
 from .settings import settings
 from .template import TEMPLATES
-from collections.abc import Sequence
-from collections.abc import Callable
 
 type StepResult = int | None
 type Step = Callable[[], StepResult]
 
+
 class Cli:
-    def __init__(self, project: str | None, build_server: str | None, interactive: bool, dry_run: bool, list_only: bool, template: int) -> None:
+    def __init__(
+        self, project: str | None, build_server: str | None, interactive: bool, dry_run: bool, list_only: bool, template: int
+    ) -> None:
         self.project = project
         self.build_server = build_server
 
