@@ -50,7 +50,7 @@ class Main:
         if dry_run:
             log('Dry run finished', 'warning')
 
-    def get_projects(self):
+    def get_projects(self) -> tuple[list[str], str]:
         projects = self.configuration.get_project_names()
         default_project = self.recipe.default_project
         return projects, default_project

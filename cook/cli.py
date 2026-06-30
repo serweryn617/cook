@@ -18,7 +18,7 @@ type Step = Callable[[], StepResult]
 
 class Cli:
     def __init__(
-        self, project: str | None, build_server: str | None, interactive: bool, dry_run: bool, list_only: bool, template: int
+        self, project: str | None, build_server: str | None, interactive: bool, dry_run: bool, list_only: bool, template: int | None
     ) -> None:
         self.project = project
         self.build_server = build_server
