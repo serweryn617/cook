@@ -28,7 +28,7 @@ class Cli:
 
         self.recipe_base_path = Path.cwd().resolve()
 
-    def generate_template(self) -> int | None:
+    def generate_template(self) -> StepResult:
         if self.template is None:
             return
 
@@ -48,7 +48,7 @@ class Cli:
         log(f'recipe_template{self.template}.py generated in {self.recipe_base_path}', 'log')
         return 0
 
-    def search_for_recipe(self) -> int | None:
+    def search_for_recipe(self) -> StepResult:
         dirs_to_check = [self.recipe_base_path] + list(self.recipe_base_path.parents)
         for directory in dirs_to_check:
             recipe_path = directory / 'recipe.py'
@@ -58,7 +58,7 @@ class Cli:
         log(f'recipe file not found in {self.recipe_base_path} or parent directories!', 'info')
         return 1
 
-    def initialize_main(self) -> None:
+    def initialize_main(self) -> StepResult:
         self.main_program = Main(self.recipe_base_path)
         self.main_program.initialize()
 
@@ -68,7 +68,7 @@ class Cli:
         self.project = self.project or self.default_project
         self.build_server = self.build_server or self.default_build_server
 
-    def list_items(self) -> int | None:
+    def list_items(self) -> StepResult:
         '''List build servers and projects defined in recipe file.'''
         if not self.list_only:
             return
@@ -96,11 +96,11 @@ class Cli:
             else:
                 log(f' - {item}', internal=False)
 
-    def update_build_server(self) -> None:
+    def update_build_server(self) -> StepResult:
         if self.build_server is None and len(self.build_servers) == 1:
             self.build_server = self.build_servers[0]
 
-    def select_parameters_interactively(self) -> int | None:
+    def select_parameters_interactively(self) -> StepResult:
         try:
             if self.interactive or self.project is None:
                 self.project = select_interactively('Project', self.projects, self.default_project)
@@ -112,7 +112,7 @@ class Cli:
             print("\nCancelled by user\n")
             return 1
 
-    def configure_and_execute(self) -> None:
+    def configure_and_execute(self) -> StepResult:
         self.main_program.configure(self.project, self.build_server)
         self.main_program.run(dry_run=self.dry_run)
 
@@ -134,7 +134,7 @@ class Cli:
         return 0
 
 
-def select_interactively(message, elements, default):
+def select_interactively(message: str, elements: Sequence[str] | None, default: str) -> None:
     if elements is None:
         return
 
@@ -144,7 +144,7 @@ def select_interactively(message, elements, default):
     return selected
 
 
-def cli():
+def cli() -> int:
     epilog_text = '\n'.join(
         (
             'example usage:',
