@@ -136,7 +136,7 @@ class Cli:
         return 0
 
 
-def select_interactively(message: str, elements: Sequence[str] | None, default: str) -> None:
+def select_interactively(message: str, elements: Sequence[str] | None, default: str) -> str | None:
     if elements is None:
         return
 

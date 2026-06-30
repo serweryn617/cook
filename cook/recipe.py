@@ -3,16 +3,18 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .project import Project
+
 
 class RecipeError(Exception):
     pass
 
 
 class Recipe:
-    default_project: str
-    default_build_server: str
-    executable: str
-    projects: dict[Any]
+    default_project: str | None
+    default_build_server: str | None
+    executable: str | None
+    projects: dict[str, Any] | list[Project]
 
     def __init__(self, base_path: str | Path):
         self.base_path = Path(base_path)
@@ -30,7 +32,7 @@ class Recipe:
 
         self._update(vars(recipe))
 
-    def _update(self, settings):
+    def _update(self, settings: dict[str, Any]):
         for key in self.__annotations__.keys():
             try:
                 value = settings[key]

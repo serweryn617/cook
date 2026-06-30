@@ -2,17 +2,19 @@ from .build_server import BuildServer, LocalBuildServer
 from .build_step import BuildStep, convert_build_steps
 from .sync import SyncItem
 
+from collections.abc import Sequence
+from typing import Any
 
 class Project:
     def __init__(
         self,
         *,
         name: str,
-        build_steps: list[BuildStep] = None,
-        build_servers: list[BuildServer] = (LocalBuildServer(),),
-        send: list[SyncItem] = None,
-        receive: list[SyncItem] = None,
-        components: list[str] = None,
+        build_steps: Sequence[BuildStep] | None = None,
+        build_servers: Sequence[BuildServer] | None = (LocalBuildServer(),),
+        send: Sequence[SyncItem] | None = None,
+        receive: Sequence[SyncItem] | None = None,
+        components: Sequence[str] | None = None,
     ):
         self.name = name
         self.build_steps = build_steps
@@ -22,16 +24,16 @@ class Project:
         self.components = components
 
 
-def convert_projects(projects: dict | list[Project]):
+def convert_projects(projects: dict[str, Any] | Sequence[Project]) -> Sequence[Project]:
     if isinstance(projects, dict):
         return convert_from_dict(projects)
-    elif isinstance(projects, list) and all(isinstance(p, Project) for p in projects):
+    elif isinstance(projects, (list, tuple)) and all(isinstance(p, Project) for p in projects):
         return projects
     else:
         raise RuntimeError('Projects should be a dict or list of Projects')
 
 
-def local_build_from_list(name, steps):
+def local_build_from_list(name: str, steps):
     return Project(
         name=name,
         build_servers=[LocalBuildServer()],

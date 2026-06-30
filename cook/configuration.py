@@ -1,13 +1,11 @@
 from copy import copy
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any
 
-from .build_server import BuildServer, LocalBuildServer
-from .build_step import BuildStep
+from .build_server import BuildServer
 from .exception import ConfigurationError
 from .project import convert_projects
-
+from .recipe import Recipe
 
 class BuildType(Enum):
     LOCAL = auto()
@@ -16,7 +14,7 @@ class BuildType(Enum):
 
 
 class ProjectConfiguration:
-    def __init__(self, recipe):
+    def __init__(self, recipe: Recipe):
         self.projects = convert_projects(recipe.projects)
         self.build_servers = self._preprocess_build_servers()
 
@@ -27,7 +25,7 @@ class ProjectConfiguration:
         self.base_path = recipe.base_path
         self.skip = False
 
-    def setup(self, project=None, server=None):
+    def setup(self, project: str | None = None, server: str | None = None):
         if project is None:
             project = self.default_project
         if project is None:

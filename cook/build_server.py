@@ -24,5 +24,5 @@ class LocalBuildServer(BuildServer):
 
 
 class RemoteBuildServer(BuildServer):
-    def __init__(self, name, *, build_path='~', address=None, skip=False, override=False) -> None:
+    def __init__(self, name: str, *, build_path: str = '~', address: str | None = None, skip: bool = False, override: bool = False) -> None:
         super().__init__(name=name, address=address, build_path=build_path, skip=skip, override=override, is_local=False)
