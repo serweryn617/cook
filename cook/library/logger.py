@@ -13,7 +13,7 @@ THEME = {
 }
 
 
-def log(message, style=None, bold=False, internal=True):
+def log(message: str, style: str | None = None, bold: bool = False, internal: bool = True):
     message = str(message)
 
     if internal:

@@ -1,8 +1,13 @@
+from collections.abc import Callable
+
+type Key = Callable[[int], str]
+type Color = Callable[[int, int, int], str]
+
 class EscapeCodes:
-    up = lambda n: f'\x1b[{n}A'
-    down = lambda n: f'\x1b[{n}B'
-    right = lambda n: f'\x1b[{n}C'
-    left = lambda n: f'\x1b[{n}D'
+    up: Key = lambda n: f'\x1b[{n}A'
+    down: Key = lambda n: f'\x1b[{n}B'
+    right: Key = lambda n: f'\x1b[{n}C'
+    left: Key = lambda n: f'\x1b[{n}D'
 
     line_begin = '\x1b[1G'
 
@@ -10,8 +15,8 @@ class EscapeCodes:
     show_cursor = '\x1b[?25h'
     clear_after_cursor = '\x1b[0J'
 
-    fg = lambda r, g, b: f'\x1b[38;2;{r};{g};{b}m'
-    bg = lambda r, g, b: f'\x1b[48;2;{r};{g};{b}m'
+    fg: Color = lambda r, g, b: f'\x1b[38;2;{r};{g};{b}m'
+    bg: Color = lambda r, g, b: f'\x1b[48;2;{r};{g};{b}m'
 
     bold = '\x1b[1m'
     bold_reset = '\x1b[22m'

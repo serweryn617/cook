@@ -3,14 +3,14 @@ import sys
 from .key import getkey
 from .logger import ORANGE
 from .terminal import EscapeCodes, UnixKeys, WindowsKeys
-
+from collections.abc import Sequence
 
 class SelectionInterrupt(Exception):
     pass
 
 
 class Selector:
-    def __init__(self, elements: tuple | list, message: str = '', cursor: str = '>', default=None):
+    def __init__(self, elements: Sequence[str], message: str = '', cursor: str = '>', default: str | None = None):
         self.elements = elements
         self.num = len(elements)
         self.cursor = cursor
@@ -20,7 +20,7 @@ class Selector:
 
         self.default_index = elements.index(default) if default is not None else 0
 
-    def select(self):
+    def select(self) -> str:
         print(EscapeCodes.fg(*ORANGE) + f'Select{" " + self.message if self.message else ""}:' + EscapeCodes.reset)
         print(EscapeCodes.hide_cursor, end='')
 
@@ -61,7 +61,7 @@ class Selector:
         self._cleanup(current)
         return self.elements[current]
 
-    def _cleanup(self, current):
+    def _cleanup(self, current: int) -> None:
         print(EscapeCodes.up(current + 1) + EscapeCodes.line_begin, end='')
         print(EscapeCodes.clear_after_cursor, end='')
         print(EscapeCodes.show_cursor, end='')
