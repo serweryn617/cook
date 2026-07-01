@@ -19,13 +19,13 @@ class Rsync:
     exclude = "--exclude="
 
     # TODO: add rsync for local build
-    def __init__(self, hostname, local_base, remote_base, dry_run=False):
+    def __init__(self, hostname, local_base, remote_base, dry_run=False) -> None:
         self.hostname = hostname
         self.local_base = local_base
         self.remote_base = remote_base
         self.dry_run = dry_run
 
-    def _sync(self, src, dst, exludes):
+    def _sync(self, src, dst, exludes) -> None:
         cmd = list(Rsync.command)
         cmd.append(src)
         cmd.append(dst)
@@ -42,7 +42,7 @@ class Rsync:
                 excludes.append(rsync_item.parse())
         return excludes
 
-    def _sync_multiple(self, rsync_items, **parser_args):
+    def _sync_multiple(self, rsync_items, **parser_args) -> None:
         excludes = self._get_exclude_list(rsync_items)
 
         if excludes:
@@ -63,7 +63,7 @@ class Rsync:
 
             self._sync(src, dst, excludes)
 
-    def send(self, rsync_items):
+    def send(self, rsync_items) -> None:
         self._sync_multiple(
             rsync_items,
             src_path=self.local_base,
@@ -71,7 +71,7 @@ class Rsync:
             dst_path=self.remote_base,
         )
 
-    def receive(self, rsync_items):
+    def receive(self, rsync_items) -> None:
         self._sync_multiple(
             rsync_items,
             src_hostname=self.hostname,

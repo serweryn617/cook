@@ -17,7 +17,7 @@ class Selector:
         message: str = "",
         cursor: str = ">",
         default: str | None = None,
-    ):
+    ) -> None:
         self.elements = elements
         self.num = len(elements)
         self.cursor = cursor

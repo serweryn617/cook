@@ -8,12 +8,12 @@ from .runner import ProjectRunner
 
 
 class Main:
-    def __init__(self, recipe_base_path):
+    def __init__(self, recipe_base_path) -> None:
         self.recipe_base_path = recipe_base_path
         self.project = None
         self.build_server = None
 
-    def initialize(self):
+    def initialize(self) -> None:
         try:
             self.recipe = Recipe(self.recipe_base_path)
             self.recipe.load()
@@ -23,11 +23,11 @@ class Main:
             log(e, "error")
             sys.exit(1)
 
-    def configure(self, project, build_server):
+    def configure(self, project, build_server) -> None:
         self.project = project
         self.build_server = build_server
 
-    def run(self, dry_run=False):
+    def run(self, dry_run=False) -> None:
         if dry_run:
             log("Dry run", "warning")
 

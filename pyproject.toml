@@ -46,6 +46,8 @@ select = [
     "B",
     # flake8-simplify
     "SIM",
+    # flake8-annotations
+    "ANN",
     # isort
     "I",
 ]

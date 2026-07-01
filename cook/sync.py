@@ -4,7 +4,7 @@ from pathlib import Path
 class SyncItem:
     is_exclude = False
 
-    def __init__(self, path: str):
+    def __init__(self, path: str) -> None:
         self.path = path
 
 
@@ -32,7 +32,7 @@ class SyncFile(SyncItem):
 
 
 class SyncDirectory(SyncFile):
-    def __init__(self, path: str = ""):
+    def __init__(self, path: str = "") -> None:
         self.path = path
 
     def parse(

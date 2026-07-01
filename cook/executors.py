@@ -4,12 +4,12 @@ from .process import ProcessRunner, SSHProcessRunner
 
 
 class Executor:
-    def __init__(self, name=None, dry_run=False, executable=None):
+    def __init__(self, name=None, dry_run=False, executable=None) -> None:
         self.name = name
         self.dry_run = dry_run
         self.executable = executable
 
-    def _run(self, runner, step):
+    def _run(self, runner, step) -> None:
         if self.dry_run:
             return
 
@@ -24,7 +24,7 @@ class Executor:
 
 
 class LocalExecutor(Executor):
-    def run_multiple(self, steps):
+    def run_multiple(self, steps) -> None:
         runner = ProcessRunner(self.executable)
         for step in steps:
             log(f"Local Step: {step.workdir}: {step.command}", "log")
@@ -33,7 +33,7 @@ class LocalExecutor(Executor):
 
 
 class RemoteExecutor(Executor):
-    def run_multiple(self, steps):
+    def run_multiple(self, steps) -> None:
         runner = SSHProcessRunner(self.name)
         for step in steps:
             log(f"Remote Step: {self.name}:{step.workdir}: {step.command}", "log")

@@ -16,7 +16,7 @@ class Project:
         send: Sequence[SyncItem] | None = None,
         receive: Sequence[SyncItem] | None = None,
         components: Sequence[str] | None = None,
-    ):
+    ) -> None:
         self.name = name
         self.build_steps = build_steps
         self.build_servers = build_servers

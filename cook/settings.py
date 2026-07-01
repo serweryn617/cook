@@ -1,5 +1,5 @@
 class Settings:
-    def __init__(self):
+    def __init__(self) -> None:
         self.args = {}
         self.flags = []
 
@@ -16,7 +16,7 @@ class Settings:
                 flags.append(user_arg)
         return args, flags
 
-    def update_user_args(self, user_args):
+    def update_user_args(self, user_args) -> None:
         user_args, user_flags = self._parse_user_args(user_args)
         settings.args.update(user_args)
         settings.flags.extend(user_flags)

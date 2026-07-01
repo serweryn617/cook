@@ -15,7 +15,7 @@ class BuildType(Enum):
 
 
 class ProjectConfiguration:
-    def __init__(self, recipe: Recipe):
+    def __init__(self, recipe: Recipe) -> None:
         self.projects = convert_projects(recipe.projects)
         self.build_servers = self._preprocess_build_servers()
 
@@ -26,7 +26,7 @@ class ProjectConfiguration:
         self.base_path = recipe.base_path
         self.skip = False
 
-    def setup(self, project: str | None = None, server: str | None = None):
+    def setup(self, project: str | None = None, server: str | None = None) -> None:
         if project is None:
             project = self.default_project
         if project is None:
@@ -61,7 +61,7 @@ class ProjectConfiguration:
 
         return build_servers
 
-    def _set_project(self, project_name):
+    def _set_project(self, project_name) -> None:
         projects_by_name = {p.name: p for p in self.projects}
         project_defined = project_name in projects_by_name
 
@@ -71,7 +71,7 @@ class ProjectConfiguration:
 
         self.project = projects_by_name[project_name]
 
-    def _set_build_server(self, build_server_name):
+    def _set_build_server(self, build_server_name) -> None:
         server_override = self._get_build_server_override()
         if server_override is not None:
             build_server_name = server_override
@@ -106,7 +106,7 @@ class ProjectConfiguration:
         if overrides:
             return overrides[0]
 
-    def _update_paths(self):
+    def _update_paths(self) -> None:
         if self.build_server.build_path is None:
             raise ConfigurationError(f"No build path defined for {self.project} on build server {self.build_server.name}")
 

@@ -5,12 +5,12 @@ from .rsync import Rsync
 
 
 class ProjectRunner:
-    def __init__(self, recipe, configuration, dry_run=False):
+    def __init__(self, recipe, configuration, dry_run=False) -> None:
         self.recipe = recipe
         self.configuration = configuration
         self.dry_run = dry_run
 
-    def run_project(self):
+    def run_project(self) -> None:
         build_type = self.configuration.get_build_type()
         self.build_server = self.configuration.get_build_server()
 
@@ -23,7 +23,7 @@ class ProjectRunner:
         else:
             raise RuntimeError(f"Unknown build type: {build_type}")
 
-    def _local_build(self):
+    def _local_build(self) -> None:
         build_steps = self.configuration.get_build_steps()
         executable = self.configuration.get_executable()
 
@@ -31,7 +31,7 @@ class ProjectRunner:
             executor = LocalExecutor("local", self.dry_run, executable)
             executor.run_multiple(build_steps)
 
-    def _remote_build(self):
+    def _remote_build(self) -> None:
         build_steps = self.configuration.get_build_steps()
         local_base, remote_base = self.configuration.get_base_paths()
         files_to_send = self.configuration.get_files_to_send()
@@ -53,7 +53,7 @@ class ProjectRunner:
             log("Receiving Files", "log")
             rsync.receive(files_to_receive)
 
-    def _composite_build(self):
+    def _composite_build(self) -> None:
         components = self.configuration.get_components()
 
         log("Running Composite Build", "log")
@@ -62,7 +62,7 @@ class ProjectRunner:
             log(f"Component: {component}", "log")
             self._run_component(component)
 
-    def _run_component(self, component):
+    def _run_component(self, component) -> None:
         try:
             component_configuration = ProjectConfiguration(self.recipe)
             component_configuration.setup(component, self.build_server)

@@ -16,10 +16,10 @@ class Recipe:
     executable: str | None
     projects: dict[str, Any] | list[Project]
 
-    def __init__(self, base_path: str | Path):
+    def __init__(self, base_path: str | Path) -> None:
         self.base_path = Path(base_path)
 
-    def load(self):
+    def load(self) -> None:
         recipe_file_path = self.base_path / "recipe.py"
 
         if not recipe_file_path.is_file():
@@ -32,7 +32,7 @@ class Recipe:
 
         self._update(vars(recipe))
 
-    def _update(self, settings: dict[str, Any]):
+    def _update(self, settings: dict[str, Any]) -> None:
         for key in self.__annotations__:
             try:
                 value = settings[key]

@@ -10,7 +10,7 @@ class ProcessRunner:
     POSIX_EXECUTABLE = "bash"
     NT_EXECUTABLE = "PowerShell"
 
-    def __init__(self, executable=None):
+    def __init__(self, executable=None) -> None:
         if executable is not None:
             self.executable = shutil.which(executable)
             if self.executable is None:
@@ -26,7 +26,7 @@ class ProcessRunner:
 
 
 class SSHProcessRunner:
-    def __init__(self, name):
+    def __init__(self, name) -> None:
         self.name = name
 
     def run(self, command, workdir="."):
