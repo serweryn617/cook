@@ -20,7 +20,7 @@ class Main:
             self.configuration = ProjectConfiguration(self.recipe)
 
         except (RecipeError, ConfigurationError) as e:
-            log(e, 'error')
+            log(e, "error")
             sys.exit(1)
 
     def configure(self, project, build_server):
@@ -29,7 +29,7 @@ class Main:
 
     def run(self, dry_run=False):
         if dry_run:
-            log('Dry run', 'warning')
+            log("Dry run", "warning")
 
         try:
             self.configuration.setup(self.project, self.build_server)
@@ -38,17 +38,17 @@ class Main:
             runner.run_project()
 
         except ConfigurationError as e:
-            log(e, 'error')
+            log(e, "error")
             sys.exit(1)
 
         except ProcessError as e:
-            log(e, 'error')
+            log(e, "error")
             sys.exit(e.return_code)
 
-        log(f'Finished running {self.project} on {self.build_server}', 'info')
+        log(f"Finished running {self.project} on {self.build_server}", "info")
 
         if dry_run:
-            log('Dry run finished', 'warning')
+            log("Dry run finished", "warning")
 
     def get_projects(self) -> tuple[list[str], str]:
         projects = self.configuration.get_project_names()

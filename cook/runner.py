@@ -21,14 +21,14 @@ class ProjectRunner:
         elif build_type == BuildType.REMOTE:
             self._remote_build()
         else:
-            raise RuntimeError(f'Unknown build type: {build_type}')
+            raise RuntimeError(f"Unknown build type: {build_type}")
 
     def _local_build(self):
         build_steps = self.configuration.get_build_steps()
         executable = self.configuration.get_executable()
 
         if build_steps:
-            executor = LocalExecutor('local', self.dry_run, executable)
+            executor = LocalExecutor("local", self.dry_run, executable)
             executor.run_multiple(build_steps)
 
     def _remote_build(self):
@@ -42,7 +42,7 @@ class ProjectRunner:
             rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
 
         if files_to_send:
-            log('Sending Files', 'log')
+            log("Sending Files", "log")
             rsync.send(files_to_send)
 
         if build_steps:
@@ -50,16 +50,16 @@ class ProjectRunner:
             executor.run_multiple(build_steps)
 
         if files_to_receive:
-            log('Receiving Files', 'log')
+            log("Receiving Files", "log")
             rsync.receive(files_to_receive)
 
     def _composite_build(self):
         components = self.configuration.get_components()
 
-        log('Running Composite Build', 'log')
+        log("Running Composite Build", "log")
 
         for component in components:
-            log(f'Component: {component}', 'log')
+            log(f"Component: {component}", "log")
             self._run_component(component)
 
     def _run_component(self, component):
@@ -70,5 +70,5 @@ class ProjectRunner:
             component_runner = ProjectRunner(self.recipe, component_configuration, self.dry_run)
             component_runner.run_project()
         except Exception as e:
-            log(f'Component {component} failed!', 'error')
+            log(f"Component {component} failed!", "error")
             raise e

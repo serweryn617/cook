@@ -1,6 +1,5 @@
 import shlex
 import subprocess
-from pathlib import Path
 
 from .exception import ProcessError
 from .library.logger import log
@@ -8,16 +7,16 @@ from .library.logger import log
 
 class Rsync:
     command = (
-        'rsync',
-        '--compress',
-        '--delete',
-        '--links',
-        '--recursive',
-        '--mkpath',
-        '--times',
-        '--info=progress2',
+        "rsync",
+        "--compress",
+        "--delete",
+        "--links",
+        "--recursive",
+        "--mkpath",
+        "--times",
+        "--info=progress2",
     )
-    exclude = '--exclude='
+    exclude = "--exclude="
 
     # TODO: add rsync for local build
     def __init__(self, hostname, local_base, remote_base, dry_run=False):
@@ -34,7 +33,7 @@ class Rsync:
 
         result = subprocess.run(shlex.join(cmd), shell=True)
         if result.returncode != 0:
-            raise ProcessError('rsync returned an error!', result.returncode)
+            raise ProcessError("rsync returned an error!", result.returncode)
 
     def _get_exclude_list(self, rsync_items):
         excludes = []
@@ -47,9 +46,9 @@ class Rsync:
         excludes = self._get_exclude_list(rsync_items)
 
         if excludes:
-            log('Excluding:')
+            log("Excluding:")
             for exclude in excludes:
-                log(f'  {exclude}')
+                log(f"  {exclude}")
 
         for rsync_item in rsync_items:
             if rsync_item.is_exclude:
@@ -57,7 +56,7 @@ class Rsync:
 
             src, dst = rsync_item.parse(**parser_args)
 
-            log(f'Transferring: {src} to {dst}')
+            log(f"Transferring: {src} to {dst}")
 
             if self.dry_run:
                 continue
@@ -65,7 +64,17 @@ class Rsync:
             self._sync(src, dst, excludes)
 
     def send(self, rsync_items):
-        self._sync_multiple(rsync_items, src_path=self.local_base, dst_hostname=self.hostname, dst_path=self.remote_base)
+        self._sync_multiple(
+            rsync_items,
+            src_path=self.local_base,
+            dst_hostname=self.hostname,
+            dst_path=self.remote_base,
+        )
 
     def receive(self, rsync_items):
-        self._sync_multiple(rsync_items, src_hostname=self.hostname, src_path=self.remote_base, dst_path=self.local_base)
+        self._sync_multiple(
+            rsync_items,
+            src_hostname=self.hostname,
+            src_path=self.remote_base,
+            dst_path=self.local_base,
+        )

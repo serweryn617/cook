@@ -17,14 +17,17 @@ class Executor:
 
         return_code = result.returncode
         if step.check and return_code != step.expected_return_code:
-            raise ProcessError(f'Encountered unexpected exit code {return_code}, expected {step.expected_return_code}', return_code)
+            raise ProcessError(
+                f"Encountered unexpected exit code {return_code}, expected {step.expected_return_code}",
+                return_code,
+            )
 
 
 class LocalExecutor(Executor):
     def run_multiple(self, steps):
         runner = ProcessRunner(self.executable)
         for step in steps:
-            log(f'Local Step: {step.workdir}: {step.command}', 'log')
+            log(f"Local Step: {step.workdir}: {step.command}", "log")
 
             self._run(runner, step)
 
@@ -33,6 +36,6 @@ class RemoteExecutor(Executor):
     def run_multiple(self, steps):
         runner = SSHProcessRunner(self.name)
         for step in steps:
-            log(f'Remote Step: {self.name}:{step.workdir}: {step.command}', 'log')
+            log(f"Remote Step: {self.name}:{step.workdir}: {step.command}", "log")
 
             self._run(runner, step)

@@ -1,9 +1,9 @@
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import patch
 
 import pytest
 
 from cook.exception import ConfigurationError
-from cook.process import ProcessRunner, SSHProcessRunner
+from cook.process import ProcessRunner
 
 
 @patch('os.name', 'posix')
@@ -56,7 +56,7 @@ def test_process_runner_custom_executable_not_found(mock_subprocess_run, mock_sh
     mock_subprocess_run.return_value.returncode = 1
     mock_shutil_which.return_value = None
 
-    with pytest.raises(ConfigurationError) as excinfo:
+    with pytest.raises(ConfigurationError):
         ProcessRunner('custom_shell')
 
     mock_shutil_which.assert_called_once_with('custom_shell')

@@ -1,4 +1,3 @@
-import pytest
 
 from cook.sync import SyncDirectory, SyncExclude, SyncFile
 
@@ -8,9 +7,9 @@ REMOTE_PATH_BASE = 'cook/remote'
 
 
 def test_sync_attributes():
-    assert SyncFile('test/sync/file').is_exclude == False
-    assert SyncDirectory('test/sync/dir').is_exclude == False
-    assert SyncExclude('test/sync/exclude').is_exclude == True
+    assert not SyncFile('test/sync/file').is_exclude
+    assert not SyncDirectory('test/sync/dir').is_exclude
+    assert SyncExclude('test/sync/exclude').is_exclude
 
 
 def test_sync_file_send():

@@ -32,7 +32,7 @@ def _getkey_windows() -> str:
     return c
 
 
-if sys.platform.startswith('linux'):
+if sys.platform.startswith("linux"):
     import termios
     import tty
 

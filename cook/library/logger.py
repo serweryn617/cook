@@ -6,10 +6,10 @@ ORANGE = 0xFF, 0x88, 0x00
 RED = 0xFF, 0x00, 0x00
 
 THEME = {
-    'log': GREEN,
-    'info': PURPLE,
-    'warning': ORANGE,
-    'error': RED,
+    "log": GREEN,
+    "info": PURPLE,
+    "warning": ORANGE,
+    "error": RED,
 }
 
 
@@ -17,7 +17,7 @@ def log(message: str, style: str | None = None, bold: bool = False, internal: bo
     message = str(message)
 
     if internal:
-        message = '==> ' + message
+        message = "==> " + message
 
     if bold:
         message = EscapeCodes.bold + message + EscapeCodes.reset

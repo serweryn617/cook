@@ -7,6 +7,7 @@ from .exception import ConfigurationError
 from .project import convert_projects
 from .recipe import Recipe
 
+
 class BuildType(Enum):
     LOCAL = auto()
     REMOTE = auto()
@@ -29,12 +30,12 @@ class ProjectConfiguration:
         if project is None:
             project = self.default_project
         if project is None:
-            raise ConfigurationError('No project selected!')
+            raise ConfigurationError("No project selected!")
 
         if server is None:
             server = self.default_build_server
         if server is None:
-            raise ConfigurationError('No build server selected!')
+            raise ConfigurationError("No build server selected!")
 
         self._set_project(project)
         self._set_build_server(server)
@@ -50,13 +51,13 @@ class ProjectConfiguration:
             if project.components is not None:
                 continue
             if not project.build_servers:
-                raise ConfigurationError(f'Build servers list not defined for project {project.name}')
+                raise ConfigurationError(f"Build servers list not defined for project {project.name}")
             build_servers.update([b.name for b in project.build_servers])
 
         build_servers = sorted(build_servers)
-        if 'local' in build_servers:
-            build_servers.remove('local')
-            build_servers.insert(0, 'local')
+        if "local" in build_servers:
+            build_servers.remove("local")
+            build_servers.insert(0, "local")
 
         return build_servers
 
@@ -66,7 +67,7 @@ class ProjectConfiguration:
 
         if not project_defined:
             # TODO: Print: did you mean xyz?
-            raise ConfigurationError(f'No such project {project}')
+            raise ConfigurationError(f"No such project {project_name}")
 
         self.project = projects_by_name[project_name]
 
@@ -84,9 +85,9 @@ class ProjectConfiguration:
                 self.build_server = build_server
                 break
         else:
-            raise ConfigurationError(f'Build server {build_server_name} not defined for {self.project}')
+            raise ConfigurationError(f"Build server {build_server_name} not defined for {self.project}")
 
-        if self.build_server.skip == True:
+        if self.build_server.skip:
             self.skip = True
 
     def _get_build_server_override(self):
@@ -96,18 +97,18 @@ class ProjectConfiguration:
 
         overrides = []
         for build_server in build_servers:
-            if build_server.override == True:
+            if build_server.override:
                 overrides.append(build_server.name)
 
         if len(overrides) > 1:
-            raise ConfigurationError(f'Multiple server overrides defined for {self.project}')
+            raise ConfigurationError(f"Multiple server overrides defined for {self.project}")
 
         if overrides:
             return overrides[0]
 
     def _update_paths(self):
         if self.build_server.build_path is None:
-            raise ConfigurationError(f'No build path defined for {self.project} on build server {self.build_server.name}')
+            raise ConfigurationError(f"No build path defined for {self.project} on build server {self.build_server.name}")
 
         build_path = Path(self.build_server.build_path)
         if self._is_local() and not build_path.is_absolute():
@@ -141,19 +142,19 @@ class ProjectConfiguration:
         return self.base_path.as_posix(), self.build_path.as_posix()
 
     def get_files_to_send(self):
-        if self.skip == True:
+        if self.skip:
             return None
 
         return self.project.send
 
     def get_files_to_receive(self):
-        if self.skip == True:
+        if self.skip:
             return None
 
         return self.project.receive
 
     def get_build_steps(self):
-        if self.skip == True:
+        if self.skip:
             return None
 
         build_steps = self.project.build_steps

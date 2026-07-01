@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import pytest
 
 from cook.build_server import LocalBuildServer, RemoteBuildServer
 from cook.build_step import BuildStep
@@ -46,7 +45,7 @@ def test_configuration_basic():
     assert configuration.get_base_paths() == ('/recipe/path', '/recipe/path')
     assert configuration.get_files_to_send() == mock_recipe.projects['build']['send']
     assert configuration.get_files_to_receive() == mock_recipe.projects['build']['receive']
-    assert configuration.get_components() == None
+    assert configuration.get_components() is None
 
     # build step workdir is parsed
     build_steps = configuration.get_build_steps()
@@ -69,7 +68,7 @@ def test_configuration_remote():
     assert configuration.get_base_paths() == ('/recipe/path', '/remote/path')
     assert configuration.get_files_to_send() == mock_recipe.projects['build']['send']
     assert configuration.get_files_to_receive() == mock_recipe.projects['build']['receive']
-    assert configuration.get_components() == None
+    assert configuration.get_components() is None
 
     # build step remote workdir
     build_steps = configuration.get_build_steps()

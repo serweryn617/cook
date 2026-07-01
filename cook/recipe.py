@@ -20,12 +20,12 @@ class Recipe:
         self.base_path = Path(base_path)
 
     def load(self):
-        recipe_file_path = self.base_path / 'recipe.py'
+        recipe_file_path = self.base_path / "recipe.py"
 
         if not recipe_file_path.is_file():
-            raise RecipeError(f'Recipe file not found in {self.base_path}')
+            raise RecipeError(f"Recipe file not found in {self.base_path}")
 
-        module_name = 'recipe'
+        module_name = "recipe"
 
         sys.path.insert(0, recipe_file_path.parent.as_posix())
         recipe = importlib.import_module(module_name)
@@ -33,11 +33,11 @@ class Recipe:
         self._update(vars(recipe))
 
     def _update(self, settings: dict[str, Any]):
-        for key in self.__annotations__.keys():
+        for key in self.__annotations__:
             try:
                 value = settings[key]
-            except KeyError:
-                if key == 'projects':
-                    raise RecipeError('Projects dictionary not found in recipe')
+            except KeyError as err:
+                if key == "projects":
+                    raise RecipeError("Projects dictionary not found in recipe") from err
                 value = None
             setattr(self, key, value)

@@ -9,8 +9,8 @@ class Settings:
         flags = []
 
         for user_arg in user_args:
-            if '=' in user_arg:
-                key, value = user_arg.split('=')
+            if "=" in user_arg:
+                key, value = user_arg.split("=")
                 args[key] = value
             else:
                 flags.append(user_arg)

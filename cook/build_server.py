@@ -20,9 +20,24 @@ class BuildServer:
 
 class LocalBuildServer(BuildServer):
     def __init__(self, *, skip: bool = False, override: bool = False) -> None:
-        super().__init__(name='local', build_path='.', skip=skip, override=override, is_local=True)
+        super().__init__(name="local", build_path=".", skip=skip, override=override, is_local=True)
 
 
 class RemoteBuildServer(BuildServer):
-    def __init__(self, name: str, *, build_path: str = '~', address: str | None = None, skip: bool = False, override: bool = False) -> None:
-        super().__init__(name=name, address=address, build_path=build_path, skip=skip, override=override, is_local=False)
+    def __init__(
+        self,
+        name: str,
+        *,
+        build_path: str = "~",
+        address: str | None = None,
+        skip: bool = False,
+        override: bool = False,
+    ) -> None:
+        super().__init__(
+            name=name,
+            address=address,
+            build_path=build_path,
+            skip=skip,
+            override=override,
+            is_local=False,
+        )

@@ -5,13 +5,13 @@ from .settings import settings
 from .sync import SyncDirectory, SyncExclude, SyncFile
 
 __all__ = [
-    'BuildServer',
-    'BuildStep',
-    'LocalBuildServer',
-    'Project',
-    'RemoteBuildServer',
-    'settings',
-    'SyncDirectory',
-    'SyncExclude',
-    'SyncFile',
+    "BuildServer",
+    "BuildStep",
+    "LocalBuildServer",
+    "Project",
+    "RemoteBuildServer",
+    "settings",
+    "SyncDirectory",
+    "SyncExclude",
+    "SyncFile",
 ]

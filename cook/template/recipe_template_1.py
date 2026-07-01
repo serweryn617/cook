@@ -1,4 +1,4 @@
-TEMPLATE = '''# Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
+TEMPLATE = """# Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
 # default_project = 'build'
 
@@ -24,4 +24,4 @@ projects['build'] = (
     # ('build', 'cmake --build .'),
     'echo "running cmake in build directory"',
 )
-'''
+"""
