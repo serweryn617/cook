@@ -37,6 +37,8 @@ class LocalExecutor(Executor):
 
 class RemoteExecutor(Executor):
     def run_multiple(self, steps: Sequence[BuildStep]) -> None:
+        assert self.name is not None
+
         runner = SSHProcessRunner(self.name)
         for step in steps:
             log(f"Remote Step: {self.name}:{step.workdir}: {step.command}", "log")

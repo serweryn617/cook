@@ -22,7 +22,7 @@ def _getkey_unix() -> str:
 
 
 def _getchar_windows() -> str:
-    return msvcrt.getwch()
+    return msvcrt.getwch()  # type: ignore
 
 
 def _getkey_windows() -> str:

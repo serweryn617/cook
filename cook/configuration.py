@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from copy import copy
 from enum import Enum, auto
 from pathlib import Path
@@ -5,8 +6,9 @@ from pathlib import Path
 from .build_server import BuildServer
 from .build_step import BuildStep
 from .exception import ConfigurationError
-from .project import convert_projects
+from .project import Project, convert_projects
 from .recipe import Recipe
+from .sync import SyncItem
 
 
 class BuildType(Enum):
@@ -73,6 +75,8 @@ class ProjectConfiguration:
         self.project = projects_by_name[project_name]
 
     def _set_build_server(self, build_server_name: str) -> None:
+        assert isinstance(self.project, Project)
+
         server_override = self._get_build_server_override()
         if server_override is not None:
             build_server_name = server_override
@@ -93,8 +97,6 @@ class ProjectConfiguration:
 
     def _get_build_server_override(self) -> str | None:
         build_servers = self.project.build_servers
-        if build_servers is None:
-            return None
 
         overrides: list[str] = []
         for build_server in build_servers:
@@ -117,14 +119,14 @@ class ProjectConfiguration:
         else:
             self.build_path = build_path
 
-    def _is_composite(self):
+    def _is_composite(self) -> bool:
         is_composite = self.project.components is not None
         return is_composite
 
-    def _is_local(self):
+    def _is_local(self) -> bool:
         return self.build_server.is_local
 
-    def get_build_type(self):
+    def get_build_type(self) -> BuildType:
         if self._is_composite():
             build_type = BuildType.COMPOSITE
         elif self._is_local():
@@ -134,27 +136,27 @@ class ProjectConfiguration:
 
         return build_type
 
-    def get_build_server(self):
+    def get_build_server(self) -> str:
         if self.build_server.address is not None:
             return self.build_server.address
         return self.build_server.name
 
-    def get_base_paths(self):
+    def get_base_paths(self) -> tuple[str, str]:
         return self.base_path.as_posix(), self.build_path.as_posix()
 
-    def get_files_to_send(self):
+    def get_files_to_send(self) -> Sequence[SyncItem] | None:
         if self.skip:
             return None
 
         return self.project.send
 
-    def get_files_to_receive(self):
+    def get_files_to_receive(self) -> Sequence[SyncItem] | None:
         if self.skip:
             return None
 
         return self.project.receive
 
-    def get_build_steps(self):
+    def get_build_steps(self) -> list[BuildStep] | None:
         if self.skip:
             return None
 
@@ -173,12 +175,12 @@ class ProjectConfiguration:
 
         return parsed_build_steps
 
-    def get_components(self):
+    def get_components(self) -> Sequence[str] | None:
         return self.project.components
 
-    def get_executable(self):
+    def get_executable(self) -> str | None:
         return self.executable
 
-    def get_project_names(self):
+    def get_project_names(self) -> list[str]:
         project_names = [p.name for p in self.projects]
         return project_names

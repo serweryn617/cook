@@ -11,7 +11,7 @@ class BuildServer:
     ) -> None:
         self.name = name
         # TODO: Add the ability to sync files locally
-        self.address = address or name
+        self.address = address
         self.build_path = build_path
         self.skip = skip
         self.override = override

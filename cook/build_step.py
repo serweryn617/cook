@@ -1,11 +1,12 @@
 from collections.abc import Sequence
+from pathlib import Path
 
 
 class BuildStep:
     def __init__(
         self,
         *,
-        workdir: str = ".",
+        workdir: str | Path = ".",
         command: str = "",
         expected_return_code: int = 0,
         check: bool = True,
@@ -20,9 +21,10 @@ type Commands = Sequence[str]
 type WorkdirCommands = Sequence[Sequence[str]]
 type ClassSteps = Sequence[BuildStep]
 
+type BuildSteps = Commands | WorkdirCommands | ClassSteps
 
 def convert_build_steps(
-    steps: Commands | WorkdirCommands | ClassSteps,
+    steps: BuildSteps,
 ) -> list[BuildStep]:
     step_objects: list[BuildStep] = []
 

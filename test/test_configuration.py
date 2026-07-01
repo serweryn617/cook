@@ -1,3 +1,5 @@
+# type: ignore
+
 from pathlib import Path
 
 from cook.build_server import LocalBuildServer, RemoteBuildServer

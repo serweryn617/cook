@@ -100,7 +100,7 @@ class Cli:
         # TODO: parse user args interactively before loading the recipe
 
     @staticmethod
-    def list_item(message: str, iterable: Sequence[str], default: str) -> None:
+    def list_item(message: str, iterable: Sequence[str], default: str | None) -> None:
         if not iterable:
             log(f"{message} not defined.", "warning")
             return
@@ -129,6 +129,9 @@ class Cli:
             return 1
 
     def configure_and_execute(self) -> StepResult:
+        assert self.project is not None
+        assert self.build_server is not None
+
         self.main_program.configure(self.project, self.build_server)
         self.main_program.run(dry_run=self.dry_run)
 
@@ -150,7 +153,7 @@ class Cli:
         return 0
 
 
-def select_interactively(message: str, elements: Sequence[str] | None, default: str) -> str | None:
+def select_interactively(message: str, elements: Sequence[str] | None, default: str | None) -> str | None:
     if elements is None:
         return
 

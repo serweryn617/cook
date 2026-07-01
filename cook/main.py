@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 from .configuration import ConfigurationError, ProjectConfiguration
 from .exception import ProcessError
@@ -8,7 +9,7 @@ from .runner import ProjectRunner
 
 
 class Main:
-    def __init__(self, recipe_base_path: str) -> None:
+    def __init__(self, recipe_base_path: Path) -> None:
         self.recipe_base_path = recipe_base_path
         self.project = None
         self.build_server = None

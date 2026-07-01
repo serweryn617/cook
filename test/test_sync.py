@@ -1,3 +1,5 @@
+# type: ignore
+
 from cook.sync import SyncDirectory, SyncFile
 
 HOSTNAME = "argon"

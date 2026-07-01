@@ -2,6 +2,7 @@ import os
 import shlex
 import shutil
 import subprocess
+from pathlib import Path
 
 from .exception import ConfigurationError
 
@@ -21,7 +22,7 @@ class ProcessRunner:
 
         self.executable = shutil.which(executable)  # if not found default system shell will be used
 
-    def run(self, command: str, workdir: str | None = None):
+    def run(self, command: str, workdir: str | Path):
         return subprocess.run(command, cwd=workdir, shell=True, executable=self.executable)
 
 
@@ -29,7 +30,7 @@ class SSHProcessRunner:
     def __init__(self, name: str) -> None:
         self.name = name
 
-    def run(self, command: str, workdir: str = "."):
+    def run(self, command: str, workdir: str | Path = "."):
         # Don't quote workdir so using special directories is allowed (e.g. ~)
         command = shlex.quote(f"cd {workdir} && {command}")
         command = f"ssh {self.name} {command}"

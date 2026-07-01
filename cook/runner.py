@@ -1,11 +1,12 @@
 from .configuration import BuildType, ProjectConfiguration
 from .executors import LocalExecutor, RemoteExecutor
 from .library.logger import log
+from .recipe import Recipe
 from .rsync import Rsync
 
 
 class ProjectRunner:
-    def __init__(self, recipe, configuration, dry_run=False) -> None:
+    def __init__(self, recipe: Recipe, configuration: ProjectConfiguration, dry_run: bool = False) -> None:
         self.recipe = recipe
         self.configuration = configuration
         self.dry_run = dry_run
@@ -37,9 +38,7 @@ class ProjectRunner:
         files_to_send = self.configuration.get_files_to_send()
         files_to_receive = self.configuration.get_files_to_receive()
 
-        setup_rsync = files_to_send or files_to_receive
-        if setup_rsync:
-            rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
+        rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
 
         if files_to_send:
             log("Sending Files", "log")
@@ -55,6 +54,7 @@ class ProjectRunner:
 
     def _composite_build(self) -> None:
         components = self.configuration.get_components()
+        assert components is not None
 
         log("Running Composite Build", "log")
 
@@ -62,7 +62,7 @@ class ProjectRunner:
             log(f"Component: {component}", "log")
             self._run_component(component)
 
-    def _run_component(self, component) -> None:
+    def _run_component(self, component: str) -> None:
         try:
             component_configuration = ProjectConfiguration(self.recipe)
             component_configuration.setup(component, self.build_server)
