@@ -10,7 +10,7 @@ class ProcessRunner:
     POSIX_EXECUTABLE = "bash"
     NT_EXECUTABLE = "PowerShell"
 
-    def __init__(self, executable=None) -> None:
+    def __init__(self, executable: str | None = None) -> None:
         if executable is not None:
             self.executable = shutil.which(executable)
             if self.executable is None:
@@ -21,15 +21,15 @@ class ProcessRunner:
 
         self.executable = shutil.which(executable)  # if not found default system shell will be used
 
-    def run(self, command, workdir=None):
+    def run(self, command: str, workdir: str | None = None):
         return subprocess.run(command, cwd=workdir, shell=True, executable=self.executable)
 
 
 class SSHProcessRunner:
-    def __init__(self, name) -> None:
+    def __init__(self, name: str) -> None:
         self.name = name
 
-    def run(self, command, workdir="."):
+    def run(self, command: str, workdir: str = "."):
         # Don't quote workdir so using special directories is allowed (e.g. ~)
         command = shlex.quote(f"cd {workdir} && {command}")
         command = f"ssh {self.name} {command}"

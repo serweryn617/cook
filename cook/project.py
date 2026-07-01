@@ -34,7 +34,7 @@ def convert_projects(projects: dict[str, Any] | Sequence[Project]) -> Sequence[P
         raise RuntimeError("Projects should be a dict or list of Projects")
 
 
-def local_build_from_list(name: str, steps):
+def local_build_from_list(name: str, steps: Sequence[BuildStep]) -> Project:
     return Project(
         name=name,
         build_servers=[LocalBuildServer()],
@@ -42,13 +42,13 @@ def local_build_from_list(name: str, steps):
     )
 
 
-def convert_from_dict(projects: dict):
-    preprocessed_projects = []
+def convert_from_dict(projects: dict[str, Any]) -> list[Project]:
+    preprocessed_projects: list[Project] = []
 
     for name, definition in projects.items():
         if isinstance(definition, dict):
             build_steps = convert_build_steps(definition["build_steps"]) if "build_steps" in definition else None
-            servers = definition["build_servers"] if "build_servers" in definition else [LocalBuildServer()]
+            servers = definition.get("build_servers", [LocalBuildServer()])
             send = definition.get("send", None)
             receive = definition.get("receive", None)
             components = definition.get("components", None)

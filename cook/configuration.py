@@ -3,6 +3,7 @@ from enum import Enum, auto
 from pathlib import Path
 
 from .build_server import BuildServer
+from .build_step import BuildStep
 from .exception import ConfigurationError
 from .project import convert_projects
 from .recipe import Recipe
@@ -45,8 +46,8 @@ class ProjectConfiguration:
 
         # TODO: validate recipe contents and print warnings
 
-    def _preprocess_build_servers(self):
-        build_servers = set()
+    def _preprocess_build_servers(self) -> list[str]:
+        build_servers: set[str] = set()
         for project in self.projects:
             if project.components is not None:
                 continue
@@ -54,14 +55,14 @@ class ProjectConfiguration:
                 raise ConfigurationError(f"Build servers list not defined for project {project.name}")
             build_servers.update([b.name for b in project.build_servers])
 
-        build_servers = sorted(build_servers)
-        if "local" in build_servers:
-            build_servers.remove("local")
-            build_servers.insert(0, "local")
+        build_servers_list = sorted(build_servers)
+        if "local" in build_servers_list:
+            build_servers_list.remove("local")
+            build_servers_list.insert(0, "local")
 
-        return build_servers
+        return build_servers_list
 
-    def _set_project(self, project_name) -> None:
+    def _set_project(self, project_name: str) -> None:
         projects_by_name = {p.name: p for p in self.projects}
         project_defined = project_name in projects_by_name
 
@@ -71,7 +72,7 @@ class ProjectConfiguration:
 
         self.project = projects_by_name[project_name]
 
-    def _set_build_server(self, build_server_name) -> None:
+    def _set_build_server(self, build_server_name: str) -> None:
         server_override = self._get_build_server_override()
         if server_override is not None:
             build_server_name = server_override
@@ -90,12 +91,12 @@ class ProjectConfiguration:
         if self.build_server.skip:
             self.skip = True
 
-    def _get_build_server_override(self):
+    def _get_build_server_override(self) -> str | None:
         build_servers = self.project.build_servers
         if build_servers is None:
             return None
 
-        overrides = []
+        overrides: list[str] = []
         for build_server in build_servers:
             if build_server.override:
                 overrides.append(build_server.name)
@@ -162,7 +163,7 @@ class ProjectConfiguration:
         if build_steps is None:
             return None
 
-        parsed_build_steps = []
+        parsed_build_steps: list[BuildStep] = []
 
         for step in build_steps:
             # shallow copy is enough as only a str is modified but be careful

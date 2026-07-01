@@ -1,14 +1,8 @@
-from cook.sync import SyncDirectory, SyncExclude, SyncFile
+from cook.sync import SyncDirectory, SyncFile
 
 HOSTNAME = "argon"
 LOCAL_PATH_BASE = "cook/local"
 REMOTE_PATH_BASE = "cook/remote"
-
-
-def test_sync_attributes() -> None:
-    assert not SyncFile("test/sync/file").is_exclude
-    assert not SyncDirectory("test/sync/dir").is_exclude
-    assert SyncExclude("test/sync/exclude").is_exclude
 
 
 def test_sync_file_send() -> None:
