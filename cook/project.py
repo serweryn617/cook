@@ -46,6 +46,7 @@ def local_build_from_list(name: str, steps: Sequence[BuildStep]) -> Project:
 type DictProject = dict[str, Any]
 type ListProject = Sequence[Any]
 
+
 def convert_from_dict(projects: dict[str, DictProject | ListProject]) -> list[Project]:
     preprocessed_projects: list[Project] = []
 

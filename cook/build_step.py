@@ -23,6 +23,7 @@ type ClassSteps = Sequence[BuildStep]
 
 type BuildSteps = Commands | WorkdirCommands | ClassSteps
 
+
 def convert_build_steps(
     steps: BuildSteps,
 ) -> list[BuildStep]:
