@@ -31,6 +31,13 @@ Issues = "https://github.com/serweryn617/cook/issues"
 [project.scripts]
 cook = "cook.cli:cli"
 
+[dependency-groups]
+dev = [
+    "ruff>=0.15",
+    "build==1.5.0",
+    "twine==6.2.0",
+]
+
 [tool.ruff]
 line-length = 140
 

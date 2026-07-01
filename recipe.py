@@ -13,7 +13,7 @@ projects = {
         "pytest",
     ],
     "release": [
-        # pip install --upgrade build twine
+        # pip install --group dev
         "rm -rf dist",
         "python3 -m build",
         "twine check --strict dist/*",
