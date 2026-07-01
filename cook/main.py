@@ -56,5 +56,5 @@ class Main:
         default_project = self.recipe.default_project
         return projects, default_project
 
-    def get_build_servers(self):
+    def get_build_servers(self) -> tuple[list[str], str | None]:
         return self.configuration.build_servers, self.recipe.default_build_server

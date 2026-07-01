@@ -3,11 +3,11 @@
 default_build_server = "local"
 
 projects = {
-    "format": [
-        "ruff format",
-    ],
     "check": [
         "ruff check --fix --unsafe-fixes",
+    ],
+    "format": [
+        "ruff format",
     ],
     "test": [
         "pytest",

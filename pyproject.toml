@@ -41,6 +41,9 @@ dev = [
 
 [tool.ruff]
 line-length = 140
+exclude = [
+    "test",
+]
 
 [tool.ruff.lint]
 select = [

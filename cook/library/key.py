@@ -3,7 +3,7 @@ import sys
 from .terminal import UnixKeys, WindowsKeys
 
 
-def _getchars_unix(num: int = 1):
+def _getchars_unix(num: int = 1) -> str:
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     tty.setraw(fd)

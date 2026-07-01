@@ -6,6 +6,8 @@ from pathlib import Path
 
 from .exception import ConfigurationError
 
+type ProcessOutput = subprocess.CompletedProcess[bytes]
+
 
 class ProcessRunner:
     POSIX_EXECUTABLE = "bash"
@@ -22,7 +24,7 @@ class ProcessRunner:
 
         self.executable = shutil.which(executable)  # if not found default system shell will be used
 
-    def run(self, command: str, workdir: str | Path | None = None):
+    def run(self, command: str, workdir: str | Path | None = None) -> ProcessOutput:
         return subprocess.run(command, cwd=workdir, shell=True, executable=self.executable)
 
 
@@ -30,7 +32,7 @@ class SSHProcessRunner:
     def __init__(self, name: str) -> None:
         self.name = name
 
-    def run(self, command: str, workdir: str | Path = "."):
+    def run(self, command: str, workdir: str | Path = ".") -> ProcessOutput:
         # Don't quote workdir so using special directories is allowed (e.g. ~)
         command = shlex.quote(f"cd {workdir} && {command}")
         command = f"ssh {self.name} {command}"
