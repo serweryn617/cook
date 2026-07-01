@@ -7,16 +7,16 @@ from cook.exception import ProcessError
 from cook.executors import LocalExecutor, RemoteExecutor
 
 
-@patch('cook.executors.ProcessRunner')
-def test_local_executor(MockProcessRunner):
+@patch("cook.executors.ProcessRunner")
+def test_local_executor(MockProcessRunner) -> None:
     mock_process_runner = MockProcessRunner.return_value
     mock_process_runner.run.return_value.returncode = 0
 
-    executable = 'shell'
+    executable = "shell"
     steps = [
-        BuildStep(command='cwd test command'),
-        BuildStep(workdir='work', command='test command'),
-        BuildStep(workdir='/work', command='absolute test command'),
+        BuildStep(command="cwd test command"),
+        BuildStep(workdir="work", command="test command"),
+        BuildStep(workdir="/work", command="absolute test command"),
     ]
 
     executor = LocalExecutor(executable=executable)
@@ -24,16 +24,16 @@ def test_local_executor(MockProcessRunner):
 
     expected_calls = (
         call(
-            'cwd test command',
-            workdir='.',
+            "cwd test command",
+            workdir=".",
         ),
         call(
-            'test command',
-            workdir='work',
+            "test command",
+            workdir="work",
         ),
         call(
-            'absolute test command',
-            workdir='/work',
+            "absolute test command",
+            workdir="/work",
         ),
     )
 
@@ -42,18 +42,18 @@ def test_local_executor(MockProcessRunner):
     mock_process_runner.run.assert_has_calls(expected_calls)
 
 
-@patch('subprocess.run')
-def test_remote_executor(mock_subprocess_run):
+@patch("subprocess.run")
+def test_remote_executor(mock_subprocess_run) -> None:
     mock_subprocess_run.return_value.returncode = 0
 
     steps = [
-        BuildStep(command='cwd test command'),
-        BuildStep(workdir='work', command='test command'),
-        BuildStep(workdir='/work', command='absolute test command'),
-        BuildStep(workdir='"dir with spaces"', command='command with spaces'),
+        BuildStep(command="cwd test command"),
+        BuildStep(workdir="work", command="test command"),
+        BuildStep(workdir="/work", command="absolute test command"),
+        BuildStep(workdir='"dir with spaces"', command="command with spaces"),
     ]
 
-    executor = RemoteExecutor('remote_host')
+    executor = RemoteExecutor("remote_host")
     executor.run_multiple(steps)
 
     expected_calls = (
@@ -70,7 +70,7 @@ def test_remote_executor(mock_subprocess_run):
             shell=True,
         ),
         call(
-            'ssh remote_host \'cd "dir with spaces" && command with spaces\'',
+            "ssh remote_host 'cd \"dir with spaces\" && command with spaces'",
             shell=True,
         ),
     )
@@ -79,12 +79,12 @@ def test_remote_executor(mock_subprocess_run):
     mock_subprocess_run.assert_has_calls(expected_calls)
 
 
-@patch('subprocess.run')
-def test_local_executor_dry_run(mock_subprocess_run):
+@patch("subprocess.run")
+def test_local_executor_dry_run(mock_subprocess_run) -> None:
     mock_subprocess_run.return_value.returncode = 0
 
     steps = [
-        BuildStep(command='cwd test command'),
+        BuildStep(command="cwd test command"),
     ]
 
     executor = LocalExecutor(dry_run=True)
@@ -93,27 +93,27 @@ def test_local_executor_dry_run(mock_subprocess_run):
     assert not mock_subprocess_run.called
 
 
-@patch('subprocess.run')
-def test_remote_executor_dry_run(mock_subprocess_run):
+@patch("subprocess.run")
+def test_remote_executor_dry_run(mock_subprocess_run) -> None:
     mock_subprocess_run.return_value.returncode = 0
 
     steps = [
-        BuildStep(command='cwd test command'),
+        BuildStep(command="cwd test command"),
     ]
 
-    executor = RemoteExecutor('remote_host', dry_run=True)
+    executor = RemoteExecutor("remote_host", dry_run=True)
     executor.run_multiple(steps)
 
     assert not mock_subprocess_run.called
 
 
-@patch('cook.executors.ProcessRunner')
-def test_local_executor_checks_returncode(MockProcessRunner):
+@patch("cook.executors.ProcessRunner")
+def test_local_executor_checks_returncode(MockProcessRunner) -> None:
     mock_process_runner = MockProcessRunner.return_value
     mock_process_runner.run.return_value.returncode = 123
 
     steps = [
-        BuildStep(command='cwd test command'),
+        BuildStep(command="cwd test command"),
     ]
 
     executor = LocalExecutor()
@@ -124,15 +124,15 @@ def test_local_executor_checks_returncode(MockProcessRunner):
     assert excinfo.value.return_code == 123
 
 
-@patch('subprocess.run')
-def test_remote_executor_checks_returncode(mock_subprocess_run):
+@patch("subprocess.run")
+def test_remote_executor_checks_returncode(mock_subprocess_run) -> None:
     mock_subprocess_run.return_value.returncode = 123
 
     steps = [
-        BuildStep(command='cwd test command'),
+        BuildStep(command="cwd test command"),
     ]
 
-    executor = RemoteExecutor('remote_host')
+    executor = RemoteExecutor("remote_host")
 
     with pytest.raises(ProcessError) as excinfo:
         executor.run_multiple(steps)
@@ -140,14 +140,14 @@ def test_remote_executor_checks_returncode(mock_subprocess_run):
     assert excinfo.value.return_code == 123
 
 
-@patch('cook.executors.ProcessRunner')
-def test_local_executor_returncodes(MockProcessRunner):
+@patch("cook.executors.ProcessRunner")
+def test_local_executor_returncodes(MockProcessRunner) -> None:
     mock_process_runner = MockProcessRunner.return_value
     mock_process_runner.run.return_value.returncode = 123
 
     steps = [
-        BuildStep(command='cwd test command', check=False),
-        BuildStep(workdir='work', command='test command', expected_return_code=123),
+        BuildStep(command="cwd test command", check=False),
+        BuildStep(workdir="work", command="test command", expected_return_code=123),
     ]
 
     executor = LocalExecutor()
@@ -155,12 +155,12 @@ def test_local_executor_returncodes(MockProcessRunner):
 
     expected_calls = (
         call(
-            'cwd test command',
-            workdir='.',
+            "cwd test command",
+            workdir=".",
         ),
         call(
-            'test command',
-            workdir='work',
+            "test command",
+            workdir="work",
         ),
     )
 
@@ -168,16 +168,16 @@ def test_local_executor_returncodes(MockProcessRunner):
     mock_process_runner.run.assert_has_calls(expected_calls)
 
 
-@patch('subprocess.run')
-def test_remote_executor_returncodes(mock_subprocess_run):
+@patch("subprocess.run")
+def test_remote_executor_returncodes(mock_subprocess_run) -> None:
     mock_subprocess_run.return_value.returncode = 123
 
     steps = [
-        BuildStep(command='cwd test command', check=False),
-        BuildStep(workdir='work', command='test command', expected_return_code=123),
+        BuildStep(command="cwd test command", check=False),
+        BuildStep(workdir="work", command="test command", expected_return_code=123),
     ]
 
-    executor = RemoteExecutor('remote_host')
+    executor = RemoteExecutor("remote_host")
     executor.run_multiple(steps)
 
     expected_calls = (
