@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
+type SyncItem = SyncSource | SyncExclude
 
-class SyncItem(ABC):
+
+class SyncSource(ABC):
     def __init__(self, path: str) -> None:
         self.path = path
 
@@ -16,7 +18,7 @@ class SyncItem(ABC):
     ) -> tuple[str, str]: ...
 
 
-class SyncFile(SyncItem):
+class SyncFile(SyncSource):
     def parse(
         self,
         src_hostname: str = "",
@@ -56,6 +58,9 @@ class SyncDirectory(SyncFile):
         return src + "/", dst
 
 
-class SyncExclude(SyncItem):
+class SyncExclude:
+    def __init__(self, path: str) -> None:
+        self.path = path
+
     def get_path(self) -> str:
         return self.path

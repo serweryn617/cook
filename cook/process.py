@@ -22,7 +22,7 @@ class ProcessRunner:
 
         self.executable = shutil.which(executable)  # if not found default system shell will be used
 
-    def run(self, command: str, workdir: str | Path):
+    def run(self, command: str, workdir: str | Path | None = None):
         return subprocess.run(command, cwd=workdir, shell=True, executable=self.executable)
 
 
