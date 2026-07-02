@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cook_builder"
-version = "0.4.0"
+version = "0.5.0"
 requires-python = ">=3.12"
 authors = [
   { name="Seweryn Rusecki" },
@@ -33,7 +33,7 @@ cook = "cook.cli:cli"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15",
+    "ruff==0.15.20",
     "build==1.5.0",
     "twine==6.2.0",
     "pytest==9.1.1",
