@@ -1,44 +1,14 @@
+from collections.abc import Sequence
 from copy import copy
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any
 
-from .build import BuildServer, BuildStep, LocalBuildServer
+from .build_server import BuildServer
+from .build_step import BuildStep
 from .exception import ConfigurationError
-
-
-def build_steps_from_list(steps):
-    step_objects = []
-
-    for step in steps:
-        if isinstance(step, BuildStep):
-            step_objects.append(step)
-        elif isinstance(step, str):
-            step_objects.append(BuildStep(command=step))
-        elif isinstance(step, (list, tuple)) and len(step) == 2 and isinstance(step[0], str) and isinstance(step[1], str):
-            step_objects.append(BuildStep(workdir=step[0], command=step[1]))
-        else:
-            raise RuntimeError(step, "should be string or list/tuple of 2 strings")
-
-    return step_objects
-
-
-def local_build_from_list(steps):
-    return {
-        'build_servers': [
-            LocalBuildServer(),
-        ],
-        'build_steps': build_steps_from_list(steps),
-    }
-
-
-def get_nested_item(source_dict, *keys, default=None):
-    nested_item = source_dict
-    for key in keys:
-        if key not in nested_item:
-            return default
-        nested_item = nested_item[key]
-    return nested_item
+from .project import Project, convert_projects
+from .recipe import Recipe
+from .sync import SyncItem
 
 
 class BuildType(Enum):
@@ -47,9 +17,9 @@ class BuildType(Enum):
     COMPOSITE = auto()
 
 
-class Configuration:
-    def __init__(self, recipe):
-        self.projects = self._preprocess_projects(recipe.projects)
+class ProjectConfiguration:
+    def __init__(self, recipe: Recipe) -> None:
+        self.projects = convert_projects(recipe.projects)
         self.build_servers = self._preprocess_build_servers()
 
         self.default_project = recipe.default_project
@@ -59,16 +29,16 @@ class Configuration:
         self.base_path = recipe.base_path
         self.skip = False
 
-    def setup(self, project=None, server=None):
+    def setup(self, project: str | None = None, server: str | None = None) -> None:
         if project is None:
             project = self.default_project
         if project is None:
-            raise ConfigurationError('No project selected!')
+            raise ConfigurationError("No project selected!")
 
         if server is None:
             server = self.default_build_server
         if server is None:
-            raise ConfigurationError('No build server selected!')
+            raise ConfigurationError("No build server selected!")
 
         self._set_project(project)
         self._set_build_server(server)
@@ -78,49 +48,35 @@ class Configuration:
 
         # TODO: validate recipe contents and print warnings
 
-    def _preprocess_projects(self, projects: dict[Any]):
-        # TODO: move preprocessing to Model class and create generic config model
-        preprocessed_projects = {}
-
-        for name, definition in projects.items():
-            if isinstance(definition, dict):
-                build_steps = get_nested_item(definition, 'build_steps')
-                if build_steps is not None and isinstance(build_steps, (list, tuple)):
-                    definition['build_steps'] = build_steps_from_list(build_steps)
-            elif isinstance(definition, (list, tuple)):
-                definition = local_build_from_list(definition)
-            else:
-                raise ConfigurationError('Unknown project format!')
-
-            preprocessed_projects[name] = definition
-
-        return preprocessed_projects
-
-    def _preprocess_build_servers(self):
-        build_servers = set()
-        for name, project in self.projects.items():
-            if 'components' in project:
+    def _preprocess_build_servers(self) -> list[str]:
+        build_servers: set[str] = set()
+        for project in self.projects:
+            if project.components is not None:
                 continue
-            if 'build_servers' not in project:
-                raise ConfigurationError(f'Build servers list not defined for project {name}')
-            build_servers.update([b.name for b in project['build_servers']])
+            if not project.build_servers:
+                raise ConfigurationError(f"Build servers list not defined for project {project.name}")
+            build_servers.update([b.name for b in project.build_servers])
 
-        build_servers = sorted(build_servers)
-        if 'local' in build_servers:
-            build_servers.remove('local')
-            build_servers.insert(0, 'local')
+        build_servers_list = sorted(build_servers)
+        if "local" in build_servers_list:
+            build_servers_list.remove("local")
+            build_servers_list.insert(0, "local")
 
-        return build_servers
+        return build_servers_list
 
-    def _set_project(self, project):
-        project_defined = project in self.projects
+    def _set_project(self, project_name: str) -> None:
+        projects_by_name = {p.name: p for p in self.projects}
+        project_defined = project_name in projects_by_name
 
         if not project_defined:
-            raise ConfigurationError(f'No such project {project}')
+            # TODO: Print: did you mean xyz?
+            raise ConfigurationError(f"No such project {project_name}")
 
-        self.project = project
+        self.project = projects_by_name[project_name]
 
-    def _set_build_server(self, build_server_name):
+    def _set_build_server(self, build_server_name: str) -> None:
+        assert isinstance(self.project, Project)
+
         server_override = self._get_build_server_override()
         if server_override is not None:
             build_server_name = server_override
@@ -129,35 +85,33 @@ class Configuration:
             self.build_server = BuildServer(name=build_server_name)
             return
 
-        for build_server in get_nested_item(self.projects, self.project, 'build_servers'):
+        for build_server in self.project.build_servers:
             if build_server.name == build_server_name:
                 self.build_server = build_server
                 break
         else:
-            raise ConfigurationError(f'Build server {build_server_name} not defined for {self.project}')
+            raise ConfigurationError(f"Build server {build_server_name} not defined for {self.project}")
 
-        if self.build_server.skip == True:
+        if self.build_server.skip:
             self.skip = True
 
-    def _get_build_server_override(self):
-        build_servers = get_nested_item(self.projects, self.project, 'build_servers')
-        if build_servers is None:
-            return None
+    def _get_build_server_override(self) -> str | None:
+        build_servers = self.project.build_servers
 
-        overrides = []
+        overrides: list[str] = []
         for build_server in build_servers:
-            if build_server.override == True:
+            if build_server.override:
                 overrides.append(build_server.name)
 
         if len(overrides) > 1:
-            raise ConfigurationError(f'Multiple server overrides defined for {self.project}')
+            raise ConfigurationError(f"Multiple server overrides defined for {self.project}")
 
         if overrides:
             return overrides[0]
 
-    def _update_paths(self):
+    def _update_paths(self) -> None:
         if self.build_server.build_path is None:
-            raise ConfigurationError(f'No build path defined for {self.project} on build server {self.build_server.name}')
+            raise ConfigurationError(f"No build path defined for {self.project} on build server {self.build_server.name}")
 
         build_path = Path(self.build_server.build_path)
         if self._is_local() and not build_path.is_absolute():
@@ -165,14 +119,14 @@ class Configuration:
         else:
             self.build_path = build_path
 
-    def _is_composite(self):
-        is_composite = 'components' in self.projects[self.project]
+    def _is_composite(self) -> bool:
+        is_composite = self.project.components is not None
         return is_composite
 
-    def _is_local(self):
+    def _is_local(self) -> bool:
         return self.build_server.is_local
 
-    def get_build_type(self):
+    def get_build_type(self) -> BuildType:
         if self._is_composite():
             build_type = BuildType.COMPOSITE
         elif self._is_local():
@@ -182,36 +136,36 @@ class Configuration:
 
         return build_type
 
-    def get_build_server(self):
+    def get_build_server(self) -> str:
         if self.build_server.address is not None:
             return self.build_server.address
         return self.build_server.name
 
-    def get_base_paths(self):
+    def get_base_paths(self) -> tuple[str, str]:
         return self.base_path.as_posix(), self.build_path.as_posix()
 
-    def get_files_to_send(self):
-        if self.skip == True:
+    def get_files_to_send(self) -> Sequence[SyncItem] | None:
+        if self.skip:
             return None
 
-        return get_nested_item(self.projects, self.project, 'send')
+        return self.project.send
 
-    def get_files_to_receive(self):
-        if self.skip == True:
+    def get_files_to_receive(self) -> Sequence[SyncItem] | None:
+        if self.skip:
             return None
 
-        return get_nested_item(self.projects, self.project, 'receive')
+        return self.project.receive
 
-    def get_build_steps(self):
-        if self.skip == True:
+    def get_build_steps(self) -> list[BuildStep] | None:
+        if self.skip:
             return None
 
-        build_steps = get_nested_item(self.projects, self.project, 'build_steps')
+        build_steps = self.project.build_steps
 
         if build_steps is None:
             return None
 
-        parsed_build_steps = []
+        parsed_build_steps: list[BuildStep] = []
 
         for step in build_steps:
             # shallow copy is enough as only a str is modified but be careful
@@ -221,9 +175,12 @@ class Configuration:
 
         return parsed_build_steps
 
-    def get_components(self):
-        components = get_nested_item(self.projects, self.project, 'components')
-        return components
+    def get_components(self) -> Sequence[str] | None:
+        return self.project.components
 
-    def get_executable(self):
+    def get_executable(self) -> str | None:
         return self.executable
+
+    def get_project_names(self) -> list[str]:
+        project_names = [p.name for p in self.projects]
+        return project_names

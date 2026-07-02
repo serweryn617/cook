@@ -1,4 +1,4 @@
-TEMPLATE = '''# Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
+TEMPLATE = """# Cooking recipe, checkout Cook at https://github.com/serweryn617/cook
 
 from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer
 from cook.sync import SyncDirectory, SyncExclude, SyncFile
@@ -98,4 +98,4 @@ projects['clean_remote'] = {
         BuildStep(command='rm -r cook_example'),
     ],
 }
-'''
+"""

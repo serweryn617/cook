@@ -2,39 +2,38 @@ import os
 import shlex
 import shutil
 import subprocess
+from pathlib import Path
 
 from .exception import ConfigurationError
-from .library.logger import log
+
+type ProcessOutput = subprocess.CompletedProcess[bytes]
 
 
 class ProcessRunner:
     POSIX_EXECUTABLE = "bash"
     NT_EXECUTABLE = "PowerShell"
 
-    def __init__(self, executable=None):
+    def __init__(self, executable: str | None = None) -> None:
         if executable is not None:
             self.executable = shutil.which(executable)
             if self.executable is None:
-                raise ConfigurationError(f'Executable not found: {executable}')
+                raise ConfigurationError(f"Executable not found: {executable}")
             return
 
-        if os.name == 'posix':
-            executable = self.POSIX_EXECUTABLE
-        else:
-            executable = self.NT_EXECUTABLE
+        executable = self.POSIX_EXECUTABLE if os.name == "posix" else self.NT_EXECUTABLE
 
         self.executable = shutil.which(executable)  # if not found default system shell will be used
 
-    def run(self, command, workdir=None):
+    def run(self, command: str, workdir: str | Path | None = None) -> ProcessOutput:
         return subprocess.run(command, cwd=workdir, shell=True, executable=self.executable)
 
 
 class SSHProcessRunner:
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
 
-    def run(self, command, workdir='.'):
+    def run(self, command: str, workdir: str | Path = ".") -> ProcessOutput:
         # Don't quote workdir so using special directories is allowed (e.g. ~)
-        command = shlex.quote(f'cd {workdir} && {command}')
-        command = f'ssh {self.name} {command}'
+        command = shlex.quote(f"cd {workdir} && {command}")
+        command = f"ssh {self.name} {command}"
         return subprocess.run(command, shell=True)

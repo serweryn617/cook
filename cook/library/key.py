@@ -1,9 +1,9 @@
 import sys
 
-from .terminal import EscapeCodes, UnixKeys, WindowsKeys
+from .terminal import UnixKeys, WindowsKeys
 
 
-def _getchars_unix(num=1):
+def _getchars_unix(num: int = 1) -> str:
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     tty.setraw(fd)
@@ -21,8 +21,8 @@ def _getkey_unix() -> str:
     return c
 
 
-def _getchar_windows():
-    return msvcrt.getwch()
+def _getchar_windows() -> str:
+    return msvcrt.getwch()  # type: ignore
 
 
 def _getkey_windows() -> str:
@@ -32,7 +32,7 @@ def _getkey_windows() -> str:
     return c
 
 
-if sys.platform.startswith('linux'):
+if sys.platform.startswith("linux"):
     import termios
     import tty
 

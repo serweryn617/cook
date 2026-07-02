@@ -1,15 +1,17 @@
+# type: ignore
+
 import sys
 
 import pytest
 
 from cook.recipe import Recipe
 
-TEST_RECIPE = '''
+TEST_RECIPE = """
 default_project = 'build'
 default_build_server = 'remote'
 projects = {'build': 'test'}
 unknown_field = 'content'
-'''
+"""
 
 
 @pytest.fixture
@@ -26,11 +28,11 @@ def restore_sys_path():
     sys.path = original
 
 
-def test_recipe_is_loaded(tmp_recipe, restore_sys_path):
+def test_recipe_is_loaded(tmp_recipe, restore_sys_path) -> None:
     recipe = Recipe(tmp_recipe)
     recipe.load()
 
-    assert recipe.default_project == 'build'
-    assert recipe.default_build_server == 'remote'
-    assert recipe.projects == {'build': 'test'}
-    assert not hasattr(recipe, 'unknown_field')
+    assert recipe.default_project == "build"
+    assert recipe.default_build_server == "remote"
+    assert recipe.projects == {"build": "test"}
+    assert not hasattr(recipe, "unknown_field")

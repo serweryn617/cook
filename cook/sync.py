@@ -1,43 +1,66 @@
+from abc import ABC, abstractmethod
 from pathlib import Path
 
+type SyncItem = SyncSource | SyncExclude
 
-class SyncItem:
-    is_exclude = False
 
-    def __init__(self, path: str):
+class SyncSource(ABC):
+    def __init__(self, path: str) -> None:
         self.path = path
 
+    @abstractmethod
+    def parse(
+        self,
+        src_hostname: str = "",
+        src_path: str = "",
+        dst_hostname: str = "",
+        dst_path: str = "",
+    ) -> tuple[str, str]: ...
 
-class SyncFile(SyncItem):
-    def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> tuple[str, str]:
+
+class SyncFile(SyncSource):
+    def parse(
+        self,
+        src_hostname: str = "",
+        src_path: str = "",
+        dst_hostname: str = "",
+        dst_path: str = "",
+    ) -> tuple[str, str]:
         # TODO: how to handle absolute paths?
         # different base path on remote server not supported at the moment for absolute paths
         src = Path(src_path) / self.path
         src = src.as_posix()
         if src_hostname:
-            src = src_hostname + ':' + src
+            src = src_hostname + ":" + src
 
         dst = Path(dst_path) / self.path
         dst = dst.as_posix()
         if dst_hostname:
-            dst = dst_hostname + ':' + dst
+            dst = dst_hostname + ":" + dst
 
         return src, dst
 
 
 class SyncDirectory(SyncFile):
-    def __init__(self, path: str = ''):
+    def __init__(self, path: str = "") -> None:
         self.path = path
 
-    def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> tuple[str, str]:
+    def parse(
+        self,
+        src_hostname: str = "",
+        src_path: str = "",
+        dst_hostname: str = "",
+        dst_path: str = "",
+    ) -> tuple[str, str]:
         src, dst = super().parse(src_hostname, src_path, dst_hostname, dst_path)
 
         # Add slash at the end to treat source as directory
-        return src + '/', dst
+        return src + "/", dst
 
 
-class SyncExclude(SyncItem):
-    is_exclude = True
+class SyncExclude:
+    def __init__(self, path: str) -> None:
+        self.path = path
 
-    def parse(self, src_hostname: str = '', src_path: str = '', dst_hostname: str = '', dst_path: str = '') -> str:
+    def get_path(self) -> str:
         return self.path

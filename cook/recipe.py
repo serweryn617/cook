@@ -3,39 +3,41 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .project import Project
+
 
 class RecipeError(Exception):
     pass
 
 
 class Recipe:
-    default_project: str
-    default_build_server: str
-    executable: str
-    projects: dict[Any]
+    default_project: str | None
+    default_build_server: str | None
+    executable: str | None
+    projects: dict[str, Any] | list[Project]
 
-    def __init__(self, base_path: str | Path):
+    def __init__(self, base_path: str | Path) -> None:
         self.base_path = Path(base_path)
 
-    def load(self):
-        recipe_file_path = self.base_path / 'recipe.py'
+    def load(self) -> None:
+        recipe_file_path = self.base_path / "recipe.py"
 
         if not recipe_file_path.is_file():
-            raise RecipeError(f'Recipe file not found in {self.base_path}')
+            raise RecipeError(f"Recipe file not found in {self.base_path}")
 
-        module_name = 'recipe'
+        module_name = "recipe"
 
         sys.path.insert(0, recipe_file_path.parent.as_posix())
         recipe = importlib.import_module(module_name)
 
         self._update(vars(recipe))
 
-    def _update(self, settings):
-        for key in self.__annotations__.keys():
+    def _update(self, settings: dict[str, Any]) -> None:
+        for key in self.__annotations__:
             try:
                 value = settings[key]
-            except KeyError:
-                if key == 'projects':
-                    raise RecipeError('Projects dictionary not found in recipe')
+            except KeyError as err:
+                if key == "projects":
+                    raise RecipeError("Projects dictionary not found in recipe") from err
                 value = None
             setattr(self, key, value)

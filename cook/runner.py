@@ -1,16 +1,17 @@
-from .configuration import BuildType, Configuration
+from .configuration import BuildType, ProjectConfiguration
 from .executors import LocalExecutor, RemoteExecutor
 from .library.logger import log
+from .recipe import Recipe
 from .rsync import Rsync
 
 
-class Cook:
-    def __init__(self, recipe, configuration, dry_run=False):
+class ProjectRunner:
+    def __init__(self, recipe: Recipe, configuration: ProjectConfiguration, dry_run: bool = False) -> None:
         self.recipe = recipe
         self.configuration = configuration
         self.dry_run = dry_run
 
-    def cook(self):
+    def run_project(self) -> None:
         build_type = self.configuration.get_build_type()
         self.build_server = self.configuration.get_build_server()
 
@@ -21,28 +22,26 @@ class Cook:
         elif build_type == BuildType.REMOTE:
             self._remote_build()
         else:
-            raise RuntimeError(f'Unknown build type: {build_type}')
+            raise RuntimeError(f"Unknown build type: {build_type}")
 
-    def _local_build(self):
+    def _local_build(self) -> None:
         build_steps = self.configuration.get_build_steps()
         executable = self.configuration.get_executable()
 
         if build_steps:
-            executor = LocalExecutor('local', self.dry_run, executable)
+            executor = LocalExecutor("local", self.dry_run, executable)
             executor.run_multiple(build_steps)
 
-    def _remote_build(self):
+    def _remote_build(self) -> None:
         build_steps = self.configuration.get_build_steps()
         local_base, remote_base = self.configuration.get_base_paths()
         files_to_send = self.configuration.get_files_to_send()
         files_to_receive = self.configuration.get_files_to_receive()
 
-        setup_rsync = files_to_send or files_to_receive
-        if setup_rsync:
-            rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
+        rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
 
         if files_to_send:
-            log('Sending Files', 'log')
+            log("Sending Files", "log")
             rsync.send(files_to_send)
 
         if build_steps:
@@ -50,25 +49,26 @@ class Cook:
             executor.run_multiple(build_steps)
 
         if files_to_receive:
-            log('Receiving Files', 'log')
+            log("Receiving Files", "log")
             rsync.receive(files_to_receive)
 
-    def _composite_build(self):
+    def _composite_build(self) -> None:
         components = self.configuration.get_components()
+        assert components is not None
 
-        log('Running Composite Build', 'log')
+        log("Running Composite Build", "log")
 
         for component in components:
-            log(f'Component: {component}', 'log')
+            log(f"Component: {component}", "log")
             self._run_component(component)
 
-    def _run_component(self, component):
+    def _run_component(self, component: str) -> None:
         try:
-            sub_configuration = Configuration(self.recipe)
-            sub_configuration.setup(component, self.build_server)
+            component_configuration = ProjectConfiguration(self.recipe)
+            component_configuration.setup(component, self.build_server)
 
-            sub_cook = Cook(self.recipe, sub_configuration, self.dry_run)
-            sub_cook.cook()
+            component_runner = ProjectRunner(self.recipe, component_configuration, self.dry_run)
+            component_runner.run_project()
         except Exception as e:
-            log(f'Component {component} failed!', 'error')
+            log(f"Component {component} failed!", "error")
             raise e

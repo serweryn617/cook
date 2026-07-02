@@ -1,87 +1,88 @@
+# type: ignore
+
 from pathlib import Path
 
-import pytest
-
-from cook.build import BuildStep, LocalBuildServer, RemoteBuildServer
-from cook.configuration import BuildType, Configuration
+from cook.build_server import LocalBuildServer, RemoteBuildServer
+from cook.build_step import BuildStep
+from cook.configuration import BuildType, ProjectConfiguration
 from cook.sync import SyncFile
 
 
 class MockRecipe:
-    def __init__(self):
-        self.default_project = 'build'
-        self.default_build_server = 'local'
-        self.build_servers = ['local', 'remote']
-        self.executable = '/bin/shell'
+    def __init__(self) -> None:
+        self.default_project = "build"
+        self.default_build_server = "local"
+        self.build_servers = ["local", "remote"]
+        self.executable = "/bin/shell"
         self.projects = {
-            'build': {
-                'build_servers': [
+            "build": {
+                "build_servers": [
                     LocalBuildServer(),
-                    RemoteBuildServer('remote', build_path='/remote/path'),
+                    RemoteBuildServer("remote", build_path="/remote/path"),
                 ],
-                'send': [
-                    SyncFile('test/input/file'),
+                "send": [
+                    SyncFile("test/input/file"),
                 ],
-                'build_steps': [
-                    BuildStep(command='cwd test command'),
-                    BuildStep(workdir='work', command='test command'),
-                    BuildStep(workdir='/work', command='absolute test command'),
+                "build_steps": [
+                    BuildStep(command="cwd test command"),
+                    BuildStep(workdir="work", command="test command"),
+                    BuildStep(workdir="/work", command="absolute test command"),
                 ],
-                'receive': [
-                    SyncFile('test/output/file'),
+                "receive": [
+                    SyncFile("test/output/file"),
                 ],
             },
         }
-        self.base_path = Path('/recipe/path')
+        self.base_path = Path("/recipe/path")
 
 
-def test_configuration_basic():
+def test_configuration_basic() -> None:
     mock_recipe = MockRecipe()
-    configuration = Configuration(mock_recipe)
+    configuration = ProjectConfiguration(mock_recipe)
     configuration.setup()
 
     assert configuration.get_build_type() == BuildType.LOCAL
-    assert configuration.get_build_server() == 'local'
-    assert configuration.get_base_paths() == ('/recipe/path', '/recipe/path')
-    assert configuration.get_files_to_send() == mock_recipe.projects['build']['send']
-    assert configuration.get_files_to_receive() == mock_recipe.projects['build']['receive']
-    assert configuration.get_components() == None
+    assert configuration.get_build_server() == "local"
+    assert configuration.get_base_paths() == ("/recipe/path", "/recipe/path")
+    assert configuration.get_files_to_send() == mock_recipe.projects["build"]["send"]
+    assert configuration.get_files_to_receive() == mock_recipe.projects["build"]["receive"]
+    assert configuration.get_components() is None
 
     # build step workdir is parsed
     build_steps = configuration.get_build_steps()
     assert len(build_steps) == 3
-    assert build_steps[0].workdir.as_posix() == '/recipe/path'
-    assert build_steps[0].command == 'cwd test command'
-    assert build_steps[1].workdir.as_posix() == '/recipe/path/work'
-    assert build_steps[1].command == 'test command'
-    assert build_steps[2].workdir.as_posix() == '/work'
-    assert build_steps[2].command == 'absolute test command'
+    assert build_steps[0].workdir.as_posix() == "/recipe/path"
+    assert build_steps[0].command == "cwd test command"
+    assert build_steps[1].workdir.as_posix() == "/recipe/path/work"
+    assert build_steps[1].command == "test command"
+    assert build_steps[2].workdir.as_posix() == "/work"
+    assert build_steps[2].command == "absolute test command"
 
 
-def test_configuration_remote():
+def test_configuration_remote() -> None:
     mock_recipe = MockRecipe()
-    configuration = Configuration(mock_recipe)
-    configuration.setup(server='remote')
+    configuration = ProjectConfiguration(mock_recipe)
+    configuration.setup(server="remote")
 
     assert configuration.get_build_type() == BuildType.REMOTE
-    assert configuration.get_build_server() == 'remote'
-    assert configuration.get_base_paths() == ('/recipe/path', '/remote/path')
-    assert configuration.get_files_to_send() == mock_recipe.projects['build']['send']
-    assert configuration.get_files_to_receive() == mock_recipe.projects['build']['receive']
-    assert configuration.get_components() == None
+    assert configuration.get_build_server() == "remote"
+    assert configuration.get_base_paths() == ("/recipe/path", "/remote/path")
+    assert configuration.get_files_to_send() == mock_recipe.projects["build"]["send"]
+    assert configuration.get_files_to_receive() == mock_recipe.projects["build"]["receive"]
+    assert configuration.get_components() is None
 
     # build step remote workdir
     build_steps = configuration.get_build_steps()
     assert len(build_steps) == 3
-    assert build_steps[0].workdir.as_posix() == '/remote/path'
-    assert build_steps[0].command == 'cwd test command'
-    assert build_steps[1].workdir.as_posix() == '/remote/path/work'
-    assert build_steps[1].command == 'test command'
-    assert build_steps[2].workdir.as_posix() == '/work'
-    assert build_steps[2].command == 'absolute test command'
+    assert build_steps[0].workdir.as_posix() == "/remote/path"
+    assert build_steps[0].command == "cwd test command"
+    assert build_steps[1].workdir.as_posix() == "/remote/path/work"
+    assert build_steps[1].command == "test command"
+    assert build_steps[2].workdir.as_posix() == "/work"
+    assert build_steps[2].command == "absolute test command"
 
 
-def test_configuration_composite():
+def test_configuration_composite() -> None:
     mock_recipe = MockRecipe()
     # fmt: off
     mock_recipe.projects['composite'] = {
@@ -92,13 +93,13 @@ def test_configuration_composite():
     }
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
-    configuration.setup(project='composite')
+    configuration = ProjectConfiguration(mock_recipe)
+    configuration.setup(project="composite")
 
-    assert configuration.get_components() == ['build', 'test']
+    assert configuration.get_components() == ["build", "test"]
 
 
-def test_configuration_build_server_override():
+def test_configuration_build_server_override() -> None:
     mock_recipe = MockRecipe()
     # fmt: off
     mock_recipe.projects['override_project'] = {
@@ -111,18 +112,18 @@ def test_configuration_build_server_override():
     }
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
-    configuration.setup(project='override_project', server='local')
+    configuration = ProjectConfiguration(mock_recipe)
+    configuration.setup(project="override_project", server="local")
 
-    assert configuration.get_build_server() == 'remote'
+    assert configuration.get_build_server() == "remote"
 
     build_steps = configuration.get_build_steps()
     assert len(build_steps) == 1
-    assert build_steps[0].workdir.as_posix() == 'remote/path'
-    assert build_steps[0].command == 'cwd test command'
+    assert build_steps[0].workdir.as_posix() == "remote/path"
+    assert build_steps[0].command == "cwd test command"
 
 
-def test_configuration_build_server_skip():
+def test_configuration_build_server_skip() -> None:
     mock_recipe = MockRecipe()
     # fmt: off
     mock_recipe.projects['skip_project'] = {
@@ -141,16 +142,16 @@ def test_configuration_build_server_skip():
     }
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
-    configuration.setup(project='skip_project', server='remote')
+    configuration = ProjectConfiguration(mock_recipe)
+    configuration.setup(project="skip_project", server="remote")
 
-    assert configuration.get_build_server() == 'remote'
+    assert configuration.get_build_server() == "remote"
     assert configuration.get_files_to_send() is None
     assert configuration.get_files_to_receive() is None
     assert configuration.get_build_steps() is None
 
 
-def test_configuration_build_steps_from_list():
+def test_configuration_build_steps_from_list() -> None:
     mock_recipe = MockRecipe()
     # fmt: off
     mock_recipe.projects['steps_list'] = {
@@ -164,18 +165,18 @@ def test_configuration_build_steps_from_list():
     }
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
-    configuration.setup(project='steps_list', server='local')
+    configuration = ProjectConfiguration(mock_recipe)
+    configuration.setup(project="steps_list", server="local")
 
     build_steps = configuration.get_build_steps()
     assert len(build_steps) == 2
-    assert build_steps[0].workdir.as_posix() == '/recipe/path'
-    assert build_steps[0].command == 'build step'
-    assert build_steps[1].workdir.as_posix() == '/recipe/path/workdir'
-    assert build_steps[1].command == 'step with workdir'
+    assert build_steps[0].workdir.as_posix() == "/recipe/path"
+    assert build_steps[0].command == "build step"
+    assert build_steps[1].workdir.as_posix() == "/recipe/path/workdir"
+    assert build_steps[1].command == "step with workdir"
 
 
-def test_configuration_local_project_from_list():
+def test_configuration_local_project_from_list() -> None:
     mock_recipe = MockRecipe()
     # fmt: off
     mock_recipe.projects['steps_list'] = [
@@ -184,14 +185,14 @@ def test_configuration_local_project_from_list():
     ]
     # fmt: on
 
-    configuration = Configuration(mock_recipe)
-    configuration.setup(project='steps_list', server='local')
+    configuration = ProjectConfiguration(mock_recipe)
+    configuration.setup(project="steps_list", server="local")
 
-    assert configuration.get_build_server() == 'local'
+    assert configuration.get_build_server() == "local"
 
     build_steps = configuration.get_build_steps()
     assert len(build_steps) == 2
-    assert build_steps[0].workdir.as_posix() == '/recipe/path'
-    assert build_steps[0].command == 'build step'
-    assert build_steps[1].workdir.as_posix() == '/recipe/path/workdir'
-    assert build_steps[1].command == 'step with workdir'
+    assert build_steps[0].workdir.as_posix() == "/recipe/path"
+    assert build_steps[0].command == "build step"
+    assert build_steps[1].workdir.as_posix() == "/recipe/path/workdir"
+    assert build_steps[1].command == "step with workdir"
