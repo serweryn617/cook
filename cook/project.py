@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from .build_server import BuildServer, LocalBuildServer
-from .build_step import BuildStep, convert_build_steps
+from .build_step import BuildStep, BuildStepDefinition, convert_build_steps
 from .sync import SyncItem
 
 
@@ -11,7 +11,7 @@ class Project:
         self,
         *,
         name: str,
-        build_steps: Sequence[BuildStep] | None = None,
+        build_steps: Sequence[BuildStepDefinition] | None = None,
         build_servers: Sequence[BuildServer] = (LocalBuildServer(),),
         send: Sequence[SyncItem] | None = None,
         receive: Sequence[SyncItem] | None = None,
@@ -35,7 +35,7 @@ def convert_projects(projects: dict[str, Any] | Sequence[Project]) -> Sequence[P
         raise RuntimeError("Projects should be a dict or list of Projects")
 
 
-def local_build_from_list(name: str, steps: Sequence[BuildStep]) -> Project:
+def local_build_from_list(name: str, steps: Sequence[BuildStepDefinition]) -> Project:
     return Project(
         name=name,
         build_servers=[LocalBuildServer()],
