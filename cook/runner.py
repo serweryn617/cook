@@ -1,8 +1,11 @@
+import platform
+
 from .configuration import BuildType, ProjectConfiguration
 from .executors import LocalExecutor, RemoteExecutor
 from .library.logger import log
 from .recipe import Recipe
 from .rsync import Rsync
+from .scp import Scp
 
 
 class ProjectRunner:
@@ -38,7 +41,10 @@ class ProjectRunner:
         files_to_send = self.configuration.get_files_to_send()
         files_to_receive = self.configuration.get_files_to_receive()
 
-        rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
+        if platform.system() == "Windows":
+            rsync = Scp(self.build_server, local_base, remote_base, self.dry_run)
+        else:
+            rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
 
         if files_to_send:
             log("Sending Files", "log")
