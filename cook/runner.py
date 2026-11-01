@@ -42,6 +42,7 @@ class ProjectRunner:
         files_to_receive = self.configuration.get_files_to_receive()
 
         if platform.system() == "Windows":
+            # TODO: Remove SCP or mark as unsupported on Windows, it works too slow
             rsync = Scp(self.build_server, local_base, remote_base, self.dry_run)
         else:
             rsync = Rsync(self.build_server, local_base, remote_base, self.dry_run)
