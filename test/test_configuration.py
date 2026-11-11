@@ -85,6 +85,11 @@ def test_configuration_remote() -> None:
 def test_configuration_composite() -> None:
     mock_recipe = MockRecipe()
     # fmt: off
+    mock_recipe.projects['test'] = {
+        'build_steps': [
+            BuildStep(command='test command'),
+        ],
+    }
     mock_recipe.projects['composite'] = {
         'components': [
             'build',

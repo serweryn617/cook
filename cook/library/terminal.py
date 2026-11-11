@@ -20,6 +20,7 @@ class EscapeCodes:
     bg: Color = lambda r, g, b: f"\x1b[48;2;{r};{g};{b}m"
 
     bold = "\x1b[1m"
+    dim = "\x1b[2m"
     bold_reset = "\x1b[22m"
     reset = "\x1b[0m"
 

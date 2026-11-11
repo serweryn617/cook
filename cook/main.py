@@ -6,6 +6,7 @@ from .exception import ProcessError
 from .library.logger import log
 from .recipe import Recipe, RecipeError
 from .runner import ProjectRunner
+from .server_checker import ServerChecker
 
 
 class Main:
@@ -55,6 +56,18 @@ class Main:
         projects = self.configuration.get_project_names()
         default_project = self.recipe.default_project
         return projects, default_project
+
+    def get_warnings(self) -> list[str]:
+        """Problems found in the definitions of all projects and their build servers."""
+        return ServerChecker(self.configuration).warnings()
+
+    def get_unusable_projects(self) -> dict[str, str]:
+        """Map every project without a usable build server to a short note."""
+        return ServerChecker(self.configuration).check_projects()
+
+    def check_build_servers(self, project: str) -> dict[str, list[str]]:
+        """Map every build server to the problems preventing its use for the project (empty list = usable)."""
+        return ServerChecker(self.configuration).check(project)
 
     def get_build_servers(self) -> tuple[list[str], str | None]:
         return self.configuration.build_servers, self.recipe.default_build_server
