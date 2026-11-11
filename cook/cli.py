@@ -4,7 +4,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from .library.logger import log
-from .library.selector import SelectionInterrupt, Selector
+from .library.selector import Element, SelectionInterrupt, Selector
 from .main import Main
 from .settings import settings
 from .template import TEMPLATES
@@ -125,7 +125,7 @@ class Cli:
                 self.build_server = select_interactively("Build Server", self.build_servers, self.default_build_server)
 
         except SelectionInterrupt:
-            print("\nCancelled by user\n")
+            log("Selection cancelled", "warning")
             return 1
 
     def configure_and_execute(self) -> StepResult:
@@ -158,7 +158,10 @@ def select_interactively(message: str, elements: Sequence[str] | None, default: 
         return
 
     visible = tuple(filter(lambda s: not s.startswith("_"), elements))
-    selected = Selector(visible, message, default=default).select()
+    if default not in visible:
+        default = None
+    elements = [Element(name) for name in visible]
+    selected = Selector(elements, message, default=default).select()
     log(f"Selected {message}: {selected}", "log")
     return selected
 

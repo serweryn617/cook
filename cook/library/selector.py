@@ -1,5 +1,7 @@
+import shutil
 import sys
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from .key import getkey
 from .logger import ORANGE
@@ -10,10 +12,31 @@ class SelectionInterrupt(Exception):
     pass
 
 
+class DisabledSelection(SelectionInterrupt):
+    """Raised when Enter is pressed on a disabled element."""
+
+    def __init__(self, element: str, note: str) -> None:
+        super().__init__(element, note)
+        self.element = element
+        self.note = note
+
+
+@dataclass
+class Element:
+    name: str
+    description: str = ""
+    disabled: bool = False
+    note: str = ""
+
+    def __str__(self) -> str:
+        note = f"({self.note}) " if self.note else ""
+        return f"{self.name}  {note}{self.description}"
+
+
 class Selector:
     def __init__(
         self,
-        elements: Sequence[str],
+        elements: Sequence[Element],
         message: str = "",
         cursor: str = ">",
         default: str | None = None,
@@ -23,6 +46,7 @@ class Selector:
         self.cursor = cursor
         self.cursor_len = len(cursor)
         self.message = message
+        self.width = shutil.get_terminal_size().columns
         assert self.cursor_len > 0, "Cursor must be at least 1 character!"
 
         self.default_index = elements.index(default) if default is not None else 0
@@ -32,11 +56,14 @@ class Selector:
         print(EscapeCodes.hide_cursor, end="")
 
         for elem in self.elements:
-            print(" ", " " * self.cursor_len, " ", elem, sep="")
+            line = " " + (" " * self.cursor_len) + " " + self._render(elem)
+            if len(line) > self.width:
+                line = line[: max(self.width - 3, 0)] + "..."
+            print(line)
         print(EscapeCodes.up(self.num) + EscapeCodes.right(1), end="")
 
         current = self.default_index
-        prev_current = current
+        previous = current
 
         if current:
             print(EscapeCodes.down(current), end="")
@@ -45,20 +72,24 @@ class Selector:
 
         while True:
             c = getkey()
+            # TODO: Remove kj keys, add search instead
             if c in (UnixKeys.up, WindowsKeys.up, "k"):
                 current -= 1
             elif c in (UnixKeys.down, WindowsKeys.down, "j"):
                 current += 1
             elif c == "\r":
+                if self.elements[current].disabled:
+                    self._cleanup(current)
+                    raise DisabledSelection(self.elements[current].name, self.elements[current].note)
                 break
             else:
                 self._cleanup(current)
                 raise SelectionInterrupt
             current %= self.num
 
-            if current != prev_current:
-                move = EscapeCodes.down(current - prev_current) if current > prev_current else EscapeCodes.up(prev_current - current)
-                prev_current = current
+            if current != previous:
+                move = EscapeCodes.down(current - previous) if current > previous else EscapeCodes.up(previous - current)
+                previous = current
 
                 print(" " * self.cursor_len + EscapeCodes.left(self.cursor_len), end="")
                 print(move, end="")
@@ -66,7 +97,15 @@ class Selector:
                 sys.stdout.flush()
 
         self._cleanup(current)
-        return self.elements[current]
+        return self.elements[current].name
+
+    def _render(self, elem: Element) -> str:
+        text = str(elem)
+
+        if not elem.disabled:
+            return text
+
+        return EscapeCodes.dim + text + EscapeCodes.reset
 
     def _cleanup(self, current: int) -> None:
         print(EscapeCodes.up(current + 1) + EscapeCodes.line_begin, end="")
