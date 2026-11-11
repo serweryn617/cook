@@ -41,6 +41,7 @@ class ProjectConfiguration:
             raise ConfigurationError("No build server selected!")
 
         self._set_project(project)
+        self._validate_components(project)
         self._set_build_server(server)
 
         if not self._is_composite():
@@ -73,6 +74,20 @@ class ProjectConfiguration:
             raise ConfigurationError(f"No such project {project_name}")
 
         self.project = projects_by_name[project_name]
+
+    # TODO: check also in verification
+    def _validate_components(self, project_name: str, stack: tuple[str, ...] = ()) -> None:
+        if project_name in stack:
+            chain = " -> ".join((*stack, project_name))
+            raise ConfigurationError(f"Circular component reference: {chain}")
+
+        projects_by_name = {p.name: p for p in self.projects}
+        project = projects_by_name[project_name]
+
+        for component in project.components or ():
+            if component not in projects_by_name:
+                raise ConfigurationError(f"Unknown component {component} in project {project_name}")
+            self._validate_components(component, (*stack, project_name))
 
     def _set_build_server(self, build_server_name: str) -> None:
         assert isinstance(self.project, Project)

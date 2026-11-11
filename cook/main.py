@@ -6,6 +6,7 @@ from .exception import ProcessError
 from .library.logger import log
 from .recipe import Recipe, RecipeError
 from .runner import ProjectRunner
+from .verification import Verification
 
 
 class Main:
@@ -55,6 +56,16 @@ class Main:
         projects = self.configuration.get_project_names()
         default_project = self.recipe.default_project
         return projects, default_project
+
+    def get_warnings(self) -> list[str]:
+        return Verification(self.configuration).warnings()
+
+    # TODO
+    # def get_unusable_projects(self) -> dict[str, str]:
+    #     return ServerChecker(self.configuration).check_projects()
+
+    # def check_build_servers(self, project: str) -> dict[str, list[str]]:
+    #     return ServerChecker(self.configuration).check(project)
 
     def get_build_servers(self) -> tuple[list[str], str | None]:
         return self.configuration.build_servers, self.recipe.default_build_server

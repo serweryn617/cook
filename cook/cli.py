@@ -4,7 +4,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from .library.logger import log
-from .library.selector import Element, SelectionInterrupt, Selector
+from .library.selector import DisabledSelection, Element, SelectionInterrupt, Selector
 from .main import Main
 from .settings import settings
 from .template import TEMPLATES
@@ -84,6 +84,10 @@ class Cli:
         self.project = self.project or self.default_project
         self.build_server = self.build_server or self.default_build_server
 
+    def report_problems(self) -> StepResult:
+        for warning in self.main_program.get_warnings():
+            log(warning, "warning")
+
     def list_items(self) -> StepResult:
         """List build servers and projects defined in recipe file."""
         if not self.list_only:
@@ -119,10 +123,22 @@ class Cli:
     def select_parameters_interactively(self) -> StepResult:
         try:
             if self.interactive or self.project is None:
+                # TODO
+                # unusable = self.main_program.get_unusable_projects()
+                # self.project = select_interactively("Project", self.projects, self.default_project, unusable)
                 self.project = select_interactively("Project", self.projects, self.default_project)
 
             if (self.interactive and len(self.build_servers) > 1) or self.build_server is None:
+                assert self.project is not None
+                # TODO
+                # problems = self.main_program.check_build_servers(self.project)
+                # disabled = {name: "; ".join(reasons) for name, reasons in problems.items() if reasons}
+                # self.build_server = select_interactively("Build Server", self.build_servers, self.default_build_server, disabled)
                 self.build_server = select_interactively("Build Server", self.build_servers, self.default_build_server)
+
+        except DisabledSelection as e:
+            log(f"Cannot select {e.element}: {e.note}", "error")
+            return 1
 
         except SelectionInterrupt:
             log("Selection cancelled", "warning")
@@ -140,6 +156,7 @@ class Cli:
             self.generate_template,
             self.search_for_recipe,
             self.initialize_main,
+            self.report_problems,
             self.list_items,
             self.update_build_server,
             self.select_parameters_interactively,
